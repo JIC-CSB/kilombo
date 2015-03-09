@@ -1,0 +1,447 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "gfx/SDL_gfxPrimitives.h"
+#include "SDL/SDL_thread.h"
+#include "SDL/SDL_timer.h"
+
+#include "display.h"
+#include "params.h"
+#include "rom8x8.h"
+#include "kilolib.h"
+#include "skilobot.h"
+
+
+//for mkdir
+#define _XOPEN_SOURCE 700
+#include <sys/stat.h>
+#include <sys/types.h>
+//windows: #include <direct.h> and use _mkdir, or use cygwin
+
+
+void draw_status(SDL_Surface *surface, int w, int h);
+
+extern void (*callback_F5) (void) ; // function pointer to user-defined callback function for F5 press
+extern void (*callback_F6) (void) ; // function pointer to user-defined callback function for F6 press
+                                    // run for *ALL* bots in sequence, used for reset
+
+extern char* (*callback_botinfo) (void) ; // function pointer to user-defined callback function for bot info
+
+SDL_Surface *screen;
+
+int quit = 0;
+
+int c_x = 0;
+int c_y = 0;
+float display_scale = 1;  
+int display_w = 1200;
+int display_h = 800;
+int saveVideo = 0;  //if non-zero, save screenshot every Nth frame
+
+void dieSDL(char *reason)
+{
+  fprintf(stderr, reason, SDL_GetError());
+  exit (1);
+}
+
+
+kilobot *grabbed = NULL; // the kilobot currently picked up with the mouse, or NULL
+kilobot *grabbedRot = NULL; // the kilobot currently picked for rotation, or NULL
+double angle; //variables for rotation
+int rotX0;
+
+/* find a bot close to the screen coordinates (x, y)
+ * return it's index, or -1 if no bot was found
+ */
+int find_bot_index (int x, int y)
+{
+  int RR = allbots[0]->radius * display_scale;
+  RR *= RR; // radius squared
+
+  int i;
+  for (i = 0; i < n_bots; i++)
+    {
+      int dx = allbots[i]->screen_x - x;
+      int dy = allbots[i]->screen_y - y;
+      int rr = dx*dx + dy*dy;
+      if (rr < RR)
+	return i;
+    }
+  return -1;
+}
+
+/* find a bot close to the screen coordinates (x, y)
+ * return a kilobot* to it, or NULL if no bot was found
+ */
+
+kilobot * find_bot (int x, int y)
+{
+  int i =  find_bot_index (x, y);
+  if (i >= 0)
+    return allbots[i];
+  else
+    return NULL;
+}
+
+
+void move_bot_to_mouse(kilobot *bot)
+{
+  int x, y;
+  SDL_GetMouseState (&x, &y);
+  bot->x = (x - c_x - display_w/2) / display_scale;
+  bot->y = (y - c_y - display_h/2) / display_scale;
+}
+
+/* try to grab a bot with the mouse*/
+void grab_bot(int x, int y)
+{
+  grabbed = find_bot (x, y);
+  if (grabbed)
+    move_bot_to_mouse(grabbed);
+}
+
+
+void rotateBot (kilobot *bot)
+{
+  int x, y;
+  SDL_GetMouseState (&x, &y);
+  
+  bot->direction = angle + (x-rotX0)*.05;
+}
+
+void grab_bot_rot(int x, int y)
+{
+  grabbedRot = find_bot (x, y);
+  if (grabbedRot)
+    {
+      rotX0 = x;
+      angle = grabbedRot->direction;
+    }
+}
+
+void release_bot()
+{
+  grabbed = NULL;
+  grabbedRot = NULL;
+}
+
+//try to open a file for reading. Return 1 if successful.
+int fileExists (char *fileName)
+{
+  FILE *f;
+  f = fopen (fileName, "rb");
+  if (f == NULL)
+    return 0;
+  fclose (f);
+  return 1;
+}
+
+void screenshot (SDL_Surface *s)
+{
+  static int screenshotN = 0;
+
+  if (screenshotN == 0) //at the first screenshot, make directory
+    mkdir ("screenshots", 0777);
+  // windows: use _mkdir ("screenshots");
+  
+  char fileName[200];
+  const char *bot_name = get_string_param("botName", "default");
+  while(1)
+    {
+      sprintf (fileName, "screenshots/%s%03d.bmp", bot_name, screenshotN);
+      if (!fileExists(fileName))
+	break;
+      screenshotN++;
+    }
+  //fileName now contains the first non-existing file name
+
+  if (SDL_SaveBMP(s, fileName))
+    dieSDL ("Could not save screenshot.\n");
+  else
+    printf ("Screenshot %s\n", fileName);
+}
+
+
+
+void input(void)
+{
+  static int save_tx_period_ticks = 1;
+ 
+  int i;
+  SDL_Event event;      
+  while (SDL_PollEvent(&event)) 
+    switch(event.type) 
+      {
+      case SDL_QUIT:
+	quit = 1;
+	break;
+      case SDL_KEYDOWN:
+	switch( event.key.keysym.sym )
+	  {
+	  case SDLK_ESCAPE:  
+	    quit = 1;           
+	    break;
+	  case SDLK_s:
+	    screenshot(screen);
+	    break;
+	  case SDLK_v:
+	    saveVideo = !saveVideo;
+	    break;
+	  case SDLK_SPACE:
+	    if (state==RUNNING)
+	      state = PAUSE;
+	    else if (state == PAUSE)
+	      state = RUNNING;
+	    break;
+	  case SDLK_a:    //add bot
+	    break;
+	  case SDLK_F5: // "userdefined" callback to the bot program - (reread JSON)
+	    if (callback_F5)
+	      callback_F5();
+	    break;
+	  case SDLK_F6: // "userdefined" callback to the bot program - (restart GRN)
+	    if (callback_F6)
+	      for (i = 0; i < n_bots; i++)
+		{
+		  current_bot = i;      // for Me() to return the right bot
+		  mydata = Me()->data;
+		  kilo_uid = i;         // XXX careful...
+		  callback_F6();
+		}
+	    break;
+	  case SDLK_F11: //simulate at maximum speed (no delay between frames)
+	    fullSpeed = !fullSpeed;
+	    break;
+	  case SDLK_F12: // fast communication mode
+	    if (tx_period_ticks > 1)
+	      {
+		save_tx_period_ticks = tx_period_ticks;
+		tx_period_ticks = 1;
+	      }
+	    else
+	      	tx_period_ticks = save_tx_period_ticks;
+	    break;
+	  default: break;
+	  }
+	break;
+      case SDL_MOUSEBUTTONDOWN:
+	if (event.button.button == SDL_BUTTON_LEFT )
+	  grab_bot(event.button.x, event.button.y);
+	else if (event.button.button == SDL_BUTTON_RIGHT)
+	  grab_bot_rot(event.button.x, event.button.y);
+	break;
+      case SDL_MOUSEBUTTONUP:
+	release_bot();
+	break;
+      default: break;
+      }
+
+    if (grabbed)
+      move_bot_to_mouse(grabbed);
+    if (grabbedRot)
+      rotateBot(grabbedRot);
+
+  // Check which keys are held down
+  // these are for keys that should have an effect as long as the key is held down
+  // for once/keypress events, use the switch above.
+  Uint8 *keystates = SDL_GetKeyState(NULL);
+  
+  double s = 1.05; // magnification factor per frame
+  int d = 20;      // amount to move per frame
+  if (keystates[SDLK_KP_PLUS] || keystates[SDLK_PLUS])
+   display_scale *= s;
+ if (keystates[SDLK_KP_MINUS] || keystates[SDLK_MINUS])
+   display_scale *= 1/s;
+ if (keystates[SDLK_RIGHT])
+   c_x -= d;
+ if (keystates[SDLK_LEFT])
+   c_x += d;
+ if (keystates[SDLK_UP])
+   c_y += d;
+ if (keystates[SDLK_DOWN])
+   c_y -= d;
+ if (keystates[SDLK_F1])
+   spread_out(500);
+ if (keystates[SDLK_F2])
+   {
+     spread_out(-200);
+     collision_detection(n_bots);
+   }
+}
+
+SDL_Surface *makeWindow(int width, int height)
+{
+  SDL_Surface *screen;
+
+  if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK) < 0)  {
+    dieSDL("SDL init failed: %s\n"); 
+  }
+
+  const SDL_VideoInfo *info = SDL_GetVideoInfo();
+
+  //printf("Screen %d x %d\n", info->current_w, info->current_h);
+
+  // if an absolute size is specieied, use it
+  display_w = get_int_param("displayWidth",  -1);
+  display_h = get_int_param("displayHeight", -1);
+  display_scale = get_float_param("displayScale", 1.0);
+
+  // if no absolute size was given, try a relative one
+  if (display_w <= 0 && display_h <= 0)
+    {
+      float d_w_percent = get_float_param("displayWidthPercent",  0.9);
+      float d_h_percent = get_float_param("displayHeightPercent", 0.9);
+
+      display_w = info->current_w * d_w_percent;
+      display_h = info->current_h * d_h_percent;
+    }
+  
+    
+  const char *bot_name = get_string_param("botName", "default");
+  SDL_WM_SetCaption(bot_name, bot_name);
+
+  screen = SDL_SetVideoMode(display_w, display_h, 32,
+			    SDL_SWSURFACE|SDL_DOUBLEBUF);
+
+  if (screen == NULL) dieSDL("SDL_SetVideoMode failed: %s\n"); // FIXME: Hmmm
+
+  // set font
+  gfxPrimitivesSetFont (font, 8, 8);
+  
+  return screen;
+}
+
+Uint32 conv_RGBA(int r, int g, int b, int a)
+{
+  return a + (b << 8) + (g << 16) + (r << 24);
+}
+
+void draw_commLines(SDL_Surface *surface)
+{
+  int i;
+  for (i = 0; i < NcommLines; i++)
+    {
+      kilobot *from = commLines[i].from;
+      kilobot *to   = commLines[i].to;
+      int x1 = c_x + display_w/2 + display_scale * from->x;
+      int y1 = c_y + display_h/2 + display_scale * from->y;
+      int x2 = c_x + display_w/2 + display_scale * to->x;
+      int y2 = c_y + display_h/2 + display_scale * to->y;
+      lineRGBA (surface, x1, y1, x2, y2, 160, 160, 160, 255);
+    }
+}
+	      
+void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
+{
+  int r = bot->radius;
+  
+  /* Draw the bot's body */
+  int draw_x = c_x + w/2 + display_scale * bot->x;
+  int draw_y = c_y + h/2 + display_scale * bot->y;
+  bot->screen_x = draw_x;
+  bot->screen_y = draw_y;
+
+  filledCircleColor(surface, draw_x, draw_y, display_scale * r, 0xffffffff);
+
+
+  /* Draw line to front */
+  int x_front = draw_x + display_scale * r * sin(bot->direction);
+  int y_front = draw_y + display_scale * r * cos(bot->direction);
+  lineColor(screen, draw_x, draw_y, x_front, y_front, 0x0000ffff);
+
+  /* Draw legs */
+  int x_l = draw_x - display_scale * r * cos(bot->direction);
+  int y_l = draw_y + display_scale * r * sin(bot->direction);
+  filledCircleColor(surface, x_l, y_l, display_scale * 2, 0xffffffff);
+
+  int x_r = draw_x + display_scale * r * cos(bot->direction);
+  int y_r = draw_y - display_scale * r * sin(bot->direction);
+  filledCircleColor(surface, x_r, y_r, display_scale * 2, 0xffffffff);
+
+  /* Draw LED */
+  Uint32 led_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, 255);
+  filledCircleColor(surface, draw_x, draw_y, display_scale * r * 0.9, led_color);
+
+  /* Draw transmit radius */
+
+  if (get_int_param("showCommsRadius", 1)) {
+    if (bot->tx_enabled == 1) {
+      circleColor(surface, draw_x, draw_y, display_scale * bot->cr, 0xffffff66);
+    }
+  }
+
+  /* Draw history */
+
+  if (get_int_param("showHist", 0)) {
+    float i_alpha = 255.;
+    for (int i=bot->p_hist-1; i>=0; i--) {
+      Uint32 ui_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, (int) i_alpha);
+      i_alpha = i_alpha * 0.99;
+      filledCircleColor(surface,
+			display_w/2 + display_scale * bot->x_history[i],
+			display_h/2 + display_scale * bot->y_history[i],
+			display_scale * 2, ui_color);
+    }
+  }
+}
+
+char botinfo_buffer[100];
+
+//default callback_botinfo function
+char *botinfo_simple()
+{
+  sprintf (botinfo_buffer, "%d", kilo_uid);
+  return botinfo_buffer;
+}
+
+void displayString (SDL_Surface *surface, int x, int y, char *s)
+{
+  int done = 0;
+  int i;
+
+  do {
+    i = 0;
+    while (s[i] != '\n' && s[i] != 0)
+      i++;
+    if (s[i] == 0)
+      done = 1;
+    s[i] = 0;
+    
+    stringColor (surface, x, y, s, 0xffffffff);
+    s += i+1;
+    y += 10;
+  } while (!done);
+}
+
+
+// draw status message for one bot, if the mouse is over it
+// also draw a simulator status
+void draw_status(SDL_Surface *surface, int w, int h)
+{
+  char buf[100];
+  sprintf(buf, "%d", kilo_ticks);
+  displayString(surface, 10, 2, buf);
+  
+  
+  // find bot under cursor
+  int x, y;
+  SDL_GetMouseState (&x, &y);
+
+  int i = find_bot_index (x, y);
+  if (i >= 0)
+    {
+      //switch to this bot
+      current_bot = i;      // for Me() to return the right bot
+      mydata = Me()->data;
+      kilo_uid = i;         // XXX careful...
+      
+      char *s = callback_botinfo();
+      displayString(surface, 10, h-30, s);
+    }
+}
+
+
+
+
+
