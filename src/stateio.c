@@ -9,9 +9,9 @@
 #include"skilobot.h"
 #include"params.h"
 
-#include"jansson.h"
+#include<jansson.h>
 
-json_t* (*callback_genes_json) (void) = NULL;
+json_t* (*callback_json_state) (void);
 
 void json_store_double(json_t* root, const char *key, double value)
 {
@@ -49,14 +49,14 @@ json_t* json_bot_rep(kilobot *bot)
   json_object_set(root, "x_history", j_x_hist);
   json_object_set(root, "y_history", j_y_hist);
 
-  // array of gene concentrations
-  json_t * j_genes;
-  if(callback_genes_json)
-    j_genes = callback_genes_json();
+  // bot state
+  json_t * j_state;
+  if(callback_json_state)
+    j_state = callback_json_state();
   else // if the bot did not define a callback function
-    j_genes = json_array();   // ... output an empty array
+    j_state = json_object();   // ... output an empty object
 
-  json_object_set(root, "genes", j_genes);
+  json_object_set(root, "genes", j_state);
   
   return root;
 }

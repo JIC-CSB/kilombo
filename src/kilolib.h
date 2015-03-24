@@ -5,6 +5,14 @@
  * @file kilolib.h
  * @mainpage Kilobot Library API
  *
+ * This is a version of kilolib.h bundled with the kilobot *simulator*.
+ * It defines the same kilobot library API as the native kilolib,
+ * with some simulator-specific additions.
+ * 
+ * 
+ * 
+ * The following is the original documentation. 
+ *
  * At its core the Kilobot Library library provides the function
  * kilo_init() to initialize the hardware of the kilobots, and the
  * function kilo_start() that uses a basic event loop programming
@@ -34,6 +42,26 @@
 #include <stdint.h>
 #include "message.h"
 #include "message_crc.h"
+
+
+/* Simulator specific definitions */
+
+/* Rename the bot's main function. Under the simulator, the real main 
+   is in the simulator library */
+#define main bot_main
+
+/* Define the macro SIMULATOR to show that this program is compiled 
+   for the simulator */
+
+#define SIMULATOR
+
+/* callback interface for communication between a bot and the simulator */
+typedef enum {CALLBACK_PARAMS, CALLBACK_RESET, CALLBACK_BOTINFO, CALLBACK_JSON_STATE} Callback_t;
+void register_callback(Callback_t type, void (*fp)(void));
+
+
+/* Original kilolib definitions follow */
+
 
 #define RGB(r,g,b) (r&3)|(((g&3)<<2))|((b&3)<<4)
 #define TICKS_PER_SEC 31

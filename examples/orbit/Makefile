@@ -1,0 +1,97 @@
+
+# Make file for compiling a kilobot program, both for the
+# kilobot simulator and for the real kilobot.
+# The program can consist of multiple files. Files and paths to various libraries are
+# configured below, these needs to be adapted to the system.
+
+#list of c files in this project
+SOURCES=orbit.c 
+
+#name of the executable file
+EXECUTABLE=orbit
+
+#path to the official kilolib, used for real bots only
+KILOHEADERS=../../../swarmbots/kilolib
+
+#path to kilolib.a in the official kilolib, needed for real bots only
+KILOLIB    =$(KILOHEADERS)/build/kilolib.a
+
+
+#compilation flags for simulated version
+SIM_CFLAGS = -c -g -O2 -Wall -std=c99  #-I$(KILOHEADERS)
+#linking flags for simulated version
+SIM_LFLAGS = -lsim -lSDL -lm -ljansson
+
+#compiling and linking flags with address sanitizer:
+#SIM_CFLAGS = -c -g -O2 -Wall -std=c99  -I$(KILOHEADERS) -fsanitize=address -fno-omit-frame-pointer
+#SIM_LFLAGS = $(SIMLIB) -lSDL -lm -ljansson -fsanitize=address
+
+# # # # # # # # # # The following should be generic and not need changes # # # # # # # # # # # # # 
+
+all: $(EXECUTABLE).hex $(EXECUTABLE)
+
+# compiling for the real bot
+#
+
+CC = avr-gcc
+AVRAR = avr-ar
+AVROC = avr-objcopy
+AVROD = avr-objdump
+AVRUP = avrdude
+
+#PFLAGS = -P usb -c avrispmkII # user to reprogram OHC
+CFLAGS = -mmcu=atmega328p -Wall -gdwarf-2 -O3 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
+CFLAGS += -DF_CPU=8000000 -I$(KILOHEADERS) -DKILOBOT
+
+#for a floating point printf
+CFLAGS += -Wl,-u,vfprintf -lprintf_flt -lm
+
+ASFLAGS = $(CFLAGS)
+#BOOTLDR_FLAGS = -Wl,-section-start=.text=0x7000 -DBOOTLOADER
+#OHC_FLAGS = -Wl,-section-start=.text=0x7000 -DOHC
+#OHC_ARDUINO_FLAGS = -DOHC -DARDUINO
+
+FLASH = -R .eeprom -R .fuse -R .lock -R .signature
+EEPROM = -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0  
+
+%.lss: %.elf
+	$(AVROD) -d -S $< > $@
+
+%.hex: %.elf
+	$(AVROC) -O ihex $(FLASH) $< $@
+
+%.eep: %.elf
+	$(AVROC) -O ihex $(EEPROM) $< $@
+
+%.bin: %.elf
+	$(AVROC) -O binary $(FLASH) $< $@ 
+
+$(EXECUTABLE).elf: $(SOURCES) $(KILOLIB)
+	$(CC) $(CFLAGS) -o $@ $^ 
+
+# make syntax:
+# $@ left-hand side of :
+# $^ right-hand side of :
+# $< first item of right-hand side of :
+
+
+# From here on, we compile for the simulator
+# 
+
+#which c compiler to use. gcc works well.
+SIM_CC=gcc
+
+#automatically make a list of object files from the list of .c files
+OBJECTS=$(SOURCES:.c=.o)
+
+
+#general rule for compiling a .c file to .o
+.c.o:
+	$(SIM_CC) $(SIM_CFLAGS) $< -o $@
+
+$(EXECUTABLE): $(OBJECTS) $(SIMLIB) 
+	$(SIM_CC)  $(SIM_LFLAGS) -o $@  $(OBJECTS) 
+
+
+clean :
+	rm *.o $(EXECUTABLE) *.elf *.hex

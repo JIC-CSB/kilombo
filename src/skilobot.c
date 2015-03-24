@@ -5,6 +5,8 @@
 #include "skilobot.h"
 #include "kilolib.h"
 
+#include <jansson.h>
+
 kilobot** allbots;
 extern int UserdataSize ;  // the size (in bytes) of the USERDATA structure.
                            // filled in by the user program.
@@ -13,11 +15,32 @@ int current_bot;
 
 int tx_period_ticks = 15;  // message twice a second
 
-char *botinfo_simple();
+char *botinfo_simple();            // default bot_info function, only returns ID
 void (*callback_F5) (void) = NULL; // function pointer to user-defined callback function
                                    // this function is called when F5 is pressed
 void (*callback_F6) (void) = NULL; // for F6
 char* (*callback_botinfo) (void) = botinfo_simple; // function for bot info, returns a string 
+json_t* (*callback_json_state) (void) = NULL; //callback for saving the bot's internal state as JSON
+
+
+void register_callback(Callback_t type, void (*fp)(void))
+{
+  switch (type)
+    {
+    case CALLBACK_PARAMS:
+      callback_F5 = fp;
+      break;
+    case CALLBACK_RESET:
+      callback_F6 = fp;
+      break;
+    case CALLBACK_BOTINFO:
+      callback_botinfo = (char*(*)(void)) fp;
+      break;
+    case CALLBACK_JSON_STATE:
+      callback_json_state = (json_t*(*)(void)) fp;
+      break;
+    }
+}
 
 int storeHistory = 1;
 

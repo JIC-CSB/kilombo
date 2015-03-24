@@ -183,6 +183,10 @@ float calc_dists(int n_bots)
 }
 
 
+/* main() is defined as bot_main in kilolib.h
+   to rename the bot's main function. This is the real main(),
+   so we need to get rid of the definition*/
+#undef main
 
 int main(int argc, char *argv[])
 {
