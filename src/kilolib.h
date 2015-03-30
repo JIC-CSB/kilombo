@@ -52,10 +52,9 @@
 
 /* Define the macro SIMULATOR to show that this program is compiled 
    for the simulator */
-
 #define SIMULATOR
 
-/* callback interface for communication between a bot and the simulator */
+/* Callback interface for communication between a bot and the simulator */
 typedef enum {CALLBACK_PARAMS, CALLBACK_RESET, CALLBACK_BOTINFO, CALLBACK_JSON_STATE} Callback_t;
 void register_callback(Callback_t type, void (*fp)(void));
 

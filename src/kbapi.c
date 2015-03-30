@@ -157,9 +157,17 @@ void rand_seed(uint8_t seed)
 }
 
 // 10 bit measurement of ambient light
+// return the x coordinate as the light intensity
+// - simulates a light gradient in x
 int16_t get_ambientlight()
 {
-  return 987;
+  kilobot* self = Me();
+  int l = self->x/100+1010;
+  if (l > 1023)
+    l = 1023;
+  if (l < 0)
+    l = 0;
+  return l;
 }
 
 // 10 bit measurement of battery voltage.
