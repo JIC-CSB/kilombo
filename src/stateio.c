@@ -1,15 +1,15 @@
-#include<ctype.h>
+#include <ctype.h>
 
-#include<stdlib.h>
-#include<unistd.h>
-#include<getopt.h>
-#include<math.h>
-#include<time.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <getopt.h>
+#include <math.h>
+#include <time.h>
 
-#include"skilobot.h"
-#include"params.h"
-
-#include<jansson.h>
+#include "skilobot.h"
+#include "params.h"
+#include "kilolib.h"
+#include <jansson.h>
 
 json_t* (*callback_json_state) (void);
 
@@ -52,11 +52,16 @@ json_t* json_bot_rep(kilobot *bot)
   // bot state
   json_t * j_state;
   if(callback_json_state)
-    j_state = callback_json_state();
+    {
+      // switch to the current bot
+      kilo_uid = bot->ID;
+      mydata = bot->data;
+      j_state = callback_json_state();
+    }  
   else // if the bot did not define a callback function
     j_state = json_object();   // ... output an empty object
 
-  json_object_set(root, "genes", j_state);
+  json_object_set(root, "state", j_state);
   
   return root;
 }

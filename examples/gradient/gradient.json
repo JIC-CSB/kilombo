@@ -1,0 +1,15 @@
+{
+    "botName" : "Orbit bot",
+    "randSeed" : 1,
+    "nBots" : 300,
+    "timeStep" : 0.0416666,
+    "simulationTime" : 10000.0,
+    "showComms" : 1,
+    "showCommsRadius" : 0,
+    "distributePercent" : 0.8,
+    "displayWidth"  : 640,
+    "displayHeight" : 424,
+    "showHist" : 0,
+    "storeHistory" : 0,
+    "__imageName" : "/home/fjansson/code/csimulator/movie2/f%04d.bmp"
+}
