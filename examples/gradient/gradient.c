@@ -1,10 +1,24 @@
 /* The gradient demonstration from the kilobotics-labs
  * https://www.kilobotics.com/labs#lab6-gradient
  *
+ * The robot with ID 0 is initialized ith the gradient_value 0
+ * Every other bot gets the smallest-value-ever-received + 1 as its own value
+ * Note that the gradient_value never increases, even if the bots are moved around. 
+ * In the simulator one can force a reset by pressing F6, which calls setup() 
+ * using the callback mechanism.
+ *
  * Lightly modified to work in the simulator, in particular:
- *   userdata->variable for global variables
- *   callback function botinfo() to report bot state back to the simulator for display
- *   callback function to save bot state as json
+ *  - mydata->variable for global variables
+ *  - callback function botinfo() to report bot state back to the simulator for display
+ *  - callback function json_state() to save bot state as json
+ *  - setup() is used as reset callback function 
+ *  - we use a table of 10 rainbow colors instead of just 3 colors. 
+ *
+ *   When a message arrives, it is processed immediately, instead of
+ *   storing it as in the original code. In the simulator, storing the message
+ *   led to lost messages if two neighbors transmit at once.   
+ *
+ * Modifications by Fredrik Jansson 2015
  */
 
 #include <kilolib.h>

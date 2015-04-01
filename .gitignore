@@ -4,3 +4,5 @@ build
 *.hex
 *.o
 orbit
+gradient
+endstate.json

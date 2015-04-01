@@ -3,8 +3,8 @@ This tool is a simulator for kilobot robots. The kilobot c program is compiled n
 
 The simulator uses SDL for grapical output. All configuration and result files are written in JSON.
 
-The program is distributed under the *WHICH LINCESE??* license, with no warranty.
-The simulator was developed in the (SWARM Organ)[www.swarm-organ.eu] project.
+The program is distributed under the *WHICH LINCESE??* license, with no warranty. 
+The simulator was developed in the [SWARM Organ](www.swarm-organ.eu) project.
 
 Contact: 
 - Fredrik Jansson fjansson@abo.fi
@@ -17,8 +17,7 @@ Installation instructions are found in the file `README.md` in the root director
 # Adapting code
 The simulator aims to be compatible with the [kilolib API.](https://www.kilobotics.com/docs/index.html)
 
-Initialization, messaging, motion, and random number generation work with the same function calls in the simulator and in the real kilobot. Two topics that require special care when using the simulator are 
-global variables and timing.
+Initialization, messaging, motion, and random number generation work with the same function calls in the simulator and in the real kilobot. Two topics that require special care when using the simulator are global variables and timing.
 
 ## Variables
 Kilobot C code usually makes use of static variables (to allow these to persist across repeated calls to the user supplied function) or global variables.  These variables demand special treatment when run in the simulator.  The simulator handles all robots in a single program, so a global or static variable ends up being common to all robots. A workaround implemented in the simulator is to keep all global variables inside a `struct`, defined in the robot's header file. 
@@ -31,10 +30,10 @@ Kilobot C code usually makes use of static variables (to allow these to persist 
 
 When used in the simulator, the robot program declares a  USERDATA *mydata;. The simulator ensures that this pointer points to the data of the correct robot before calling any of the user program's functions. Additionally, the simulator needs to know the size of the USERDATA structure (however, it does not need to know the contents of it, and it will never change it). The size of the structure is communicated to the simulator by declaring a variable UserdataSize, and setting it to the size of the structure:
 
-#ifdef SIMULATOR
-int UserdataSize = sizeof(USERDATA);
-USERDATA *mydata;
-#endif
+    #ifdef SIMULATOR
+    int UserdataSize = sizeof(USERDATA);
+    USERDATA *mydata;
+    #endif
 
 In the program, the variables can then be accessed using `mydata->N_Neighbors`. The simulator ensures that `mydata` points to the data of the currently running bot. Note that local variables (i.e. regular variables defined inside a function) can be used in the usual way. 
 
@@ -74,6 +73,7 @@ For convenience, the simulator implements a system of callback functions for com
     #endif
 
 `(void(*)(void))` here is a typecast to avoid compiler warnings about the function type. The functions need to be defined with return types as specified in the table above. For an example of the botinfo callback, see `examples/orbit/orbit.c`.
+For an example of the json state saving callback, see `examples/gradient/gradient.c`.
 
 
 # Controls
@@ -118,6 +118,41 @@ The following keywords are recognized in the simulator JSON configuration file:
 * `-b bots.json` : starting positions for the bots. Optional.
 
 At the end of the simulation, the simulator stores the final state of the bots in a file named `endstate.json`. This file can be given as a starting state for the next simulation, simply copy it to a new name, and pass that name to the simulator with the -b option. Thus the simulator can be used as an editor of bot starting configurations as well.
+
+#Saving state
+At the end of the simulation, and optionally also during the simulation (TODO) the simulator saves the state of the swarm as a JSON file, `endstate.json`.
+
+The json object contains a n array named `bot_states`.
+Each element in this array contains the data for one bot, with the following keys:
+
+| key | value| 
+|------|--------|
+|ID|  the bot's unique ID number|
+|direction| angle in which the bot is poiting, radians|
+|x_position | x coordinate, in mm|
+|y_position | y coordinate, in mm|
+| state| a json object describing the internal state of the bot, optionally provided by the callback function CALLBACK_JSON_STATE|
+
+TODO: a mechanism for saving this data during the simulation
+
+
+
+#Example bots
+A few example bots are provided with the simulator. They are found in the directory 'examples/'. Some of them are based on examples from www.kilobotics.com, but modified to work on the simulator.
+
+## orbit
+One stationary bot, with ID 0, emits messages. Another bot moves and tries to keep a constant distance to the stationary bot.
+
+## gradient
+The robot with ID 0 is initialized ith the gradient_value 0.  Every other bot gets the smallest-value-ever-received + 1 as its own value.  Note that the gradient_value never increases, even if the bots are moved around.  In the simulator one can force a reset by pressing F6, which calls setup()  using the callback mechanism.
+Callbacks in use: `CALLBACK_RESET`, `CALLBACK_BOTINFO`, `CALLBACK_JSON_STATE`
+
+## gradient2
+This version of the gradient example maintains a table of neighbors, and uses that to  calculate the current gradient_value.  This means that the value is dynamically updated if the  robots are moved around. The robot with ID 0 is initialized with the gradient_value 0.   Every other bot gets the smallest-value-of-current-neighbors + 1 as its own value  In the simulator one can force a reset by pressing F6, which calls `setup()` using the callback mechanism.
+
+A side effect of the dynamic update is that if the root bot is removed from the swarm, the other robots will update their gradient_value in a wave-like manner, to higher and higher values.
+ 
+
 
 # Implementation decisions
 The following are some justifications for the way the simulator was implemented, and some thoughts on other ways to do it.

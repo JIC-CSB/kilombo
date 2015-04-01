@@ -2,8 +2,10 @@
  * https://www.kilobotics.com/labs#lab4-orbit
  *
  * Lightly modified to work in the simulator, in particular:
- *   userdata->variable for global variables
- *   callback function botinfo() to report bot state back to the simulator for display
+ * - mydata->variable for global variables
+ * - callback function botinfo() to report bot state back to the simulator for display
+ *
+ * Modifications by Fredrik Jansson 2015
  */
 
 #include <math.h>
