@@ -1,1 +1,6 @@
 build
+*~
+*.elf
+*.hex
+*.o
+orbit
