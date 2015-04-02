@@ -1,6 +1,7 @@
 # ckbsim - C kilobot simulator
 
 This repository holds the code for ckbsim, a C based kilobot simulator.
+Installation instructions follow below. For detailed usage instruction and programming documentation, see `docs/manual.md` and the example bots in `examples/`.
 
 ## Build instructions
 

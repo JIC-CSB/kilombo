@@ -200,7 +200,7 @@ char *botinfo(void)
   p += sprintf (p, "ID: %d \n", kilo_uid);
   p += sprintf (p, "Gradient Value: %d\n", mydata->gradient_value);
 
-  p += sprintf (p, "\n%d neighbors: ", mydata->N_Neighbors);
+  p += sprintf (p, "%d neighbors: ", mydata->N_Neighbors);
 
   for (i = 0; i < mydata->N_Neighbors; i++)
     p += sprintf (p, "%d ", mydata->neighbors[i].ID);
