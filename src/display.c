@@ -2,14 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "gfx/SDL_gfxPrimitives.h"
-#include "SDL/SDL_thread.h"
-#include "SDL/SDL_timer.h"
+#include "kilolib.h"
+#undef main   // to avoid warning when SDL redefines main
 
 #include "display.h"
 #include "params.h"
 #include "rom8x8.h"
-#include "kilolib.h"
+#include "gfx/SDL_gfxPrimitives.h"
+#include "SDL/SDL_thread.h"
+#include "SDL/SDL_timer.h"
 #include "skilobot.h"
 
 

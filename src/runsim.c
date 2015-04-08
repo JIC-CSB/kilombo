@@ -6,15 +6,24 @@
 #include<math.h>
 #include<time.h>
 
-#include"skilobot.h"
-#include"display.h"
-#include"params.h"
-#include"stateio.h"
 #include"kilolib.h"
+#undef main 
+/* main() is defined as bot_main in kilolib.h
+   to rename the bot's main function. This file has the real main(),
+   so we need to get rid of the definition. Also, SDL redefines main as SDL_main on OSX,
+   so SDL_main.h needs to be included after this.
+*/
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_main.h>
 #include "gfx/SDL_framerate.h"
+
+#include"skilobot.h"
+#include"display.h"
+#include"params.h"
+#include"stateio.h"
+
+
 
 int n_bots = 100;
 int state = RUNNING;
@@ -183,10 +192,6 @@ float calc_dists(int n_bots)
 }
 
 
-/* main() is defined as bot_main in kilolib.h
-   to rename the bot's main function. This is the real main(),
-   so we need to get rid of the definition*/
-#undef main
 
 int main(int argc, char *argv[])
 {
