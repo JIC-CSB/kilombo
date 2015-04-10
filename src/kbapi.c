@@ -162,11 +162,14 @@ void rand_seed(uint8_t seed)
 int16_t get_ambientlight()
 {
   kilobot* self = Me();
-  int l = self->x/100+1010;
+  int l = self->x/.01;
+  /*
   if (l > 1023)
     l = 1023;
+  
   if (l < 0)
     l = 0;
+  */
   return l;
 }
 
