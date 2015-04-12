@@ -1,3 +1,4 @@
+#include <math.h>
 #include "skilobot.h"
 #include "kilolib.h"
 
@@ -156,13 +157,41 @@ void rand_seed(uint8_t seed)
   self->seed = seed;
 }
 
+
+float get_potential(int type)
+{
+  kilobot* self = Me();
+  switch(type)
+    {
+    case POT_LINEAR:
+      return self->x;
+    case POT_PARABOLIC: 
+      return pow(self->x, 2) + pow(self->y, 2);
+    case POT_GRAVITY:
+      return 1.0 / hypot(self->x, self->y);      
+    default:
+      return 0;
+    }
+  
+}
+
 // 10 bit measurement of ambient light
 // return the x coordinate as the light intensity
 // - simulates a light gradient in x
 int16_t get_ambientlight()
 {
   kilobot* self = Me();
-  int l = self->x/.01;
+
+  // linear light gradient
+  // int l = self->x/.01;
+
+  // gravity well
+  // int l = -10000000 / hypot(self->x, self->y);
+
+  // parabolic well
+  int l = ( pow(self->x, 2) + pow(self->y, 2) )/10;
+  
+  
   /*
   if (l > 1023)
     l = 1023;

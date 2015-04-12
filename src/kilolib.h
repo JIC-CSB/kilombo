@@ -59,6 +59,10 @@ typedef enum {CALLBACK_PARAMS, CALLBACK_RESET, CALLBACK_BOTINFO, CALLBACK_JSON_S
 void register_callback(Callback_t type, void (*fp)(void));
 
 
+// measure a fictive potential in the environment, for testing
+enum {POT_LINEAR, POT_PARABOLIC, POT_GRAVITY};
+float get_potential(int type);
+
 /* Original kilolib definitions follow */
 
 
