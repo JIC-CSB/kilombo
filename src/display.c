@@ -342,8 +342,8 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   int draw_y = c_y + h/2 + display_scale * bot->y;
   bot->screen_x = draw_x;
   bot->screen_y = draw_y;
-
-  filledCircleColor(surface, draw_x, draw_y, display_scale * r, 0xffffffff);
+  int rBody = display_scale * r;
+  filledCircleColor(surface, draw_x, draw_y, rBody, 0xffffffff);
 
 
   /* Draw line to front */
@@ -351,6 +351,7 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   int y_front = draw_y + display_scale * r * cos(bot->direction);
   lineColor(screen, draw_x, draw_y, x_front, y_front, 0x0000ffff);
 
+  
   /* Draw legs */
   int x_l = draw_x - display_scale * r * cos(bot->direction);
   int y_l = draw_y + display_scale * r * sin(bot->direction);
@@ -362,7 +363,27 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
 
   /* Draw LED */
   Uint32 led_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, 255);
-  filledCircleColor(surface, draw_x, draw_y, display_scale * r * 0.9, led_color);
+  int rLED = display_scale * r * 0.9;
+  // don't allow the LED to cover the body circle completely
+  if (rLED >= rBody)
+    rLED = rBody - 1;
+  // don't allow the LED to vanish either
+  if (rLED < 1)
+    rLED = 1;
+  filledCircleColor(surface, draw_x, draw_y, rLED, led_color);
+
+  
+  /* draw a triangle pointing forward */
+  int txf = draw_x + display_scale * r*.4 * sin(bot->direction);
+  int tyf = draw_y + display_scale * r*.4 * cos(bot->direction);
+  int tx1 = draw_x + display_scale * r*.4 * sin(bot->direction+2*M_PI*.4);
+  int ty1 = draw_y + display_scale * r*.4 * cos(bot->direction+2*M_PI*.4);
+  int tx2 = draw_x + display_scale * r*.4 * sin(bot->direction-2*M_PI*.4);
+  int ty2 = draw_y + display_scale * r*.4 * cos(bot->direction-2*M_PI*.4);
+  
+  filledTrigonColor (screen, txf, tyf, tx1, ty1, tx2, ty2, 0xffffffff);
+
+  
 
   /* Draw transmit radius */
 
