@@ -10,7 +10,7 @@ simulation_params* parse_param_file(const char *filename)
   json_t *root, *data;
 
   parsed_params = (simulation_params*) malloc(sizeof(simulation_params));
-
+  printf ("Reading simulator parameters from %s\n", filename);
   root = json_load_file(filename, 0, &error);
 
   if (!root) {

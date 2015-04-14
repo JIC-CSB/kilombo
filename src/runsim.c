@@ -183,7 +183,10 @@ int main(int argc, char *argv[])
   n_bots = 100;
   float time = 0;
 
-  char param_filename[255] = "simulatorParams.json";
+  char param_filename[1000];
+  sprintf (param_filename, "%s%s", argv[0], ".json");
+  //default to <program name>.json
+  
   char *bot_state_file = (char *) NULL;
 
   int c;
