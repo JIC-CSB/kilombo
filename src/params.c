@@ -8,7 +8,6 @@ simulation_params* parse_param_file(const char *filename)
 
   json_error_t error;
   json_t *root, *data;
-  json_t *timeSteps;
 
   parsed_params = (simulation_params*) malloc(sizeof(simulation_params));
 
