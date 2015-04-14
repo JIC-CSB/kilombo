@@ -84,20 +84,23 @@ kilobot *new_kilobot(int ID, int n_bots)
   return bot;
 }
 
-void init_all_bots(int n_bots)
+void create_bots(int n_bots)
 {
-  /* Initialise the global allbots array */
   allbots = (kilobot**) malloc(sizeof(kilobot*) * n_bots);
 
-  for (int i=0; i<n_bots; i++) {
+  for (int i=0; i<n_bots; i++) 
     allbots[i] = new_kilobot(i, n_bots);
+}
 
-    current_bot = i;      // for Me() to return the right bot
-    mydata = Me()->data;
-    kilo_uid = i;         // in case the bot's main() uses ID
-    bot_main();
-  }
-
+void init_all_bots(int n_bots)
+{
+  for (int i=0; i<n_bots; i++)
+    {
+      current_bot = i;      // for Me() to return the right bot
+      mydata = Me()->data;
+      kilo_uid = i;         // in case the bot's main() uses ID
+      bot_main();
+    }
 }
 
 kilobot *Me()

@@ -10,8 +10,8 @@
 #undef main 
 /* main() is defined as bot_main in kilolib.h
    to rename the bot's main function. This file has the real main(),
-   so we need to get rid of the definition. Also, SDL redefines main as SDL_main on OSX,
-   so SDL_main.h needs to be included after this.
+   so we need to get rid of the definition. Also, SDL redefines main as 
+   SDL_main on OSX, so SDL_main.h needs to be included after this.
 */
 
 #include <SDL/SDL.h>
@@ -55,13 +55,13 @@ void distribute_line(int n_bots)
 
 void distribute_rand(int n_bots, int w, int h)
 {
-
   for (int i=0; i < n_bots; i++) {
     allbots[i]->x = rand()%w - w/2;
     allbots[i]->y = rand()%h - h/2;
     allbots[i]->direction = 2 * 3.141 * (float) rand() / (float) RAND_MAX;
   }
 }
+
 void distribute_pile2(int n_bots)
 {
   int pos_x=0;
@@ -74,8 +74,6 @@ void distribute_pile2(int n_bots)
 
   for (int i=-num_start; i < num_start; i++) {
     for (int j=-num_start; j < num_start; j++) {
-      
-      
       pos_x = i*2*(radius+3);
       pos_y = j*2*(radius+3);
       
@@ -92,7 +90,21 @@ void distribute_pile2(int n_bots)
   }
 }
 
-// move the bots apart slightly, by lettign them repel each other
+void distribute_bots(int n_bots)
+{
+  //distribute_line(n_bots);
+  //distribute_rand(n_bots, w, h);
+  //int w = get_int_param("distributeWidth", 500);
+  //int h = get_int_param("distributeHeight", 500);
+  float f = get_float_param("distributePercent", 0.2);
+  distribute_rand(n_bots, f * display_w, f * display_h);
+  
+  //distribute_pile2(n_bots);
+}
+
+
+
+// move the bots apart slightly, by letting them repel each other
 void spread_out(double k)
 {
   int i, j;
@@ -118,17 +130,6 @@ void spread_out(double k)
       }
 }
 
-void special_init(int n_bots)
-{
-  /* Run specific initialisation */
-  // Maybe this sould go int the user program file ? - FJ
-
-  /*
-  for (int i=0; i < n_bots; i++) {
-    allbots[i]->type = 1 + (i % 3);
-    } */
-}
-
 void initialise_simulator(const char *param_filename)
 {
   /* Parse parameter file and perform initialisation */
@@ -142,22 +143,6 @@ void initialise_simulator(const char *param_filename)
   } else {
     srand(rand_seed);
   }
-
-}
-
-void initialise_bots(int n_bots)
-{
-  init_all_bots(n_bots);
-
-  //distribute_line(n_bots);
-  //distribute_rand(n_bots, w, h);
-  //int w = get_int_param("distributeWidth", 500);
-  //int h = get_int_param("distributeHeight", 500);
-  float f = get_float_param("distributePercent", 0.2);
-  distribute_rand(n_bots, f * display_w, f * display_h);
-  //distribute_pile2(n_bots);
-
-  special_init(n_bots);
 
 }
 
@@ -198,7 +183,10 @@ int main(int argc, char *argv[])
   n_bots = 100;
   float time = 0;
 
-  char param_filename[255] = "simulatorParams.json";
+  char param_filename[1000];
+  sprintf (param_filename, "%s%s", argv[0], ".json");
+  //default to <program name>.json
+  
   char *bot_state_file = (char *) NULL;
 
   int c;
@@ -234,26 +222,27 @@ int main(int argc, char *argv[])
   kilo_message_tx_success = message_tx_success_dummy;
   kilo_message_rx = message_rx_dummy;
 
+  allbots = NULL;
   if (bot_state_file) {
     allbots = bot_loader(bot_state_file, &n_bots);
-    int i;
-    //call bot_main() for each bot
-    for (i = 0; i < n_bots; i++)  
-      {
-	current_bot = i;      // for Me() to return the right bot
-	mydata = Me()->data;
-	kilo_uid = i;         // in case the bot's main() uses ID
-	bot_main();
-      }
-  } else {
-    n_bots = get_int_param("nBots", n_bots);
-    if (n_bots <= 0)
-      die("nBots must be > 0.");
-	
-    initialise_bots(n_bots);    
+    if (allbots == NULL)
+	die("Could not parse the given bot file");
   }
+  
+  if (allbots == NULL) //no bot file given, or it could not be parsed
+    {
+      n_bots = get_int_param("nBots", n_bots);
+      if (n_bots <= 0)
+	die("nBots must be > 0.");
+      
+      create_bots(n_bots);
+      distribute_bots(n_bots);
+    }
 
-  //  dump_all_bots(n_bots);
+  // call main() in every bot
+  init_all_bots(n_bots);
+  
+  // dump_all_bots(n_bots);
 
   // maxTime <= 0 for unlimited simulation
   float maxTime   = get_float_param("simulationTime", 0);

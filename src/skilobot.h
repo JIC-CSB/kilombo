@@ -52,12 +52,14 @@ extern void (*user_setup)(void);
 extern void (*user_loop)(void);
 
 extern kilobot** allbots;
+void create_bots(int n_bots);
 kilobot *new_kilobot(int ID, int n_bots);
 void init_all_bots(int n_bots);
 void run_all_bots(int n_bots);
 void dump_all_bots(int n_bots);
 void update_all_bots(int n_bots, float timestep);
 void spread_out(double k);
+
 
 void collision_detection(int n_bots);
 
