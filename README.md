@@ -13,7 +13,7 @@ You'll need to have:
 
 
 ### Debian-based Linux systems
-`sudo apt-get install build-essential git gcc-avr gdb-avr binutils-avr avr-libc avrdude libsdl1.2-dev libjansson-dev cmake `
+`sudo apt-get install build-essential git gcc-avr gdb-avr binutils-avr avr-libc avrdude libsdl1.2-dev libjansson-dev cmake check`
 
 
 ## Build instructions
