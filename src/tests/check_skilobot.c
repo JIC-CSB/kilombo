@@ -2,9 +2,20 @@
 #include <check.h>
 #include "skilobot.h"
 
-START_TEST(test_framework_working)
+// Needed to compile any program with a library.
+//#include "kilolib.h"
+typedef struct { } USERDATA;
+int UserdataSize = sizeof(USERDATA);
+void *mydata;
+int bot_main(void) { return 0; };
+char* botinfo_simple(void) { return NULL; };
+extern uint16_t kilo_uid;
+
+START_TEST(test_new_kilobot)
 {
-    ck_assert_int_eq(1, 1);
+    kilobot* k;
+    k = new_kilobot(20, 1);
+    ck_assert_int_eq(k->ID, 20);
 }
 END_TEST
 
@@ -16,7 +27,7 @@ Suite *add_suite(void)
     s = suite_create("skilobot");
     tc_core = tcase_create("core");
 
-    tcase_add_test(tc_core, test_framework_working);
+    tcase_add_test(tc_core, test_new_kilobot);
     suite_add_tcase(s, tc_core);
 
     return s;
