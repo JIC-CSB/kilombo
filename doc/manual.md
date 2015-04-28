@@ -102,6 +102,7 @@ The following keywords are recognized in the simulator JSON configuration file:
 * `botName` : the name of this bot type
 * `randSeed` : a random seed, for repeatable simulations
 * `nBots` : number of bots to simulate     
+* `formation` : starting bot formation. Current options are ("random", "line", "pile", "circle", "ellipse"). Defaults to "random".     
 * `timeStep` : time step. Also determines the displayed frame rate (currently, will be configurable)
 * `simulationTime` : how long to run the simulation
 * `showComms` :  whether or not to draw a line between each pair of bots in communication range, whenever a message is passed between them.

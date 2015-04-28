@@ -62,6 +62,136 @@ void distribute_rand(int n_bots, int w, int h)
   }
 }
 
+void distribute_circle(int n_bots){
+
+	int bot = 0;
+	float bot_radius = 1.8 * allbots[0]->radius;
+	float radius = n_bots * bot_radius/3.1415927;
+	float theta = 0;
+	float delta_theta = 2 * 3.1415927/n_bots;
+	float alpha = theta - 3.1415927/4;
+	float x_value = radius * sin(theta);
+	float y_value = radius * cos(theta);
+
+	while(bot < n_bots){
+
+		allbots[bot]->x = x_value;
+		allbots[bot]->y = y_value;
+		allbots[bot]->direction = alpha;
+
+		theta += delta_theta;
+		alpha = theta - 3.1415927/4;
+		x_value = radius * sin(theta);
+		y_value = radius * cos(theta);
+
+		bot++;
+	}
+}
+
+void distribute_pile(int n_bots){
+
+	float bot_radius = 1.3 * allbots[0]->radius;
+	float radius = 0;
+	int max_n_bots = 1;
+	int bot = 0;
+	float x_value = 0;
+	float y_value = 0;
+	float theta = 0;
+	float delta_theta = 0;
+	float alpha = theta - 3.1415927/4;
+
+    while(bot < n_bots){
+
+    	allbots[bot]->x = x_value;
+    	allbots[bot]->y = y_value;
+    	allbots[bot]->direction = alpha;
+
+    	max_n_bots--;
+    	if(max_n_bots > 0){
+
+    		theta += delta_theta;
+    		alpha = theta - 3.1415927/4;
+
+    	}
+
+    	else{
+
+    		radius += 2 * bot_radius + bot_radius/3;
+
+    		max_n_bots = (int) (3.1415927 * radius/bot_radius);
+
+    		delta_theta = 2 * 3.1415927/max_n_bots;
+    		theta = 0;
+    		alpha = theta - 3.1415927/4;
+
+
+    	}
+
+    	x_value = radius * sin(theta);
+		y_value = radius * cos(theta);
+
+
+    	bot++;
+
+
+
+    }
+
+
+}
+
+void distribute_elipse(int n_bots){
+
+	float bot_radius = 1.5 * allbots[0]->radius;
+	float radius = 0;
+	int max_n_bots = 1;
+	int bot = 0;
+	float x_value = 0;
+	float y_value = 0;
+	float theta = 0;
+	float delta_theta = 0;
+	float alpha = theta - 3.1415927/4;
+
+    while(bot < n_bots){
+
+    	allbots[bot]->x = x_value;
+    	allbots[bot]->y = y_value;
+    	allbots[bot]->direction = alpha;
+
+    	max_n_bots--;
+    	if(max_n_bots > 0){
+
+    		theta += delta_theta;
+    		alpha = theta - 3.1415927/4;
+
+    	}
+
+    	else{
+
+    		radius += 2 * bot_radius + bot_radius/3;
+
+    		max_n_bots = (int) (3.1415927 * radius/bot_radius);
+
+    		delta_theta = 2 * 3.1415927/max_n_bots;
+    		theta = 0;
+    		alpha = theta - 3.1415927/4;
+
+
+    	}
+
+    	x_value = radius * sin(theta);
+		y_value = 0.75 * radius * cos(theta);
+
+
+    	bot++;
+
+
+
+    }
+
+
+}
+
 void distribute_pile2(int n_bots)
 {
   int pos_x=0;
@@ -92,13 +222,27 @@ void distribute_pile2(int n_bots)
 
 void distribute_bots(int n_bots)
 {
+
   //distribute_line(n_bots);
   //distribute_rand(n_bots, w, h);
   //int w = get_int_param("distributeWidth", 500);
   //int h = get_int_param("distributeHeight", 500);
-  float f = get_float_param("distributePercent", 0.2);
-  distribute_rand(n_bots, f * display_w, f * display_h);
+	const char *formation = get_string_param("formation","random");
+
+	float f = get_float_param("distributePercent", 0.2);
   
+	if(strcmp(formation, "line") == 0) distribute_line(n_bots);
+
+	if(strcmp(formation, "random") == 0)  distribute_rand(n_bots, f * display_w, f * display_h);
+
+	if(strcmp(formation, "pile") == 0) distribute_pile(n_bots);
+
+	if(strcmp(formation, "circle") == 0) distribute_circle(n_bots);
+
+	if(strcmp(formation, "elipse") == 0) distribute_elipse(n_bots);
+
+
+
   //distribute_pile2(n_bots);
 }
 
@@ -232,6 +376,7 @@ int main(int argc, char *argv[])
   if (allbots == NULL) //no bot file given, or it could not be parsed
     {
       n_bots = get_int_param("nBots", n_bots);
+
       if (n_bots <= 0)
 	die("nBots must be > 0.");
       
@@ -245,6 +390,7 @@ int main(int argc, char *argv[])
   // dump_all_bots(n_bots);
 
   // maxTime <= 0 for unlimited simulation
+
   float maxTime   = get_float_param("simulationTime", 0);
   float timeStep  = get_float_param("timeStep", 0.02);
   const char *imageName = get_string_param("imageName", NULL);
