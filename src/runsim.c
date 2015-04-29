@@ -5,6 +5,7 @@
 #include<getopt.h>
 #include<math.h>
 #include<time.h>
+#include<jansson.h>
 
 #include"kilolib.h"
 #undef main 
@@ -14,9 +15,9 @@
    SDL_main on OSX, so SDL_main.h needs to be included after this.
 */
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_main.h>
-#include "gfx/SDL_framerate.h"
+#include<SDL/SDL.h>
+#include<SDL/SDL_main.h>
+#include"gfx/SDL_framerate.h"
 
 #include"skilobot.h"
 #include"display.h"
@@ -396,6 +397,9 @@ int main(int argc, char *argv[])
   const char *imageName = get_string_param("imageName", NULL);
   storeHistory = get_int_param("storeHistory", 1);
   int saveVideoN = get_int_param("saveVideoN", 1); // save video screenshot every Nth frame
+
+  const char *stateFileName = get_string_param("stateFileName", NULL);
+  int stateFileSteps = get_int_param("stateFileSteps", 100);
   
   char buf[2000];
 
@@ -405,7 +409,8 @@ int main(int argc, char *argv[])
   SDL_setFramerate(&manager, FPS);
   
 
-
+  json_t *j_state = json_array();
+    
   printf("Running %d bots with timestep %f for total time %f\n", 
 	 n_bots, timeStep, maxTime);
 
@@ -427,7 +432,7 @@ int main(int argc, char *argv[])
     }
     
     
-    //    printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
+    //   printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
     
     if (state == RUNNING)
       {
@@ -449,6 +454,15 @@ int main(int argc, char *argv[])
 	}
 
     kilo_ticks = time * TICKS_PER_SEC;
+    
+    if (stateFileName)
+      if (n_step % stateFileSteps == 0)
+	{
+	  json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
+	  json_array_append(j_state, t);
+	}
+       
+
     draw_status(screen, display_w, display_h);
     // draw status here, after video capture
     
@@ -459,5 +473,10 @@ int main(int argc, char *argv[])
 
   save_bot_state_to_file(allbots, n_bots, "endstate.json");
 
+  if (stateFileName)
+    {
+      json_dump_file(j_state, stateFileName, JSON_INDENT(2) | JSON_SORT_KEYS);
+    }
+  
   return 0;
 }

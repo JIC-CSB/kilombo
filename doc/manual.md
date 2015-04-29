@@ -111,8 +111,12 @@ The following keywords are recognized in the simulator JSON configuration file:
 * `displayWidth`  : absolute width of the window, pixels
 * `displayHeight` : absolute height of the window, pixels
 * `showHist` : whether to show the paths the robots have moved
-* `imageName` :  File name for storing images during the simulation. Format example: `movie/f%04d.bmp`,
+* `imageName` :  file name for storing images during the simulation. Format example: `movie/f%04d.bmp`,
   where the `%...d` will be replaced by an increasing number.
+* `stateFileName` : file name for saving the simulation state as JSON during the simulation.
+* `stateFileSteps` : number of simulator timesteps between storing the simulator state as JSON.
+
+
 
 #Command line options
 * `-p parameterfile.json` : Simulator parameters. Mandatory

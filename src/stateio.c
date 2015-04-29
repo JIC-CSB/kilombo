@@ -66,13 +66,15 @@ json_t* json_bot_rep(kilobot *bot)
   return root;
 }
 
-json_t* json_rep_all_bots(kilobot **bot_array, int array_size)
+json_t* json_rep_all_bots(kilobot **bot_array, int array_size, int ticks)
 {
   json_t* root = json_object();
   json_t* j_bot_array = json_array();
-
+  
+  
   json_object_set(root, "bot_states", j_bot_array);
-
+  json_store_int(root, "ticks", ticks);
+   
   json_t *jbot;
   for (int i=0; i<array_size; i++) {
     jbot = json_bot_rep(bot_array[i]);
@@ -89,10 +91,12 @@ json_t* json_rep_all_bots(kilobot **bot_array, int array_size)
 
 void save_bot_state_to_file(kilobot **bot_array, int array_size, const char *filename)
 {
-  json_t* root = json_rep_all_bots(bot_array, array_size);
+  json_t* root = json_rep_all_bots(bot_array, array_size, kilo_ticks);
 
   json_dump_file(root, filename, JSON_INDENT(2) | JSON_SORT_KEYS);
 }
+
+
 
 double extract_double(json_t* js, const char *param_name)
 {
