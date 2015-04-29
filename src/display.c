@@ -90,8 +90,8 @@ void move_bot_to_mouse(kilobot *bot)
 {
   int x, y;
   SDL_GetMouseState (&x, &y);
-  bot->x = (x - c_x - display_w/2) / display_scale;
-  bot->y = (y - c_y - display_h/2) / display_scale;
+  bot->x = (x - display_w/2) / display_scale + c_x;
+  bot->y = (y - display_h/2) / display_scale + c_y;
 }
 
 /* try to grab a bot with the mouse*/
@@ -249,19 +249,22 @@ void input(void)
   Uint8 *keystates = SDL_GetKeyState(NULL);
   
   double s = 1.05; // magnification factor per frame
-  int d = 20;      // amount to move per frame
+  int d = 20/display_scale;      // amount to move per frame
+  if (d < 1)
+    d = 1;
+  
   if (keystates[SDLK_KP_PLUS] || keystates[SDLK_PLUS])
    display_scale *= s;
  if (keystates[SDLK_KP_MINUS] || keystates[SDLK_MINUS])
    display_scale *= 1/s;
  if (keystates[SDLK_RIGHT])
-   c_x -= d;
- if (keystates[SDLK_LEFT])
    c_x += d;
+ if (keystates[SDLK_LEFT])
+   c_x -= d; 
  if (keystates[SDLK_UP])
-   c_y += d;
+   c_y -= d; 
  if (keystates[SDLK_DOWN])
-   c_y -= d;
+   c_y += d; 
  if (keystates[SDLK_F1])
    spread_out(500);
  if (keystates[SDLK_F2])
@@ -325,10 +328,12 @@ void draw_commLines(SDL_Surface *surface)
     {
       kilobot *from = commLines[i].from;
       kilobot *to   = commLines[i].to;
-      int x1 = c_x + display_w/2 + display_scale * from->x;
-      int y1 = c_y + display_h/2 + display_scale * from->y;
-      int x2 = c_x + display_w/2 + display_scale * to->x;
-      int y2 = c_y + display_h/2 + display_scale * to->y;
+
+      int x1 = display_w/2 + display_scale * (from->x - c_x); 
+      int y1 = display_h/2 + display_scale * (from->y - c_y);
+      int x2 = display_w/2 + display_scale * (to->x - c_x); 
+      int y2 = display_h/2 + display_scale * (to->y - c_y);  
+
       lineRGBA (surface, x1, y1, x2, y2, 160, 160, 160, 255);
     }
 }
@@ -338,8 +343,10 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   int r = bot->radius;
   
   /* Draw the bot's body */
-  int draw_x = c_x + w/2 + display_scale * bot->x;
-  int draw_y = c_y + h/2 + display_scale * bot->y;
+
+  int draw_x = w/2 + display_scale * (bot->x - c_x);
+  int draw_y = h/2 + display_scale * (bot->y - c_y);
+  
   bot->screen_x = draw_x;
   bot->screen_y = draw_y;
   int rBody = display_scale * r;
