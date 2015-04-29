@@ -2,14 +2,22 @@
 #include <check.h>
 #include "skilobot.h"
 
+#include <stdio.h>
+
 // Needed to compile any program with a library.
 //#include "kilolib.h"
 typedef struct { } USERDATA;
 int UserdataSize = sizeof(USERDATA);
 void *mydata;
-int bot_main(void) { return 0; };
 char* botinfo_simple(void) { return NULL; };
 extern uint16_t kilo_uid;
+
+// Define a dummy bot_main function for testing purposes.
+int n_calls_to_bot_main = 0;
+int bot_main(void) {
+    n_calls_to_bot_main++;
+    return 0;
+};
 
 START_TEST(test_new_kilobot)
 {
@@ -29,6 +37,16 @@ START_TEST(test_create_bots)
 }
 END_TEST
 
+START_TEST(test_init_all_bots)
+{
+    int n = 3;
+    n_calls_to_bot_main = 0;  // Clean up from any previous tests.
+    create_bots(n);
+    init_all_bots(n);
+    ck_assert_int_eq(n_calls_to_bot_main, n);
+}
+END_TEST
+
 Suite *add_suite(void)
 {
     Suite *s;
@@ -39,6 +57,7 @@ Suite *add_suite(void)
 
     tcase_add_test(tc_core, test_new_kilobot);
     tcase_add_test(tc_core, test_create_bots);
+    tcase_add_test(tc_core, test_init_all_bots);
     suite_add_tcase(s, tc_core);
 
     return s;
