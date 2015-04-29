@@ -3,6 +3,4 @@ build
 *.elf
 *.hex
 *.o
-orbit
-gradient
 endstate.json
