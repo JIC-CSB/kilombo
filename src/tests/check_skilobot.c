@@ -47,6 +47,17 @@ START_TEST(test_init_all_bots)
 }
 END_TEST
 
+START_TEST(test_me)
+{
+    int n = 3;
+    create_bots(n);
+    for (int i=0; i<n; i++) {
+        current_bot = i;
+        ck_assert_int_eq(Me()->ID, i);
+    }
+}
+END_TEST
+
 Suite *add_suite(void)
 {
     Suite *s;
@@ -58,6 +69,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_new_kilobot);
     tcase_add_test(tc_core, test_create_bots);
     tcase_add_test(tc_core, test_init_all_bots);
+    tcase_add_test(tc_core, test_me);
     suite_add_tcase(s, tc_core);
 
     return s;
