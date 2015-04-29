@@ -48,7 +48,7 @@ void die(char *s)
 void distribute_line(int n_bots)
 {
   for (int i=0; i < n_bots; i++) {
-    allbots[i]->x += 80 * i - 40 * (n_bots - 1);
+    allbots[i]->x += 60 * i - 40 * (n_bots - 1);
 
   }
 }
@@ -239,7 +239,7 @@ void distribute_bots(int n_bots)
 
 	if(strcmp(formation, "circle") == 0) distribute_circle(n_bots);
 
-	if(strcmp(formation, "elipse") == 0) distribute_elipse(n_bots);
+	if(strcmp(formation, "ellipse") == 0) distribute_elipse(n_bots);
 
 
 
