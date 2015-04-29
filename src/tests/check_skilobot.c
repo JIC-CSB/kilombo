@@ -6,7 +6,7 @@
 
 // Needed to compile any program with a library.
 //#include "kilolib.h"
-typedef struct { } USERDATA;
+typedef struct { int num_bot_steps; } USERDATA;
 int UserdataSize = sizeof(USERDATA);
 void *mydata;
 char* botinfo_simple(void) { return NULL; };
@@ -18,6 +18,15 @@ int bot_main(void) {
     n_calls_to_bot_main++;
     return 0;
 };
+
+// Define dummy setup and loop functions for testing purposes.
+void setup(void) {
+    ((USERDATA* )mydata)->num_bot_steps = 0;
+}
+void dummy_loop(void) {
+    ((USERDATA* )mydata)->num_bot_steps++;
+}
+
 
 START_TEST(test_new_kilobot)
 {
@@ -58,6 +67,27 @@ START_TEST(test_me)
 }
 END_TEST
 
+START_TEST(test_run_all_bots)
+{
+    int n = 3;
+    USERDATA* d;
+    create_bots(n);
+    init_all_bots(n);
+    for (int i=0; i<n; i++) {
+        current_bot = i;
+        mydata = (USERDATA* )(Me()->data);
+        setup();
+    }
+    user_loop = &dummy_loop;
+    run_all_bots(n);
+    for (int i=0; i<n; i++) {
+        current_bot = i;
+        d = ((USERDATA* )Me()->data);
+        ck_assert_int_eq(d->num_bot_steps, 1);
+    }
+}
+END_TEST
+
 Suite *add_suite(void)
 {
     Suite *s;
@@ -70,6 +100,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_create_bots);
     tcase_add_test(tc_core, test_init_all_bots);
     tcase_add_test(tc_core, test_me);
+    tcase_add_test(tc_core, test_run_all_bots);
     suite_add_tcase(s, tc_core);
 
     return s;
