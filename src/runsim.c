@@ -28,7 +28,8 @@
 
 int n_bots = 100;
 int state = RUNNING;
-int fullSpeed = 0;   //if nonzero, run without delay between frames
+int fullSpeed = 0;     // if nonzero, run without delay between frames
+int stepsPerFrame = 1; // number of simulation steps to take between frames
 
 extern int storeHistory;  //whether to save the history of all bot positions
 
@@ -326,8 +327,10 @@ float calc_dists(int n_bots)
 int main(int argc, char *argv[])
 {
   n_bots = 100;
-  float time = 0;
-
+  double time = 0;
+  double frameTimeAvg = 0;
+  Uint32 lastTicks;
+  
   char param_filename[1000];
   sprintf (param_filename, "%s%s", argv[0], ".json");
   //default to <program name>.json
@@ -400,7 +403,8 @@ int main(int argc, char *argv[])
 
   const char *stateFileName = get_string_param("stateFileName", NULL);
   int stateFileSteps = get_int_param("stateFileSteps", 100);
-  
+  stepsPerFrame = get_int_param("stepsPerFrame", 1);
+    
   char buf[2000];
 
   FPSmanager manager;
@@ -419,6 +423,8 @@ int main(int argc, char *argv[])
   //  int n_timesteps = (int) (1 + (maxTime / timeStep));
 
   int n_step = 0;
+  lastTicks = SDL_GetTicks();
+  
   while(!quit && (time < maxTime || maxTime <= 0)) {
      //printf("Time = %f (pause %d)\n", t, pause);
 
@@ -430,45 +436,48 @@ int main(int argc, char *argv[])
     for (int i=0; i <n_bots; i++) {
       draw_bot(screen, display_w, display_h, allbots[i]);
     }
-    
-    
+
     //   printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
     
     if (state == RUNNING)
-      {
-	process_bots(n_bots, timeStep);
-
-	time += timeStep;
-	n_step++;
-      }    
-
-   
-    
-    if (imageName && saveVideo)
-      if (n_step % saveVideoN == 0)
+      for (int s = 0; s < stepsPerFrame; s++)
 	{
-	  static int frame = 0;
-	  snprintf (buf, 2000, imageName, frame);
-	  frame++;
-	  SDL_SaveBMP(screen, buf);
-	}
+	  process_bots(n_bots, timeStep);
 
-    kilo_ticks = time * TICKS_PER_SEC;
-    
-    if (stateFileName)
-      if (n_step % stateFileSteps == 0)
-	{
-	  json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
-	  json_array_append(j_state, t);
-	}
-       
+	  // save screenshots for video
+	  if (imageName && saveVideo)
+	    if (n_step % saveVideoN == 0)
+	      {
+		static int frame = 0;
+		snprintf (buf, 2000, imageName, frame);
+		frame++;
+		SDL_SaveBMP(screen, buf);
+	      }
 
-    draw_status(screen, display_w, display_h);
+	  // save state as JSON
+	  if (stateFileName)
+	    if (n_step % stateFileSteps == 0)
+	      {
+		json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
+		json_array_append(j_state, t);
+	      }
+
+	  n_step++;
+	  time += timeStep;
+	  kilo_ticks = time * TICKS_PER_SEC;
+	}    
+  
+    draw_status(screen, display_w, display_h, 1000.0/frameTimeAvg);
     // draw status here, after video capture
     
     SDL_Flip(screen);
     if (!fullSpeed)
       SDL_framerateDelay(&manager);
+    
+    Uint32 t = SDL_GetTicks();
+    double w = .02;
+    frameTimeAvg = (1-w) * frameTimeAvg + w*(t-lastTicks);
+    lastTicks = t;    
   }
 
   save_bot_state_to_file(allbots, n_bots, "endstate.json");

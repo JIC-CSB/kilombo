@@ -21,7 +21,6 @@
 //windows: #include <direct.h> and use _mkdir, or use cygwin
 
 
-void draw_status(SDL_Surface *surface, int w, int h);
 
 extern void (*callback_F5) (void) ; // function pointer to user-defined callback function for F5 press
 extern void (*callback_F6) (void) ; // function pointer to user-defined callback function for F6 press
@@ -264,7 +263,12 @@ void input(void)
  if (keystates[SDLK_UP])
    c_y -= d; 
  if (keystates[SDLK_DOWN])
-   c_y += d; 
+   c_y += d;
+ if (keystates[SDLK_KP_MULTIPLY]) // faster
+   stepsPerFrame++;
+ if (keystates[SDLK_KP_DIVIDE])   // slower
+   if (stepsPerFrame > 0)
+     stepsPerFrame--;
  if (keystates[SDLK_F1])
    spread_out(500);
  if (keystates[SDLK_F2])
@@ -446,10 +450,10 @@ void displayString (SDL_Surface *surface, int x, int y, char *s)
 
 // draw status message for one bot, if the mouse is over it
 // also draw a simulator status
-void draw_status(SDL_Surface *surface, int w, int h)
+void draw_status(SDL_Surface *surface, int w, int h, double FPS)
 {
   char buf[100];
-  sprintf(buf, "%d", kilo_ticks);
+  sprintf(buf, "%3dx  %8d  %5.1f FPS", stepsPerFrame, kilo_ticks, FPS);
   displayString(surface, 10, 2, buf);
   
   

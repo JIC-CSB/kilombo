@@ -76,5 +76,6 @@ enum {PAUSE, RUNNING};
 extern int state;   //simulator state. PAUSE or RUNNING.
 extern int tx_period_ticks;
 extern int fullSpeed;
+extern int stepsPerFrame;
 
 #endif

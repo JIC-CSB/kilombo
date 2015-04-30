@@ -83,6 +83,8 @@ The following keybindings are active during simulation:
 * ESC: terminate simulation
 * Numpad +: zoom in
 * Numpad -: zoom out
+* Numpad *: faster
+* Numpad /: slower
 * Arrow keys : move display
 * Space : pause/resume simulation
 * Mouse-left: drag bots around
@@ -115,7 +117,7 @@ The following keywords are recognized in the simulator JSON configuration file:
   where the `%...d` will be replaced by an increasing number.
 * `stateFileName` : file name for saving the simulation state as JSON during the simulation.
 * `stateFileSteps` : number of simulator timesteps between storing the simulator state as JSON.
-
+* `stepsPerFrame`  : number of simulator time steps to perform between drawing. Can be changed interactively using numpad `/` and '*'.
 
 
 #Command line options
