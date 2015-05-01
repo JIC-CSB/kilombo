@@ -341,11 +341,28 @@ void draw_commLines(SDL_Surface *surface)
       lineRGBA (surface, x1, y1, x2, y2, 160, 160, 160, 255);
     }
 }
-	      
+
+/* Draw history */
+void draw_bot_history(SDL_Surface *surface, int w, int h, kilobot *bot)
+{
+  if (get_int_param("showHist", 0)) {
+    float i_alpha = 255.;
+    for (int i=bot->p_hist-1; i>=0; i--) {
+      Uint32 ui_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, (int) i_alpha);
+      i_alpha = i_alpha * 0.998;
+      filledCircleColor(surface,
+			display_w/2 + display_scale * bot->x_history[i],
+			display_h/2 + display_scale * bot->y_history[i],
+			display_scale * 2, ui_color);
+    }
+  }
+  
+}
+
 void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
 {
   int r = bot->radius;
-  
+
   /* Draw the bot's body */
 
   int draw_x = w/2 + display_scale * (bot->x - c_x);
@@ -404,19 +421,6 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
     }
   }
 
-  /* Draw history */
-
-  if (get_int_param("showHist", 0)) {
-    float i_alpha = 255.;
-    for (int i=bot->p_hist-1; i>=0; i--) {
-      Uint32 ui_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, (int) i_alpha);
-      i_alpha = i_alpha * 0.99;
-      filledCircleColor(surface,
-			display_w/2 + display_scale * bot->x_history[i],
-			display_h/2 + display_scale * bot->y_history[i],
-			display_scale * 2, ui_color);
-    }
-  }
 }
 
 char botinfo_buffer[100];

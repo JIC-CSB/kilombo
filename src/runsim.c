@@ -433,9 +433,12 @@ int main(int argc, char *argv[])
     SDL_FillRect(screen, NULL, 0x00000000);
     if (get_int_param("showComms", 1)) 
       draw_commLines(screen);
-    for (int i=0; i <n_bots; i++) {
+
+    for (int i=0; i <n_bots; i++) 
+      draw_bot_history(screen, display_w, display_h, allbots[i]);
+    for (int i=0; i <n_bots; i++) 
       draw_bot(screen, display_w, display_h, allbots[i]);
-    }
+    
 
     //   printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
     

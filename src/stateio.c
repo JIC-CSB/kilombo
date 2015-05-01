@@ -36,6 +36,9 @@ json_t* json_bot_rep(kilobot *bot)
   json_store_double(root, "x_position", bot->x);
   json_store_double(root, "y_position", bot->y);
 
+  /*
+  // store history in bot state
+  // not in use currently, since full bot states can be stored periodically.
   json_t* j_x_hist = json_array();
   json_t* j_y_hist = json_array();
   json_t *j_xhval, *j_yhval;
@@ -48,7 +51,8 @@ json_t* json_bot_rep(kilobot *bot)
 
   json_object_set(root, "x_history", j_x_hist);
   json_object_set(root, "y_history", j_y_hist);
-
+  */
+  
   // bot state
   json_t * j_state;
   if(callback_json_state)

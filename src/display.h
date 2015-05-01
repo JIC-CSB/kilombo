@@ -9,6 +9,7 @@ SDL_Surface *makeWindow(int width, int height);
 void input(void);
 
 void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot);
+void draw_bot_history(SDL_Surface *surface, int w, int h, kilobot *bot);
 void draw_commLines(SDL_Surface *surface);
 void draw_status(SDL_Surface *surface, int w, int h, double FPS);
 
