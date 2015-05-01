@@ -197,6 +197,7 @@ double bot_dist(kilobot *bot1, kilobot *bot2)
 
   return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
+
 // treat c as a vector, return a unit vector parallel to c.
 // if c is 0 or very short, special case: choose o.x=1, o.y=0
 coord2D normalise(coord2D c)
