@@ -431,11 +431,13 @@ int main(int argc, char *argv[])
     input(); // process input here for fastest response.
 
     SDL_FillRect(screen, NULL, 0x00000000);
-    if (get_int_param("showComms", 1)) 
-      draw_commLines(screen);
 
     for (int i=0; i <n_bots; i++) 
       draw_bot_history(screen, display_w, display_h, allbots[i]);
+    
+    if (get_int_param("showComms", 1)) 
+      draw_commLines(screen);
+   
     for (int i=0; i <n_bots; i++) 
       draw_bot(screen, display_w, display_h, allbots[i]);
     
