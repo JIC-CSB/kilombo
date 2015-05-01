@@ -142,6 +142,13 @@ void dump_all_bots(int n_bots)
   }
 }
 
+void update_history(kilobot *bot)
+{
+      bot->x_history[bot->p_hist] = bot->x;
+      bot->y_history[bot->p_hist] = bot->y;
+      bot->p_hist++;
+}
+
 void update_bot(kilobot *bot, float timestep)
 {
   int r = bot->radius;
@@ -151,12 +158,9 @@ void update_bot(kilobot *bot, float timestep)
   double x_r = bot->x + r * cos(bot->direction);
   double y_r = bot->y - r * sin(bot->direction);
 
-  if (storeHistory)
-    {
-      bot->x_history[bot->p_hist] = bot->x;
-      bot->y_history[bot->p_hist] = bot->y;
-      bot->p_hist++;
-    }
+  if (storeHistory) {
+      update_history(bot);
+  }
   
   /* If our history is longer than the memory allocation, reallocate */
   if (1 + bot->p_hist > bot->n_hist) {

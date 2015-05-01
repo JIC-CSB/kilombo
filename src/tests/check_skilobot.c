@@ -88,6 +88,29 @@ START_TEST(test_run_all_bots)
 }
 END_TEST
 
+START_TEST(test_update_history)
+{
+    kilobot* k;
+    k = new_kilobot(0, 1);
+
+    ck_assert_int_eq(k->x, 0);
+    ck_assert_int_eq(k->y, 0);
+
+    update_history(k);
+
+    ck_assert_int_eq(k->x_history[0], 0);
+    ck_assert_int_eq(k->y_history[0], 0);
+
+
+    k->x = 1;
+    k->y = 2;
+    update_history(k);
+
+    ck_assert_int_eq(k->x_history[1], 1);
+    ck_assert_int_eq(k->y_history[1], 2);
+}
+END_TEST
+
 Suite *add_suite(void)
 {
     Suite *s;
@@ -101,6 +124,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_init_all_bots);
     tcase_add_test(tc_core, test_me);
     tcase_add_test(tc_core, test_run_all_bots);
+    tcase_add_test(tc_core, test_update_history);
     suite_add_tcase(s, tc_core);
 
     return s;
