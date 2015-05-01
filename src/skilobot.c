@@ -44,11 +44,6 @@ void register_callback(Callback_t type, void (*fp)(void))
 
 int storeHistory = 1;
 
-typedef struct {
-  double x;
-  double y;
-} coord2D;
-
 kilobot *new_kilobot(int ID, int n_bots)
 {
   kilobot* bot = (kilobot*) calloc(1, sizeof(kilobot));

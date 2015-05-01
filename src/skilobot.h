@@ -36,6 +36,11 @@ typedef struct {
 
 } kilobot;
 
+typedef struct {
+  double x;
+  double y;
+} coord2D;
+
 typedef struct 
 {
   kilobot *from;
@@ -62,6 +67,7 @@ void spread_out(double k);
 
 void update_history(kilobot *bot);
 double bot_dist(kilobot *bot1, kilobot *bot2);
+coord2D normalise(coord2D c);
 
 
 void collision_detection(int n_bots);
