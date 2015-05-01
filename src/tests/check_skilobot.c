@@ -28,6 +28,14 @@ void dummy_loop(void) {
 }
 
 
+// Helper function to do a double comparison.
+
+void check_double_equality(double d1, double d2) {
+    double abs_diff = abs(d1 - d2);
+    fail_unless(abs_diff < 0.00001, "double not equal");
+}
+
+
 START_TEST(test_new_kilobot)
 {
     kilobot* k;
@@ -122,10 +130,30 @@ START_TEST(test_bot_dist)
     k2->x = 3.0;
     k2->y = 4.0;
     double distance = bot_dist(k1, k2);
-    double abs_diff = abs(distance - 5.0);
-    fail_unless(abs_diff < 0.001, "Distance is incorrect.");
+    check_double_equality(distance, 5.0);
+//    double abs_diff = abs(distance - 5.0);
+//    fail_unless(abs_diff < 0.001, "Distance is incorrect.");
 }
 END_TEST
+
+START_TEST(test_normalise)
+{
+    coord2D c;
+    c.x = 0.0;
+    c.y = 0.0;
+    c = normalise(c);
+
+    check_double_equality(c.x, 1.0);
+    check_double_equality(c.y, 0.0);
+
+    c.x = 5.0;
+    c.y = 5.0;
+    c = normalise(c);
+    check_double_equality(c.x, 1.4142135);
+    check_double_equality(c.y, 1.4142135);
+}
+END_TEST
+
 
 Suite *add_suite(void)
 {
@@ -142,6 +170,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_run_all_bots);
     tcase_add_test(tc_core, test_update_history);
     tcase_add_test(tc_core, test_bot_dist);
+    tcase_add_test(tc_core, test_normalise);
     suite_add_tcase(s, tc_core);
 
     return s;
