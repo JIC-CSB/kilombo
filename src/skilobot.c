@@ -72,7 +72,7 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->g_led = 0;
   bot->b_led = 0;
 
-  bot->cr = 70;
+  bot->cr = get_int_param("commsRadius", 70);
 
   bot->in_range = (int*) malloc(sizeof(int) * n_bots);
   bot->n_in_range = 0;

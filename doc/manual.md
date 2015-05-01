@@ -107,6 +107,7 @@ The following keywords are recognized in the simulator JSON configuration file:
 * `formation` : starting bot formation. Current options are ("random", "line", "pile", "circle", "ellipse"). Defaults to "random".     
 * `timeStep` : time step. Also determines the displayed frame rate (currently, will be configurable)
 * `simulationTime` : how long to run the simulation
+* `commsRadius` : the communication range of the robots in mm
 * `showComms` :  whether or not to draw a line between each pair of bots in communication range, whenever a message is passed between them.
 * `showCommsRadius` :  whether or not to draw a circle for the communications range of each bot
 * `distributePercent` :
