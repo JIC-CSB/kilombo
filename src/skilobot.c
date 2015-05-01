@@ -58,10 +58,10 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->x = 0;
   bot->y = 0;
 
-  bot->x_history = (double *) calloc(100, sizeof(double));
-  bot->y_history = (double *) calloc(100, sizeof(double));
-  bot->p_hist = 0;
   bot->n_hist = 100;
+  bot->x_history = (double *) calloc(bot->n_hist, sizeof(double));
+  bot->y_history = (double *) calloc(bot->n_hist, sizeof(double));
+  bot->p_hist = 0;
 
   bot->radius = 17; // mm
 
