@@ -83,8 +83,9 @@ void create_bots(int n_bots)
 {
   allbots = (kilobot**) malloc(sizeof(kilobot*) * n_bots);
 
-  for (int i=0; i<n_bots; i++) 
+  for (int i=0; i<n_bots; i++) {
     allbots[i] = new_kilobot(i, n_bots);
+  }
 }
 
 void init_all_bots(int n_bots)
@@ -301,15 +302,13 @@ void addCommLine(kilobot *from, kilobot *to)
 void removeOldCommLines(int dt, int maxt)
 {
   int i;
-  for (i = NcommLines-1; i >= 0; i--)
-    {
-      commLines[i].time += dt;
-      if (commLines[i].time > maxt)
-	{
+  for (i = NcommLines-1; i >= 0; i--) {
+    commLines[i].time += dt;
+    if (commLines[i].time > maxt) {
 	  commLines[i] = commLines[NcommLines-1];
 	  NcommLines--;
 	}
-    }
+  }
 }
 
 
@@ -359,12 +358,12 @@ void process_messaging(int n_bots)
 {
   /* Update messaging between bots. */
 
-  for (int i=0; i<n_bots; i++)
-    if (kilo_ticks >= allbots[i]->tx_ticks)
-      {
-	allbots[i]->tx_ticks += tx_period_ticks;
-	pass_message(allbots[i]);
-      }
+  for (int i=0; i<n_bots; i++) {
+    if (kilo_ticks >= allbots[i]->tx_ticks) {
+      allbots[i]->tx_ticks += tx_period_ticks;
+      pass_message(allbots[i]);
+    }
+  }
 
   // run removeOldCommLines at most once every kilo_ticks.
   static int last_ticks = 0;
