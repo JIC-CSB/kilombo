@@ -136,13 +136,6 @@ void dump_all_bots(int n_bots)
   }
 }
 
-void update_bot_history(kilobot *bot)
-{
-      bot->x_history[bot->p_hist] = bot->x;
-      bot->y_history[bot->p_hist] = bot->y;
-      bot->p_hist++;
-}
-
 void manage_bot_history_memory(kilobot *bot)
 {
   /* If our history is longer than the memory allocation, reallocate */
@@ -151,6 +144,15 @@ void manage_bot_history_memory(kilobot *bot)
     bot->x_history = (double *) realloc(bot->x_history, sizeof(double) * bot->n_hist);
     bot->y_history = (double *) realloc(bot->y_history, sizeof(double) * bot->n_hist);
   }
+}
+
+void update_bot_history(kilobot *bot)
+{
+      bot->x_history[bot->p_hist] = bot->x;
+      bot->y_history[bot->p_hist] = bot->y;
+      bot->p_hist++;
+
+      manage_bot_history_memory(bot);
 }
 
 void move_bot_forward(kilobot *bot, float timestep)
@@ -199,9 +201,6 @@ void update_bot(kilobot *bot, float timestep)
   if (storeHistory) {
       update_bot_history(bot);
   }
-  
-  manage_bot_history_memory(bot);
-
   update_bot_location(bot, timestep);
 }
 
