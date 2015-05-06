@@ -15,6 +15,7 @@ double bot_dist(kilobot *bot1, kilobot *bot2);
 coord2D normalise(coord2D c);
 coord2D separation_unit_vector(kilobot *bot1, kilobot *bot2);
 void separate_clashing_bots(kilobot *bot1, kilobot *bot2);
+void reset_n_in_range_indices(int n_bots);
 
 // Needed to compile any program with a library.
 //#include "kilolib.h"
@@ -274,6 +275,23 @@ START_TEST(test_separate_clashing_bots)
 }
 END_TEST
 
+START_TEST(test_reset_n_in_range_indices)
+{
+    int n = 3;
+    create_bots(n);
+    init_all_bots(n);
+    for (int i=0; i<n; i++) {
+        allbots[i]->n_in_range = i;
+        ck_assert_int_eq(allbots[i]->n_in_range, i);
+    }
+
+    reset_n_in_range_indices(n);
+    for (int i=0; i<n; i++) {
+        ck_assert_int_eq(allbots[i]->n_in_range, 0);
+    }
+}
+END_TEST
+
 
 Suite *add_suite(void)
 {
@@ -297,6 +315,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_normalise);
     tcase_add_test(tc_core, test_separation_unit_vector);
     tcase_add_test(tc_core, test_separate_clashing_bots);
+    tcase_add_test(tc_core, test_reset_n_in_range_indices);
     suite_add_tcase(s, tc_core);
 
     return s;

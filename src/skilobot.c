@@ -248,6 +248,13 @@ coord2D separation_unit_vector(kilobot* bot1, kilobot* bot2)
   return normalise(separation_vector);
 }
 
+void reset_n_in_range_indices(int n_bots)
+{
+  for (int i=0; i<n_bots; i++) {
+    allbots[i]->n_in_range = 0;
+  }
+}
+
 void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
 {
   coord2D suv = separation_unit_vector(bot1, bot2);
@@ -263,9 +270,7 @@ void collision_detection(int n_bots)
   double r = allbots[0]->radius;
   double communication_radius = allbots[0]->cr;
 
-  for (int i=0; i<n_bots; i++) {
-    allbots[i]->n_in_range = 0;
-  }
+  reset_n_in_range_indices(n_bots);
 
   for (int i=0; i<n_bots; i++) {
     for (int j=i+1; j<n_bots; j++) {
