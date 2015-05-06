@@ -143,6 +143,16 @@ void update_bot_history(kilobot *bot)
       bot->p_hist++;
 }
 
+void manage_bot_history_memory(kilobot *bot)
+{
+  /* If our history is longer than the memory allocation, reallocate */
+  if (1 + bot->p_hist > bot->n_hist) {
+    bot->n_hist += 100;
+    bot->x_history = (double *) realloc(bot->x_history, sizeof(double) * bot->n_hist);
+    bot->y_history = (double *) realloc(bot->y_history, sizeof(double) * bot->n_hist);
+  }
+}
+
 void move_bot_forward(kilobot *bot, float timestep)
 {
     int velocity = 0.5 * (bot->left_motor_power + bot->right_motor_power);
@@ -190,12 +200,7 @@ void update_bot(kilobot *bot, float timestep)
       update_bot_history(bot);
   }
   
-  /* If our history is longer than the memory allocation, reallocate */
-  if (1 + bot->p_hist > bot->n_hist) {
-    bot->n_hist += 100;
-    bot->x_history = (double *) realloc(bot->x_history, sizeof(double) * bot->n_hist);
-    bot->y_history = (double *) realloc(bot->y_history, sizeof(double) * bot->n_hist);
-  }
+  manage_bot_history_memory(bot);
 
   update_bot_location(bot, timestep);
 }

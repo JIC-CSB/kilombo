@@ -6,6 +6,7 @@
 
 // Include some definitions of "private" functions we want to test.
 void update_bot_history(kilobot *bot);
+void manage_bot_history_memory(kilobot *bot);
 void move_bot_forward(kilobot *bot, float timestep);
 void turn_bot_right(kilobot *bot, float timestep);
 void turn_bot_left(kilobot *bot, float timestep);
@@ -131,6 +132,20 @@ START_TEST(test_update_bot_history)
 }
 END_TEST
 
+START_TEST(test_manage_bot_history_memory)
+{
+    kilobot* k;
+    k = new_kilobot(0, 1);
+
+    ck_assert_int_eq(k->n_hist, 100);
+    
+    k->p_hist = 100;
+    manage_bot_history_memory(k);
+
+    ck_assert_int_eq(k->n_hist, 200);
+}
+END_TEST
+
 START_TEST(test_move_bot_forward)
 {
     kilobot* k;
@@ -229,6 +244,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_me);
     tcase_add_test(tc_core, test_run_all_bots);
     tcase_add_test(tc_core, test_update_bot_history);
+    tcase_add_test(tc_core, test_manage_bot_history_memory);
     tcase_add_test(tc_core, test_move_bot_forward);
     tcase_add_test(tc_core, test_turn_bot_right);
     tcase_add_test(tc_core, test_turn_bot_left);
