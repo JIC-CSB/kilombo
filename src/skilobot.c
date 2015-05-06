@@ -251,7 +251,7 @@ void collision_detection(int n_bots)
 {
   //double r = (double) allbots[0].radius;
   double r = allbots[0]->radius;
-  double cr = allbots[0]->cr;
+  double communication_radius = allbots[0]->cr;
 
   for (int i=0; i<n_bots; i++) {
     allbots[i]->n_in_range = 0;
@@ -259,9 +259,9 @@ void collision_detection(int n_bots)
 
   for (int i=0; i<n_bots; i++) {
     for (int j=i+1; j<n_bots; j++) {
-      double bd = bot_dist(allbots[i], allbots[j]);
+      double bot2bot_distance = bot_dist(allbots[i], allbots[j]);
 
-      if (bd < (2 * r)) {
+      if (bot2bot_distance < (2 * r)) {
         //	  printf("Whack %d %d\n", i, j);
         coord2D us = unit_sep(allbots[i], allbots[j]);
         allbots[i]->x -= us.x;
@@ -269,12 +269,12 @@ void collision_detection(int n_bots)
         allbots[j]->x += us.x;
         allbots[j]->y += us.y;
         // we move the bots, this changes the distance.
-        // so bd should be recalculated.
+        // so bot2bot_distance should be recalculated.
         // but we only need it below to tell if the bots are
         // in communications range, and after resolving the collision, they will still be
         // ... unless they are densely packed and a bot is moved very far, unlikely.
       }
-      if (bd < cr) {
+      if (bot2bot_distance < communication_radius) {
         //if (i == 0) printf("%d and %d in range\n", i, j);
         allbots[i]->in_range[allbots[i]->n_in_range++] = j;
         allbots[j]->in_range[allbots[j]->n_in_range++] = i;
