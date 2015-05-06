@@ -21,6 +21,8 @@ void *mydata;
 char* botinfo_simple(void) { return NULL; };
 extern uint16_t kilo_uid;
 
+// Needed to setup a new kilobot.
+int get_int_param(const char *param_name, int default_val) { return default_val; };
 
 // Define a dummy bot_main function for testing purposes.
 int n_calls_to_bot_main = 0;
