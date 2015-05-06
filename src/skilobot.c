@@ -149,38 +149,38 @@ void manage_bot_history_memory(kilobot *bot)
 
 void update_bot_history(kilobot *bot)
 {
-      bot->x_history[bot->p_hist] = bot->x;
-      bot->y_history[bot->p_hist] = bot->y;
-      bot->p_hist++;
+  bot->x_history[bot->p_hist] = bot->x;
+  bot->y_history[bot->p_hist] = bot->y;
+  bot->p_hist++;
 
-      manage_bot_history_memory(bot);
+  manage_bot_history_memory(bot);
 }
 
 void move_bot_forward(kilobot *bot, float timestep)
 {
-    int velocity = 0.5 * (bot->left_motor_power + bot->right_motor_power);
-    bot->y += timestep * velocity * cos(bot->direction);
-    bot->x += timestep * velocity * sin(bot->direction);
+  int velocity = 0.5 * (bot->left_motor_power + bot->right_motor_power);
+  bot->y += timestep * velocity * cos(bot->direction);
+  bot->x += timestep * velocity * sin(bot->direction);
 }
 
 void turn_bot_right(kilobot *bot, float timestep)
 {
-    int r = bot->radius;
-    double x_r = bot->x + r * cos(bot->direction);
-    double y_r = bot->y - r * sin(bot->direction);
-    bot->direction += timestep * (double) (bot->left_motor_power) / 30;
-    bot->x = x_r - r * cos(bot->direction);
-    bot->y = y_r + r * sin(bot->direction);
+  int r = bot->radius;
+  double x_r = bot->x + r * cos(bot->direction);
+  double y_r = bot->y - r * sin(bot->direction);
+  bot->direction += timestep * (double) (bot->left_motor_power) / 30;
+  bot->x = x_r - r * cos(bot->direction);
+  bot->y = y_r + r * sin(bot->direction);
 }
 
 void turn_bot_left(kilobot *bot, float timestep)
 {
-    int r = bot->radius;
-    double x_l = bot->x - r * cos(bot->direction);
-    double y_l = bot->y + r * sin(bot->direction);
-    bot->direction -= timestep * (double) (bot->right_motor_power) / 30;
-    bot->x = x_l + r * cos(bot->direction);
-    bot->y = y_l - r * sin(bot->direction);
+  int r = bot->radius;
+  double x_l = bot->x - r * cos(bot->direction);
+  double y_l = bot->y + r * sin(bot->direction);
+  bot->direction -= timestep * (double) (bot->right_motor_power) / 30;
+  bot->x = x_l + r * cos(bot->direction);
+  bot->y = y_l - r * sin(bot->direction);
 }
 
 void update_bot_location(kilobot *bot, float timestep)
@@ -200,7 +200,7 @@ void update_bot_location(kilobot *bot, float timestep)
 void update_bot(kilobot *bot, float timestep)
 {
   if (storeHistory) {
-      update_bot_history(bot);
+    update_bot_history(bot);
   }
   update_bot_location(bot, timestep);
 }
@@ -260,26 +260,26 @@ void collision_detection(int n_bots)
 
   for (int i=0; i<n_bots; i++) {
     for (int j=i+1; j<n_bots; j++) {
-        double bd = bot_dist(allbots[i], allbots[j]);
+      double bd = bot_dist(allbots[i], allbots[j]);
 
-        if (bd < (2 * r)) {
-            //	  printf("Whack %d %d\n", i, j);
-            coord2D us = unit_sep(allbots[i], allbots[j]);
-            allbots[i]->x -= us.x;
-            allbots[i]->y -= us.y;
-            allbots[j]->x += us.x;
-            allbots[j]->y += us.y;
-            // we move the bots, this changes the distance.
-            // so bd should be recalculated.
-            // but we only need it below to tell if the bots are
-            // in communications range, and after resolving the collision, they will still be
-            // ... unless they are densely packed and a bot is moved very far, unlikely.
-        }
-        if (bd < cr) {
-            //if (i == 0) printf("%d and %d in range\n", i, j);
-            allbots[i]->in_range[allbots[i]->n_in_range++] = j;
-            allbots[j]->in_range[allbots[j]->n_in_range++] = i;
-        }
+      if (bd < (2 * r)) {
+        //	  printf("Whack %d %d\n", i, j);
+        coord2D us = unit_sep(allbots[i], allbots[j]);
+        allbots[i]->x -= us.x;
+        allbots[i]->y -= us.y;
+        allbots[j]->x += us.x;
+        allbots[j]->y += us.y;
+        // we move the bots, this changes the distance.
+        // so bd should be recalculated.
+        // but we only need it below to tell if the bots are
+        // in communications range, and after resolving the collision, they will still be
+        // ... unless they are densely packed and a bot is moved very far, unlikely.
+      }
+      if (bd < cr) {
+        //if (i == 0) printf("%d and %d in range\n", i, j);
+        allbots[i]->in_range[allbots[i]->n_in_range++] = j;
+        allbots[j]->in_range[allbots[j]->n_in_range++] = i;
+      }
     }
   }
 }
@@ -313,43 +313,44 @@ void removeOldCommLines(int dt, int maxt)
 
 void pass_message(kilobot* tx)
 {
-    /* Pass message from tx to all bots in range*/
+  /* Pass message from tx to all bots in range*/
 
-    int i;
+  int i;
 
+  kilo_uid = tx->ID;
+  mydata = tx->data;
+  message_t * msg = kilo_message_tx();
+  distance_measurement_t distm;
+
+  if (msg) {
+    tx->tx_enabled = 1;
+    //printf ("n_in_range=%d\n",tx->n_in_range);
+    for (i = 0; i < tx->n_in_range; i++) {
+      //switch to next receiving bot
+      kilobot *rx = allbots[tx->in_range[i]];
+      addCommLine(tx, rx);
+ 
+      kilo_uid = rx->ID;
+      mydata = rx->data;
+
+     /* set up a distance measurement structure
+      * we know the true distance, so we just store it in the structure
+      * estimate_distance() will just return high_gain .
+      */
+      distm.low_gain = 0;
+      distm.high_gain = bot_dist(tx, rx);
+
+      kilo_message_rx(msg, &distm);
+    }
+
+    // switch to the transmitting bot, to call kilo_message_tx_success()
     kilo_uid = tx->ID;
     mydata = tx->data;
-    message_t * msg = kilo_message_tx();
-    distance_measurement_t distm;
-
-    if (msg) {
-        tx->tx_enabled = 1;
-        //printf ("n_in_range=%d\n",tx->n_in_range);
-        for (i = 0; i < tx->n_in_range; i++) {
-            //switch to next receiving bot
-            kilobot *rx = allbots[tx->in_range[i]];
-            addCommLine(tx, rx);
- 
-            kilo_uid = rx->ID;
-            mydata = rx->data;
-
-           /* set up a distance measurement structure
-            * we know the true distance, so we just store it in the structure
-            * estimate_distance() will just return high_gain .
-            */
-            distm.low_gain = 0;
-            distm.high_gain = bot_dist(tx, rx);
-
-            kilo_message_rx(msg, &distm);
-        }
-
-        // switch to the transmitting bot, to call kilo_message_tx_success()
-        kilo_uid = tx->ID;
-        mydata = tx->data;
-        kilo_message_tx_success();
-    } else {
-        tx->tx_enabled = 0;
-    }
+    kilo_message_tx_success();
+  }
+  else {
+    tx->tx_enabled = 0;
+  }
 }
  
 void process_messaging(int n_bots)
