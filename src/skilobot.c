@@ -260,7 +260,6 @@ void collision_detection(int n_bots)
 
   for (int i=0; i<n_bots; i++) {
     for (int j=i+1; j<n_bots; j++) {
-      {
         double bd = bot_dist(allbots[i], allbots[j]);
 
         if (bd < (2 * r)) {
@@ -281,7 +280,6 @@ void collision_detection(int n_bots)
             allbots[i]->in_range[allbots[i]->n_in_range++] = j;
             allbots[j]->in_range[allbots[j]->n_in_range++] = i;
         }
-      }
     }
   }
 }
