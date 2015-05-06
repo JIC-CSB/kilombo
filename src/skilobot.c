@@ -89,8 +89,7 @@ void create_bots(int n_bots)
 
 void init_all_bots(int n_bots)
 {
-  for (int i=0; i<n_bots; i++)
-    {
+  for (int i=0; i<n_bots; i++) {
       current_bot = i;      // for Me() to return the right bot
       mydata = Me()->data;
       kilo_uid = i;         // in case the bot's main() uses ID
@@ -137,14 +136,14 @@ void dump_all_bots(int n_bots)
   }
 }
 
-void update_history(kilobot *bot)
+void update_bot_history(kilobot *bot)
 {
       bot->x_history[bot->p_hist] = bot->x;
       bot->y_history[bot->p_hist] = bot->y;
       bot->p_hist++;
 }
 
-void update_bot(kilobot *bot, float timestep)
+void update_bot_location(kilobot *bot, float timestep)
 {
   int r = bot->radius;
   
@@ -153,19 +152,7 @@ void update_bot(kilobot *bot, float timestep)
   double x_r = bot->x + r * cos(bot->direction);
   double y_r = bot->y - r * sin(bot->direction);
 
-  if (storeHistory) {
-      update_history(bot);
-  }
-  
-  /* If our history is longer than the memory allocation, reallocate */
-  if (1 + bot->p_hist > bot->n_hist) {
-    bot->n_hist += 100;
-    bot->x_history = (double *) realloc(bot->x_history, sizeof(double) * bot->n_hist);
-    bot->y_history = (double *) realloc(bot->y_history, sizeof(double) * bot->n_hist);
-  }
-
   if (bot->cwm && bot->ccwm) { // forward movement
-
     int velocity = 0.5 * (bot->ccwm + bot->cwm);
     bot->y += timestep * velocity * cos(bot->direction);
     bot->x += timestep * velocity * sin(bot->direction);
@@ -181,6 +168,22 @@ void update_bot(kilobot *bot, float timestep)
       bot->y = y_l - r * sin(bot->direction);
     }
   }
+}
+
+void update_bot(kilobot *bot, float timestep)
+{
+  if (storeHistory) {
+      update_bot_history(bot);
+  }
+  
+  /* If our history is longer than the memory allocation, reallocate */
+  if (1 + bot->p_hist > bot->n_hist) {
+    bot->n_hist += 100;
+    bot->x_history = (double *) realloc(bot->x_history, sizeof(double) * bot->n_hist);
+    bot->y_history = (double *) realloc(bot->y_history, sizeof(double) * bot->n_hist);
+  }
+
+  update_bot_location(bot, timestep);
 }
 
 double bot_dist(kilobot *bot1, kilobot *bot2)
