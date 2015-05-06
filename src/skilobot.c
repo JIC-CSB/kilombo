@@ -125,7 +125,7 @@ void dump_bot_info(kilobot *self)
   /* Dump bot info to stdout */
 
   printf("B %d: At (%f, %f), speed (%d, %d)\n", 
-	 self->ID, self->x, self->y, self->right_motor_power, self->left_motor_power);
+    self->ID, self->x, self->y, self->right_motor_power, self->left_motor_power);
 }
 
 void dump_all_bots(int n_bots)
@@ -261,26 +261,26 @@ void collision_detection(int n_bots)
   for (int i=0; i<n_bots; i++) {
     for (int j=i+1; j<n_bots; j++) {
       {
-	double bd = bot_dist(allbots[i], allbots[j]);
-	
-	if (bd < (2 * r)) {
-	  //	  printf("Whack %d %d\n", i, j);
-	  coord2D us = unit_sep(allbots[i], allbots[j]);
-	  allbots[i]->x -= us.x;
-	  allbots[i]->y -= us.y;
-	  allbots[j]->x += us.x;
-	  allbots[j]->y += us.y;
-	  // we move the bots, this changes the distance.
-	  // so bd should be recalculated.
-	  // but we only need it below to tell if the bots are
-	  // in communications range, and after resolving the collision, they will still be
-	  // ... unless they are densely packed and a bot is moved very far, unlikely.
-	}
-	if (bd < cr) {
-	  //if (i == 0) printf("%d and %d in range\n", i, j);
-	  allbots[i]->in_range[allbots[i]->n_in_range++] = j;
-	  allbots[j]->in_range[allbots[j]->n_in_range++] = i;
-	}
+        double bd = bot_dist(allbots[i], allbots[j]);
+
+        if (bd < (2 * r)) {
+            //	  printf("Whack %d %d\n", i, j);
+            coord2D us = unit_sep(allbots[i], allbots[j]);
+            allbots[i]->x -= us.x;
+            allbots[i]->y -= us.y;
+            allbots[j]->x += us.x;
+            allbots[j]->y += us.y;
+            // we move the bots, this changes the distance.
+            // so bd should be recalculated.
+            // but we only need it below to tell if the bots are
+            // in communications range, and after resolving the collision, they will still be
+            // ... unless they are densely packed and a bot is moved very far, unlikely.
+        }
+        if (bd < cr) {
+            //if (i == 0) printf("%d and %d in range\n", i, j);
+            allbots[i]->in_range[allbots[i]->n_in_range++] = j;
+            allbots[j]->in_range[allbots[j]->n_in_range++] = i;
+        }
       }
     }
   }
@@ -305,9 +305,9 @@ void removeOldCommLines(int dt, int maxt)
   for (i = NcommLines-1; i >= 0; i--) {
     commLines[i].time += dt;
     if (commLines[i].time > maxt) {
-	  commLines[i] = commLines[NcommLines-1];
-	  NcommLines--;
-	}
+      commLines[i] = commLines[NcommLines-1];
+      NcommLines--;
+    }
   }
 }
 
