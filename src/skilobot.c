@@ -316,46 +316,42 @@ void removeOldCommLines(int dt, int maxt)
 
 void pass_message(kilobot* tx)
 {
-  /* Pass message from tx to all bots in range*/
+    /* Pass message from tx to all bots in range*/
 
-  int i;
+    int i;
 
-  kilo_uid = tx->ID;
-  mydata = tx->data;
-  message_t * msg = kilo_message_tx();
-  distance_measurement_t distm;
+    kilo_uid = tx->ID;
+    mydata = tx->data;
+    message_t * msg = kilo_message_tx();
+    distance_measurement_t distm;
 
-  if (msg)
-    {
-      tx->tx_enabled = 1;
-      //printf ("n_in_range=%d\n",tx->n_in_range);
-      for (i = 0; i < tx->n_in_range; i++)
-	{
-	  //switch to next receiving bot
-	  kilobot *rx = allbots[tx->in_range[i]];
-	  addCommLine(tx, rx);
+    if (msg) {
+        tx->tx_enabled = 1;
+        //printf ("n_in_range=%d\n",tx->n_in_range);
+        for (i = 0; i < tx->n_in_range; i++) {
+            //switch to next receiving bot
+            kilobot *rx = allbots[tx->in_range[i]];
+            addCommLine(tx, rx);
  
-	  kilo_uid = rx->ID;
-	  mydata = rx->data;
-	  
-	  /* set up a distance measurement structure
-	   * we know the true distance, so we just store it in the structure
-	   * estimate_distance() will just return high_gain .
-	   */
-	  distm.low_gain = 0;
-	  distm.high_gain = bot_dist(tx, rx);
-	  
-	  kilo_message_rx(msg, &distm);
-	}
-      
-      // switch to the transmitting bot, to call kilo_message_tx_success()
-      kilo_uid = tx->ID;
-      mydata = tx->data;
-      kilo_message_tx_success();
-    }
-  else
-    {
-      tx->tx_enabled = 0;
+            kilo_uid = rx->ID;
+            mydata = rx->data;
+
+           /* set up a distance measurement structure
+            * we know the true distance, so we just store it in the structure
+            * estimate_distance() will just return high_gain .
+            */
+            distm.low_gain = 0;
+            distm.high_gain = bot_dist(tx, rx);
+
+            kilo_message_rx(msg, &distm);
+        }
+
+        // switch to the transmitting bot, to call kilo_message_tx_success()
+        kilo_uid = tx->ID;
+        mydata = tx->data;
+        kilo_message_tx_success();
+    } else {
+        tx->tx_enabled = 0;
     }
 }
  
