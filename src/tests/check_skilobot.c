@@ -6,6 +6,9 @@
 
 // Include some definitions of "private" functions we want to test.
 void update_bot_history(kilobot *bot);
+void move_bot_forward(kilobot *bot, float timestep);
+void turn_bot_right(kilobot *bot, float timestep);
+void turn_bot_left(kilobot *bot, float timestep);
 void update_bot_location(kilobot *bot, float timestep);
 double bot_dist(kilobot *bot1, kilobot *bot2);
 coord2D normalise(coord2D c);
@@ -126,21 +129,51 @@ START_TEST(test_update_bot_history)
 }
 END_TEST
 
-START_TEST(test_update_bot_location)
+START_TEST(test_move_bot_forward)
 {
     kilobot* k;
     k = new_kilobot(0, 1);
-    ck_assert_int_eq(k->x, 0.0);
-    ck_assert_int_eq(k->y, 0.0);
 
     // Move forwards along the north axis.
     k->cwm = 2;
     k->ccwm = 2;
     k->direction = 0.0;
-    update_bot_location(k, 3.0);
+    move_bot_forward(k, 3.0);
 
-    ck_assert_int_eq(k->x, 0.0);
-    ck_assert_int_eq(k->y, 6.0);
+    check_double_equality(k->x, 0.0);
+    check_double_equality(k->y, 6.0);
+}
+END_TEST
+
+START_TEST(test_turn_bot_right)
+{
+    kilobot* k;
+    k = new_kilobot(0, 1);
+
+    // Turn from North to East.
+    k->direction = 0.0;
+    k->ccwm = 30;
+    turn_bot_right(k, 3.1415927/2);
+
+    check_double_equality( k->direction, 3.1415927/2 );
+    check_double_equality(k->x, 17.0);
+    check_double_equality(k->y, 17.0);
+}
+END_TEST
+
+START_TEST(test_turn_bot_left)
+{
+    kilobot* k;
+    k = new_kilobot(0, 1);
+
+    // Turn from North to West.
+    k->direction = 0.0;
+    k->cwm = 30;
+    turn_bot_left(k, 3.1415927/2);
+
+    check_double_equality( k->direction, -3.1415927/2 );
+    check_double_equality(k->x, -17.0);
+    check_double_equality(k->y, 17.0);
 }
 END_TEST
 
@@ -194,7 +227,9 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_me);
     tcase_add_test(tc_core, test_run_all_bots);
     tcase_add_test(tc_core, test_update_bot_history);
-    tcase_add_test(tc_core, test_update_bot_location);
+    tcase_add_test(tc_core, test_move_bot_forward);
+    tcase_add_test(tc_core, test_turn_bot_right);
+    tcase_add_test(tc_core, test_turn_bot_left);
     tcase_add_test(tc_core, test_bot_dist);
     tcase_add_test(tc_core, test_normalise);
     suite_add_tcase(s, tc_core);

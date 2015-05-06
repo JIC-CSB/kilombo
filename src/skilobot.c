@@ -143,29 +143,43 @@ void update_bot_history(kilobot *bot)
       bot->p_hist++;
 }
 
-void update_bot_location(kilobot *bot, float timestep)
+void move_bot_forward(kilobot *bot, float timestep)
 {
-  int r = bot->radius;
-  
-  double x_l = bot->x - r * cos(bot->direction);
-  double y_l = bot->y + r * sin(bot->direction);
-  double x_r = bot->x + r * cos(bot->direction);
-  double y_r = bot->y - r * sin(bot->direction);
-
-  if (bot->cwm && bot->ccwm) { // forward movement
     int velocity = 0.5 * (bot->ccwm + bot->cwm);
     bot->y += timestep * velocity * cos(bot->direction);
     bot->x += timestep * velocity * sin(bot->direction);
+}
+
+void turn_bot_right(kilobot *bot, float timestep)
+{
+    int r = bot->radius;
+    double x_r = bot->x + r * cos(bot->direction);
+    double y_r = bot->y - r * sin(bot->direction);
+    bot->direction += timestep * (double) (bot->ccwm) / 30;
+    bot->x = x_r - r * cos(bot->direction);
+    bot->y = y_r + r * sin(bot->direction);
+}
+
+void turn_bot_left(kilobot *bot, float timestep)
+{
+    int r = bot->radius;
+    double x_l = bot->x - r * cos(bot->direction);
+    double y_l = bot->y + r * sin(bot->direction);
+    bot->direction -= timestep * (double) (bot->cwm) / 30;
+    bot->x = x_l + r * cos(bot->direction);
+    bot->y = y_l - r * sin(bot->direction);
+}
+
+void update_bot_location(kilobot *bot, float timestep)
+{
+  if (bot->cwm && bot->ccwm) { // forward movement
+    move_bot_forward(bot, timestep);
   } else {
     if (bot->ccwm) {
-      bot->direction += timestep * (double) (bot->ccwm) / 30;
-      bot->x = x_r - r * cos(bot->direction);
-      bot->y = y_r + r * sin(bot->direction);
+      turn_bot_right(bot, timestep);
     }
     if (bot->cwm) {
-      bot->direction -= timestep * (double) (bot->cwm) / 30;
-      bot->x = x_l + r * cos(bot->direction);
-      bot->y = y_l - r * sin(bot->direction);
+      turn_bot_left(bot, timestep);
     }
   }
 }
