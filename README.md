@@ -29,7 +29,7 @@ Run cmake:
 
 Install:
 
-	make install
+	sudo make install
 
 This installs the kilobot simulator in a system-wide location, by default
 under `/usr/local/lib` and `/usr/local/include`.
