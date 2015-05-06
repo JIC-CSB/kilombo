@@ -60,8 +60,8 @@ kilobot *new_kilobot(int ID, int n_bots)
 
   bot->radius = 17; // mm
 
-  bot->cwm = 0;
-  bot->ccwm = 0;
+  bot->right_motor_power = 0;
+  bot->left_motor_power = 0;
   bot->direction = (2 * 3.1415927 / 4);
   bot->r_led = 0;
   bot->g_led = 0;
@@ -124,7 +124,7 @@ void dump_bot_info(kilobot *self)
   /* Dump bot info to stdout */
 
   printf("B %d: At (%f, %f), speed (%d, %d)\n", 
-	 self->ID, self->x, self->y, self->cwm, self->ccwm);
+	 self->ID, self->x, self->y, self->right_motor_power, self->left_motor_power);
 }
 
 void dump_all_bots(int n_bots)
@@ -145,7 +145,7 @@ void update_bot_history(kilobot *bot)
 
 void move_bot_forward(kilobot *bot, float timestep)
 {
-    int velocity = 0.5 * (bot->ccwm + bot->cwm);
+    int velocity = 0.5 * (bot->left_motor_power + bot->right_motor_power);
     bot->y += timestep * velocity * cos(bot->direction);
     bot->x += timestep * velocity * sin(bot->direction);
 }
@@ -155,7 +155,7 @@ void turn_bot_right(kilobot *bot, float timestep)
     int r = bot->radius;
     double x_r = bot->x + r * cos(bot->direction);
     double y_r = bot->y - r * sin(bot->direction);
-    bot->direction += timestep * (double) (bot->ccwm) / 30;
+    bot->direction += timestep * (double) (bot->left_motor_power) / 30;
     bot->x = x_r - r * cos(bot->direction);
     bot->y = y_r + r * sin(bot->direction);
 }
@@ -165,20 +165,20 @@ void turn_bot_left(kilobot *bot, float timestep)
     int r = bot->radius;
     double x_l = bot->x - r * cos(bot->direction);
     double y_l = bot->y + r * sin(bot->direction);
-    bot->direction -= timestep * (double) (bot->cwm) / 30;
+    bot->direction -= timestep * (double) (bot->right_motor_power) / 30;
     bot->x = x_l + r * cos(bot->direction);
     bot->y = y_l - r * sin(bot->direction);
 }
 
 void update_bot_location(kilobot *bot, float timestep)
 {
-  if (bot->cwm && bot->ccwm) { // forward movement
+  if (bot->right_motor_power && bot->left_motor_power) { // forward movement
     move_bot_forward(bot, timestep);
   } else {
-    if (bot->ccwm) {
+    if (bot->left_motor_power) {
       turn_bot_right(bot, timestep);
     }
-    if (bot->cwm) {
+    if (bot->right_motor_power) {
       turn_bot_left(bot, timestep);
     }
   }

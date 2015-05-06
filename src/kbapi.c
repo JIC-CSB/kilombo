@@ -63,12 +63,12 @@ void set_motors(uint8_t left, uint8_t right)
   /* int aID = GetBotID(); */
 
   /* allbots[aID]->cwm = cw; */
-  /* allbots[aID]->ccwm = ccw; */
+  /* allbots[aID]->left_motor_power = ccw; */
 
   kilobot* self = Me();
 
-  self->ccwm = left;
-  self->cwm  = right;
+  self->left_motor_power = left;
+  self->right_motor_power  = right;
   return;
 }
 

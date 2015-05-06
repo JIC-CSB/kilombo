@@ -135,8 +135,8 @@ START_TEST(test_move_bot_forward)
     k = new_kilobot(0, 1);
 
     // Move forwards along the north axis.
-    k->cwm = 2;
-    k->ccwm = 2;
+    k->right_motor_power = 2;
+    k->left_motor_power = 2;
     k->direction = 0.0;
     move_bot_forward(k, 3.0);
 
@@ -152,7 +152,7 @@ START_TEST(test_turn_bot_right)
 
     // Turn from North to East.
     k->direction = 0.0;
-    k->ccwm = 30;
+    k->left_motor_power = 30;
     turn_bot_right(k, 3.1415927/2);
 
     check_double_equality( k->direction, 3.1415927/2 );
@@ -168,7 +168,7 @@ START_TEST(test_turn_bot_left)
 
     // Turn from North to West.
     k->direction = 0.0;
-    k->cwm = 30;
+    k->right_motor_power = 30;
     turn_bot_left(k, 3.1415927/2);
 
     check_double_equality( k->direction, -3.1415927/2 );

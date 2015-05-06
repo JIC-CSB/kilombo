@@ -13,7 +13,7 @@ typedef struct {
   double *x_history, *y_history;
   int p_hist, n_hist;
   
-  int cwm, ccwm;
+  int right_motor_power, left_motor_power;
   int ID;
   double direction; //Angle relative to constant x, +ve y in radians
   int r_led, g_led, b_led;
