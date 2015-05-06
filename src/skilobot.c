@@ -91,11 +91,11 @@ void create_bots(int n_bots)
 void init_all_bots(int n_bots)
 {
   for (int i=0; i<n_bots; i++) {
-      current_bot = i;      // for Me() to return the right bot
-      mydata = Me()->data;
-      kilo_uid = i;         // in case the bot's main() uses ID
-      bot_main();
-    }
+    current_bot = i;      // for Me() to return the right bot
+    mydata = Me()->data;
+    kilo_uid = i;         // in case the bot's main() uses ID
+    bot_main();
+  }
 }
 
 kilobot *Me()
@@ -187,7 +187,8 @@ void update_bot_location(kilobot *bot, float timestep)
 {
   if (bot->right_motor_power && bot->left_motor_power) { // forward movement
     move_bot_forward(bot, timestep);
-  } else {
+  }
+  else {
     if (bot->left_motor_power) {
       turn_bot_right(bot, timestep);
     }
@@ -224,16 +225,14 @@ coord2D normalise(coord2D c)
 
 #define eps 1e-6
   // try to avoid dividing by 0
-  if (l > eps)
-    {
-      o.x = c.x / l;
-      o.y = c.y / l;
-    }
-  else
-    {
-      o.x = 1;
-      o.y = 0;
-    }
+  if (l > eps) {
+    o.x = c.x / l;
+    o.y = c.y / l;
+  }
+  else {
+    o.x = 1;
+    o.y = 0;
+  }
 
   return o;
 }
@@ -293,8 +292,9 @@ void addCommLine(kilobot *from, kilobot *to)
   commLines[NcommLines].from = from;
   commLines[NcommLines].to = to;
   commLines[NcommLines].time = 0;
-  if (NcommLines < MAXCOMMLINES-1)
+  if (NcommLines < MAXCOMMLINES-1) {
     NcommLines++;
+  }
 }
 
 void removeOldCommLines(int dt, int maxt)
@@ -366,11 +366,10 @@ void process_messaging(int n_bots)
 
   // run removeOldCommLines at most once every kilo_ticks.
   static int last_ticks = 0;
-  if (kilo_ticks > last_ticks)
-    {
-      removeOldCommLines(kilo_ticks-last_ticks, tx_period_ticks);
-      last_ticks = kilo_ticks;
-    }
+  if (kilo_ticks > last_ticks) {
+    removeOldCommLines(kilo_ticks-last_ticks, tx_period_ticks);
+    last_ticks = kilo_ticks;
+  }
 }
 
 void update_all_bots(int n_bots, float timestep)
