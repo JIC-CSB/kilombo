@@ -4,6 +4,12 @@
 
 #include <stdio.h>
 
+// Include some definitions of "private" functions we want to test.
+void update_bot_history(kilobot *bot);
+void update_bot_location(kilobot *bot, float timestep);
+double bot_dist(kilobot *bot1, kilobot *bot2);
+coord2D normalise(coord2D c);
+
 // Needed to compile any program with a library.
 //#include "kilolib.h"
 typedef struct { int num_bot_steps; } USERDATA;
@@ -11,6 +17,7 @@ int UserdataSize = sizeof(USERDATA);
 void *mydata;
 char* botinfo_simple(void) { return NULL; };
 extern uint16_t kilo_uid;
+
 
 // Define a dummy bot_main function for testing purposes.
 int n_calls_to_bot_main = 0;

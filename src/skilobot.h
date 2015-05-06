@@ -65,12 +65,6 @@ void dump_all_bots(int n_bots);
 void update_all_bots(int n_bots, float timestep);
 void spread_out(double k);
 
-void update_bot_history(kilobot *bot);
-void update_bot_location(kilobot *bot, float timestep);
-double bot_dist(kilobot *bot1, kilobot *bot2);
-coord2D normalise(coord2D c);
-
-
 void collision_detection(int n_bots);
 
 extern int current_bot;
