@@ -248,6 +248,15 @@ coord2D separation_unit_vector(kilobot* bot1, kilobot* bot2)
   return normalise(separation_vector);
 }
 
+void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
+{
+  coord2D suv = separation_unit_vector(bot1, bot2);
+  bot1->x -= suv.x;
+  bot1->y -= suv.y;
+  bot2->x += suv.x;
+  bot2->y += suv.y;
+}
+
 void collision_detection(int n_bots)
 {
   //double r = (double) allbots[0].radius;
@@ -264,11 +273,7 @@ void collision_detection(int n_bots)
 
       if (bot2bot_distance < (2 * r)) {
         //	  printf("Whack %d %d\n", i, j);
-        coord2D suv = separation_unit_vector(allbots[i], allbots[j]);
-        allbots[i]->x -= suv.x;
-        allbots[i]->y -= suv.y;
-        allbots[j]->x += suv.x;
-        allbots[j]->y += suv.y;
+        separate_clashing_bots(allbots[i], allbots[j]);
         // we move the bots, this changes the distance.
         // so bot2bot_distance should be recalculated.
         // but we only need it below to tell if the bots are

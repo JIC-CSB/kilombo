@@ -14,6 +14,7 @@ void update_bot_location(kilobot *bot, float timestep);
 double bot_dist(kilobot *bot1, kilobot *bot2);
 coord2D normalise(coord2D c);
 coord2D separation_unit_vector(kilobot *bot1, kilobot *bot2);
+void separate_clashing_bots(kilobot *bot1, kilobot *bot2);
 
 // Needed to compile any program with a library.
 //#include "kilolib.h"
@@ -251,6 +252,28 @@ START_TEST(test_separation_unit_vector)
 }
 END_TEST
 
+START_TEST(test_separate_clashing_bots)
+{
+    kilobot* k1;
+    kilobot* k2;
+
+    k1 = new_kilobot(0, 1);
+    k2 = new_kilobot(0, 1);
+    k1->x = 4.0;
+    k1->y = 4.0;
+    k2->x = 4.0;
+    k2->y = 10.0;
+
+    separate_clashing_bots(k1, k2);
+
+    check_double_equality(k1->x, 4.0);
+    check_double_equality(k1->y, 3.0);
+    check_double_equality(k2->x, 4.0);
+    check_double_equality(k2->y, 11.0);
+
+}
+END_TEST
+
 
 Suite *add_suite(void)
 {
@@ -273,6 +296,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_bot_dist);
     tcase_add_test(tc_core, test_normalise);
     tcase_add_test(tc_core, test_separation_unit_vector);
+    tcase_add_test(tc_core, test_separate_clashing_bots);
     suite_add_tcase(s, tc_core);
 
     return s;
