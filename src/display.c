@@ -274,7 +274,7 @@ void input(void)
  if (keystates[SDLK_F2])
    {
      spread_out(-200);
-     collision_detection(n_bots);
+     update_interactions(n_bots);
    }
 }
 

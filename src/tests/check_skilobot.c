@@ -316,7 +316,7 @@ START_TEST(test_update_n_in_range_indices)
 }
 END_TEST
 
-START_TEST(test_collision_detection)
+START_TEST(test_update_interactions)
 {
     // Setup.
     int n = 2;
@@ -333,7 +333,7 @@ START_TEST(test_collision_detection)
     // Not within communication distance.
     allbots[1]->x = 0.0;
     allbots[1]->y = 50.0;
-    collision_detection(n);
+    update_interactions(n);
     for (int i=0; i<n; i++) {
         ck_assert_int_eq(allbots[i]->n_in_range, 0);
     }
@@ -345,7 +345,7 @@ START_TEST(test_collision_detection)
     // Just within communication distance.
     allbots[1]->x = 0.0;
     allbots[1]->y = 49.9;
-    collision_detection(n);
+    update_interactions(n);
     for (int i=0; i<n; i++) {
         ck_assert_int_eq(allbots[i]->n_in_range, 1);
     }
@@ -357,7 +357,7 @@ START_TEST(test_collision_detection)
     // Touching but not collided.
     allbots[1]->x = 0.0;
     allbots[1]->y = 40.0;
-    collision_detection(n);
+    update_interactions(n);
     for (int i=0; i<n; i++) {
         ck_assert_int_eq(allbots[i]->n_in_range, 1);
     }
@@ -369,7 +369,7 @@ START_TEST(test_collision_detection)
     // Collided.
     allbots[1]->x = 0.0;
     allbots[1]->y = 39.9;
-    collision_detection(n);
+    update_interactions(n);
     for (int i=0; i<n; i++) {
         ck_assert_int_eq(allbots[i]->n_in_range, 1);
     }
@@ -405,7 +405,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_separate_clashing_bots);
     tcase_add_test(tc_core, test_reset_n_in_range_indices);
     tcase_add_test(tc_core, test_update_n_in_range_indices);
-    tcase_add_test(tc_core, test_collision_detection);
+    tcase_add_test(tc_core, test_update_interactions);
     suite_add_tcase(s, tc_core);
 
     return s;

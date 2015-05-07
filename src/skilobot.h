@@ -65,7 +65,7 @@ void dump_all_bots(int n_bots);
 void update_all_bots(int n_bots, float timestep);
 void spread_out(double k);
 
-void collision_detection(int n_bots);
+void update_interactions(int n_bots);
 
 extern int current_bot;
 extern void* mydata;

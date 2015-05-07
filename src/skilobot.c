@@ -270,7 +270,7 @@ void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
   bot2->y += suv.y;
 }
 
-void collision_detection(int n_bots)
+void update_interactions(int n_bots)
 {
   //double r = (double) allbots[0].radius;
   double r = allbots[0]->radius;
@@ -394,7 +394,7 @@ void update_all_bots(int n_bots, float timestep)
     update_bot(allbots[i], timestep);
   }
 
-  collision_detection(n_bots);
+  update_interactions(n_bots);
 
   process_messaging(n_bots);
 }
