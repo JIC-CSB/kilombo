@@ -316,6 +316,70 @@ START_TEST(test_update_n_in_range_indices)
 }
 END_TEST
 
+START_TEST(test_collision_detection)
+{
+    // Setup.
+    int n = 2;
+    create_bots(n);
+    init_all_bots(n);
+    reset_n_in_range_indices(n);
+    for (int i=0; i<n; i++) {
+        allbots[i]->cr = 50;
+        allbots[i]->radius = 20;
+    }
+    allbots[0]->x = 0.0;
+    allbots[0]->y = 0.0;
+
+    // Not within communication distance.
+    allbots[1]->x = 0.0;
+    allbots[1]->y = 50.0;
+    collision_detection(n);
+    for (int i=0; i<n; i++) {
+        ck_assert_int_eq(allbots[i]->n_in_range, 0);
+    }
+    check_double_equality(allbots[0]->x, 0.0);
+    check_double_equality(allbots[0]->y, 0.0);
+    check_double_equality(allbots[1]->x, 0.0);
+    check_double_equality(allbots[1]->y, 50.0);
+
+    // Just within communication distance.
+    allbots[1]->x = 0.0;
+    allbots[1]->y = 49.9;
+    collision_detection(n);
+    for (int i=0; i<n; i++) {
+        ck_assert_int_eq(allbots[i]->n_in_range, 1);
+    }
+    check_double_equality(allbots[0]->x, 0.0);
+    check_double_equality(allbots[0]->y, 0.0);
+    check_double_equality(allbots[1]->x, 0.0);
+    check_double_equality(allbots[1]->y, 49.9);
+
+    // Touching but not collided.
+    allbots[1]->x = 0.0;
+    allbots[1]->y = 40.0;
+    collision_detection(n);
+    for (int i=0; i<n; i++) {
+        ck_assert_int_eq(allbots[i]->n_in_range, 1);
+    }
+    check_double_equality(allbots[0]->x, 0.0);
+    check_double_equality(allbots[0]->y, 0.0);
+    check_double_equality(allbots[1]->x, 0.0);
+    check_double_equality(allbots[1]->y, 40.0);
+
+    // Collided.
+    allbots[1]->x = 0.0;
+    allbots[1]->y = 39.9;
+    collision_detection(n);
+    for (int i=0; i<n; i++) {
+        ck_assert_int_eq(allbots[i]->n_in_range, 1);
+    }
+    check_double_equality(allbots[0]->x, 0.0);
+    check_double_equality(allbots[0]->y, -1.0);
+    check_double_equality(allbots[1]->x, 0.0);
+    check_double_equality(allbots[1]->y, 40.9);
+}
+END_TEST
+
 
 Suite *add_suite(void)
 {
@@ -341,6 +405,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_separate_clashing_bots);
     tcase_add_test(tc_core, test_reset_n_in_range_indices);
     tcase_add_test(tc_core, test_update_n_in_range_indices);
+    tcase_add_test(tc_core, test_collision_detection);
     suite_add_tcase(s, tc_core);
 
     return s;
