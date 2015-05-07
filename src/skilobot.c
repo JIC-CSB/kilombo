@@ -255,6 +255,12 @@ void reset_n_in_range_indices(int n_bots)
   }
 }
 
+void update_n_in_range_indices(kilobot* bot1, kilobot* bot2)
+{
+  bot1->in_range[bot1->n_in_range++] = bot2->ID;
+  bot2->in_range[bot2->n_in_range++] = bot1->ID;
+}
+
 void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
 {
   coord2D suv = separation_unit_vector(bot1, bot2);
@@ -287,8 +293,7 @@ void collision_detection(int n_bots)
       }
       if (bot2bot_distance < communication_radius) {
         //if (i == 0) printf("%d and %d in range\n", i, j);
-        allbots[i]->in_range[allbots[i]->n_in_range++] = j;
-        allbots[j]->in_range[allbots[j]->n_in_range++] = i;
+        update_n_in_range_indices(allbots[i], allbots[j]);
       }
     }
   }

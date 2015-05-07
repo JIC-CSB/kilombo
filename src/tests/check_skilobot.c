@@ -16,6 +16,7 @@ coord2D normalise(coord2D c);
 coord2D separation_unit_vector(kilobot *bot1, kilobot *bot2);
 void separate_clashing_bots(kilobot *bot1, kilobot *bot2);
 void reset_n_in_range_indices(int n_bots);
+void update_n_in_range_indices(kilobot *bot1, kilobot *bot2);
 
 // Needed to compile any program with a library.
 //#include "kilolib.h"
@@ -292,6 +293,29 @@ START_TEST(test_reset_n_in_range_indices)
 }
 END_TEST
 
+START_TEST(test_update_n_in_range_indices)
+{
+    // Setup.
+    int n = 2;
+    create_bots(n);
+    init_all_bots(n);
+    reset_n_in_range_indices(n);
+
+    // Code we want to test.
+    update_n_in_range_indices(allbots[0], allbots[1]);
+
+    // Both bots have each other in range.
+    ck_assert_int_eq(allbots[0]->in_range[0], 1);
+    ck_assert_int_eq(allbots[1]->in_range[0], 0);
+
+    // The n_in_range index is ready to add the next bot.
+    for (int i=0; i<n; i++) {
+        ck_assert_int_eq(allbots[i]->n_in_range, 1);
+    }
+
+}
+END_TEST
+
 
 Suite *add_suite(void)
 {
@@ -316,6 +340,7 @@ Suite *add_suite(void)
     tcase_add_test(tc_core, test_separation_unit_vector);
     tcase_add_test(tc_core, test_separate_clashing_bots);
     tcase_add_test(tc_core, test_reset_n_in_range_indices);
+    tcase_add_test(tc_core, test_update_n_in_range_indices);
     suite_add_tcase(s, tc_core);
 
     return s;
