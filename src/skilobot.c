@@ -5,10 +5,10 @@
 #include<stdlib.h>
 #include<math.h>
 
+#include <jansson.h>
+
 #include "skilobot.h"
 #include "kilolib.h"
-
-#include <jansson.h>
 
 
 /* Global variables.
