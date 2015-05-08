@@ -60,11 +60,6 @@ void kilo_start(void (*setup)(void), void (*loop)(void))
 
 void set_motors(uint8_t left, uint8_t right)
 {
-  /* int aID = GetBotID(); */
-
-  /* allbots[aID]->cwm = cw; */
-  /* allbots[aID]->left_motor_power = ccw; */
-
   kilobot* self = Me();
 
   self->left_motor_power = left;

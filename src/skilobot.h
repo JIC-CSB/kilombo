@@ -74,8 +74,6 @@ kilobot *Me();
 
 int bot_main (void);
 
-int GetBotID();
-
 enum {PAUSE, RUNNING};
 extern int state;   //simulator state. PAUSE or RUNNING.
 extern int tx_period_ticks;

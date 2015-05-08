@@ -398,8 +398,3 @@ void update_all_bots(int n_bots, float timestep)
 
   process_messaging(n_bots);
 }
-
-int GetBotID()
-{
-  return current_bot;
-}
