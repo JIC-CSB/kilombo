@@ -69,7 +69,7 @@ void register_callback(Callback_t type, void (*fp)(void))
 kilobot *new_kilobot(int ID, int n_bots)
 {
   kilobot* bot = (kilobot*) calloc(1, sizeof(kilobot));
-  //calloc sets the memory area to 0 - guarantees initialization of user data
+  // calloc sets the memory area to 0 - guarantees initialization of user data.
 
   bot->ID = ID;
   bot->x = 0;
@@ -113,24 +113,26 @@ void create_bots(int n_bots)
 void init_all_bots(int n_bots)
 {
   for (int i=0; i<n_bots; i++) {
-    current_bot = i;      // for Me() to return the right bot
+    current_bot = i;      // For Me() to return the right bot.
     mydata = Me()->data;
-    kilo_uid = i;         // in case the bot's main() uses ID
+    kilo_uid = i;         // In case the bot's main() uses ID.
     bot_main();
   }
 }
 
 kilobot *Me()
 {
-  /* Return the current bot to the calling function, using the global variable
-     current_bot to work out which bot is active */
+  /* Return the current bot to the calling function.
+   *
+   * Uses the global variable current_bot to work out which bot is active.
+   */
 
   return allbots[current_bot];
 }
 
 void run_all_bots(int n_bots)
 {
-  /* Run the user program for each bot */
+  /* Run the user program for each bot. */
   for (current_bot=0; current_bot<n_bots; current_bot++) {
     //me = & (allbots[current_bot]->data);
 
@@ -144,7 +146,7 @@ void run_all_bots(int n_bots)
 
 void dump_bot_info(kilobot *self)
 {
-  /* Dump bot info to stdout */
+  /* Dump bot info to stdout. */
 
   printf("B %d: At (%f, %f), speed (%d, %d)\n", 
     self->ID, self->x, self->y, self->right_motor_power, self->left_motor_power);
@@ -152,7 +154,7 @@ void dump_bot_info(kilobot *self)
 
 void dump_all_bots(int n_bots)
 {
-  /* Dump info for all bots. Should only be called in a critical region */
+  /* Dump info for all bots. Should only be called in a critical region. */
 
   for (int i=0; i<n_bots; i++) {
     dump_bot_info(allbots[i]);
@@ -161,7 +163,7 @@ void dump_all_bots(int n_bots)
 
 void manage_bot_history_memory(kilobot *bot)
 {
-  /* If our history is longer than the memory allocation, reallocate */
+  /* If our history is longer than the memory allocation, reallocate. */
   if (1 + bot->p_hist > bot->n_hist) {
     bot->n_hist += 100;
     bot->x_history = (double *) realloc(bot->x_history, sizeof(double) * bot->n_hist);
@@ -238,15 +240,17 @@ double bot_dist(kilobot *bot1, kilobot *bot2)
   return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
-// treat c as a vector, return a unit vector parallel to c.
-// if c is 0 or very short, special case: choose o.x=1, o.y=0
 coord2D normalise(coord2D c)
 {
+  /* Return a unit vector parallel to c (treating c as a vector).
+   *
+   * If c is 0 or very short, special case: choose o.x=1, o.y=0.
+   */
   coord2D o;
   double l = sqrt(c.x * c.x + c.y * c.y);
 
 #define eps 1e-6
-  // try to avoid dividing by 0
+  // Try to avoid dividing by 0.
   if (l > eps) {
     o.x = c.x / l;
     o.y = c.y / l;
@@ -305,13 +309,15 @@ void update_interactions(int n_bots)
       double bot2bot_distance = bot_dist(allbots[i], allbots[j]);
 
       if (bot2bot_distance < (2 * r)) {
-        //	  printf("Whack %d %d\n", i, j);
+        //printf("Whack %d %d\n", i, j);
         separate_clashing_bots(allbots[i], allbots[j]);
-        // we move the bots, this changes the distance.
-        // so bot2bot_distance should be recalculated.
-        // but we only need it below to tell if the bots are
-        // in communications range, and after resolving the collision, they will still be
-        // ... unless they are densely packed and a bot is moved very far, unlikely.
+        // We move the bots, this changes the distance.
+        // So bot2bot_distance should be recalculated.
+        // But we only need it below to tell if the bots are
+        // in communications range, and after resolving the collision,
+        // they will still be...
+        // Unless they are densely packed and a bot is moved
+        // very far, which is unlikely.
       }
       if (bot2bot_distance < communication_radius) {
         //if (i == 0) printf("%d and %d in range\n", i, j);
@@ -345,7 +351,7 @@ void removeOldCommLines(int dt, int maxt)
 
 void pass_message(kilobot* tx)
 {
-  /* Pass message from tx to all bots in range*/
+  /* Pass message from tx to all bots in range. */
 
   int i;
 
@@ -358,16 +364,16 @@ void pass_message(kilobot* tx)
     tx->tx_enabled = 1;
     //printf ("n_in_range=%d\n",tx->n_in_range);
     for (i = 0; i < tx->n_in_range; i++) {
-      //switch to next receiving bot
+      // Switch to next receiving bot.
       kilobot *rx = allbots[tx->in_range[i]];
       addCommLine(tx, rx);
  
       kilo_uid = rx->ID;
       mydata = rx->data;
 
-     /* set up a distance measurement structure
-      * we know the true distance, so we just store it in the structure
-      * estimate_distance() will just return high_gain .
+     /* Set up a distance measurement structure.
+      * We know the true distance, so we just store it in the structure.
+      * The estimate_distance() will just return high_gain.
       */
       distm.low_gain = 0;
       distm.high_gain = bot_dist(tx, rx);
@@ -375,7 +381,7 @@ void pass_message(kilobot* tx)
       kilo_message_rx(msg, &distm);
     }
 
-    // switch to the transmitting bot, to call kilo_message_tx_success()
+    // Switch to the transmitting bot, to call kilo_message_tx_success().
     kilo_uid = tx->ID;
     mydata = tx->data;
     kilo_message_tx_success();
@@ -396,7 +402,7 @@ void process_messaging(int n_bots)
     }
   }
 
-  // run removeOldCommLines at most once every kilo_ticks.
+  // Run removeOldCommLines at most once every kilo_ticks.
   static int last_ticks = 0;
   if (kilo_ticks > last_ticks) {
     removeOldCommLines(kilo_ticks-last_ticks, tx_period_ticks);
