@@ -22,7 +22,7 @@ extern int UserdataSize ;
 kilobot** allbots;
 int current_bot;
 
-// Internal settings of the simulation.
+// Settings of the simulation.
 int tx_period_ticks = 15;  // Message twice a second.
 int storeHistory = 1;
 
@@ -33,8 +33,8 @@ void (*callback_F5) (void) = NULL;
 void (*callback_F6) (void) = NULL;
 
 // Callback function prototype and function pointer for simple reporting.
-char *botinfo_simple();                            // Default only returns ID.
-char* (*callback_botinfo) (void) = botinfo_simple; // Returns a string.
+char *botinfo_simple();
+char* (*callback_botinfo) (void) = botinfo_simple;
 
 // Callback function pointer for saving the bot's internal state as JSON.
 json_t* (*callback_json_state) (void) = NULL;
@@ -68,9 +68,13 @@ void register_callback(Callback_t type, void (*fp)(void))
     }
 }
 
+
+/* Functions for initialising the bots to be used in the simulation. */
+
 kilobot *new_kilobot(int ID, int n_bots)
 {
-  /* Return a pointer to a kilobot. */
+  /* Allocates the memory for a kilobot struct and populates it with default
+   * values.*/
 
   kilobot* bot = (kilobot*) calloc(1, sizeof(kilobot));
   // calloc sets the memory area to 0 - guarantees initialization of user data.
@@ -107,10 +111,9 @@ kilobot *new_kilobot(int ID, int n_bots)
 
 void create_bots(int n_bots)
 {
-  /* Create the bots.
-   *
-   * Allocate the memory required to store n_bots and
-   * populate the allbots array with new kilobots.
+  /*
+   * Allocate the memory required to store n pointers to bots and
+   * creates n new kilobots.
    */
 
   allbots = (kilobot**) malloc(sizeof(kilobot*) * n_bots);
@@ -122,7 +125,7 @@ void create_bots(int n_bots)
 
 void init_all_bots(int n_bots)
 {
-  /* Initialise the first n_bots stored in allbots. */
+  /* Call the setup function of the user's bot. */
 
   for (int i=0; i<n_bots; i++) {
     current_bot = i;      // For Me() to return the right bot.
@@ -131,6 +134,9 @@ void init_all_bots(int n_bots)
     bot_main();
   }
 }
+
+
+/* Helper functions for working with the current bot. */
 
 kilobot *Me()
 {
@@ -142,19 +148,8 @@ kilobot *Me()
   return allbots[current_bot];
 }
 
-void run_all_bots(int n_bots)
-{
-  /* Run the user program for each bot. */
-  for (current_bot=0; current_bot<n_bots; current_bot++) {
-    //me = & (allbots[current_bot]->data);
 
-    //  alternative way for each bot to access its own data - less copying - FJ
-    mydata = allbots[current_bot]->data;
-    kilo_uid = allbots[current_bot]->ID;
-    //printf ("running bot %d ID: %d\n", current_bot, kilo_uid);
-    user_loop();
-  }
-}
+/* Functions for logging output to stdout. */
 
 void dump_bot_info(kilobot *self)
 {
@@ -173,6 +168,9 @@ void dump_all_bots(int n_bots)
   }
 }
 
+
+/* Functions for managing the history of the bots. */
+
 void manage_bot_history_memory(kilobot *bot)
 {
   /* If our history is longer than the memory allocation, reallocate. */
@@ -186,7 +184,7 @@ void manage_bot_history_memory(kilobot *bot)
 
 void update_bot_history(kilobot *bot)
 {
-  /* Update the bot's history of its where it has been. */
+  /* Update the bot's history of where it has been. */
 
   bot->x_history[bot->p_hist] = bot->x;
   bot->y_history[bot->p_hist] = bot->y;
@@ -195,9 +193,12 @@ void update_bot_history(kilobot *bot)
   manage_bot_history_memory(bot);
 }
 
+
+/* Functions for moving the bots. */
+
 void move_bot_forward(kilobot *bot, float timestep)
 {
-  /* Move the bot forwards by a timestep increment. */
+  /* Move the bot forwards by a timestep dependent increment. */
 
   int velocity = 0.5 * (bot->left_motor_power + bot->right_motor_power);
   bot->y += timestep * velocity * cos(bot->direction);
@@ -206,7 +207,7 @@ void move_bot_forward(kilobot *bot, float timestep)
 
 void turn_bot_right(kilobot *bot, float timestep)
 {
-  /* Turn the bot to the right by a timestep increment. */
+  /* Turn the bot to the right by a timestep dependent increment. */
 
   int r = bot->radius;
   double x_r = bot->x + r * cos(bot->direction);
@@ -218,7 +219,7 @@ void turn_bot_right(kilobot *bot, float timestep)
 
 void turn_bot_left(kilobot *bot, float timestep)
 {
-  /* Turn the bot to the left by a timestep increment. */
+  /* Turn the bot to the left by a timestep dependent increment. */
 
   int r = bot->radius;
   double x_l = bot->x - r * cos(bot->direction);
@@ -230,7 +231,7 @@ void turn_bot_left(kilobot *bot, float timestep)
 
 void update_bot_location(kilobot *bot, float timestep)
 {
-  /* Update the bot's location by a timestep increment. */
+  /* Update the bot's location by a timestep dependent increment. */
   if (bot->right_motor_power && bot->left_motor_power) { // forward movement
     move_bot_forward(bot, timestep);
   }
@@ -244,9 +245,12 @@ void update_bot_location(kilobot *bot, float timestep)
   }
 }
 
+
+/* Functions for updating both the history and the location of the bots. */
+
 void update_bot(kilobot *bot, float timestep)
 {
-  /* Update a bot by a timestep.
+  /* Update a bot by a timestep dependent increment.
    *
    * Save the history (if required) before updating the location.
    */
@@ -255,6 +259,9 @@ void update_bot(kilobot *bot, float timestep)
   }
   update_bot_location(bot, timestep);
 }
+
+
+/* Geometry helper functions. */
 
 double bot_dist(kilobot *bot1, kilobot *bot2)
 {
@@ -292,7 +299,6 @@ coord2D normalise(coord2D c)
   return o;
 }
 
-
 coord2D separation_unit_vector(kilobot* bot1, kilobot* bot2)
 {
   /* Return the separation unit vector between the two bots. */
@@ -303,27 +309,6 @@ coord2D separation_unit_vector(kilobot* bot1, kilobot* bot2)
   separation_vector.y = bot2->y - bot1->y;
 
   return normalise(separation_vector);
-}
-
-void reset_n_in_range_indices(int n_bots)
-{
-  /* Set all n_in_range variables to 0.
-   *
-   * I.e. after this function has been called the bots will have no bots within
-   * communication range.
-   */
-
-  for (int i=0; i<n_bots; i++) {
-    allbots[i]->n_in_range = 0;
-  }
-}
-
-void update_n_in_range_indices(kilobot* bot1, kilobot* bot2)
-{
-  /* Set bot1 and bot2 to be within commuication range of each other. */
-
-  bot1->in_range[bot1->n_in_range++] = bot2->ID;
-  bot2->in_range[bot2->n_in_range++] = bot1->ID;
 }
 
 void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
@@ -339,6 +324,34 @@ void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
   bot2->x += suv.x;
   bot2->y += suv.y;
 }
+
+
+/* Functions for determining which bots can communicate with each other. */
+
+void reset_n_in_range_indices(int n_bots)
+{
+  /* Set all n_in_range variables to 0.
+   *
+   * I.e. after this function has been called the bots will have no bots within
+   * communication radius.
+   */
+
+  for (int i=0; i<n_bots; i++) {
+    allbots[i]->n_in_range = 0;
+  }
+}
+
+void update_n_in_range_indices(kilobot* bot1, kilobot* bot2)
+{
+  /* Set bot1 and bot2 to be within commuication radius of each other
+   * and increment the n_in_range counters. */
+
+  bot1->in_range[bot1->n_in_range++] = bot2->ID;
+  bot2->in_range[bot2->n_in_range++] = bot1->ID;
+}
+
+
+/* Functions for dealing with interactions between bots. */
 
 void update_interactions(int n_bots)
 {
@@ -461,6 +474,24 @@ void process_messaging(int n_bots)
   if (kilo_ticks > last_ticks) {
     removeOldCommLines(kilo_ticks-last_ticks, tx_period_ticks);
     last_ticks = kilo_ticks;
+  }
+}
+
+
+/* Functions called by the runsim/headless process_bots function. */
+
+void run_all_bots(int n_bots)
+{
+  /* Run the user program for each bot. */
+
+  for (current_bot=0; current_bot<n_bots; current_bot++) {
+    //me = & (allbots[current_bot]->data);
+
+    //  alternative way for each bot to access its own data - less copying - FJ
+    mydata = allbots[current_bot]->data;
+    kilo_uid = allbots[current_bot]->ID;
+    //printf ("running bot %d ID: %d\n", current_bot, kilo_uid);
+    user_loop();
   }
 }
 
