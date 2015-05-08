@@ -1,3 +1,6 @@
+/* Core kilobot simulation code.
+ */
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
@@ -7,13 +10,21 @@
 
 #include <jansson.h>
 
-kilobot** allbots;
+
+/* Global variables.
+ */
+
+kilobot** allbots;          // All the bots in the simulation.
+int current_bot;            // The current bot that the simulation is processing.
+
+CommLine commLines[MAXCOMMLINES];
+int NcommLines = 0;
+
 extern int UserdataSize ;  // the size (in bytes) of the USERDATA structure.
                            // filled in by the user program.
 
-int current_bot;
-
 int tx_period_ticks = 15;  // message twice a second
+
 
 char *botinfo_simple();            // default bot_info function, only returns ID
 void (*callback_F5) (void) = NULL; // function pointer to user-defined callback function
@@ -22,6 +33,11 @@ void (*callback_F6) (void) = NULL; // for F6
 char* (*callback_botinfo) (void) = botinfo_simple; // function for bot info, returns a string 
 json_t* (*callback_json_state) (void) = NULL; //callback for saving the bot's internal state as JSON
 
+int storeHistory = 1;
+
+
+/* Functions.
+ */
 
 void register_callback(Callback_t type, void (*fp)(void))
 {
@@ -41,8 +57,6 @@ void register_callback(Callback_t type, void (*fp)(void))
       break;
     }
 }
-
-int storeHistory = 1;
 
 kilobot *new_kilobot(int ID, int n_bots)
 {
@@ -299,10 +313,6 @@ void update_interactions(int n_bots)
   }
 }
 
-
-CommLine commLines[MAXCOMMLINES];
-int NcommLines = 0;
-
 void addCommLine(kilobot *from, kilobot *to)
 {
   commLines[NcommLines].from = from;
@@ -324,8 +334,6 @@ void removeOldCommLines(int dt, int maxt)
     }
   }
 }
-
-
 
 void pass_message(kilobot* tx)
 {
