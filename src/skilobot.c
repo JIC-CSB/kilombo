@@ -164,6 +164,7 @@ void dump_all_bots(int n_bots)
 void manage_bot_history_memory(kilobot *bot)
 {
   /* If our history is longer than the memory allocation, reallocate. */
+
   if (1 + bot->p_hist > bot->n_hist) {
     bot->n_hist += 100;
     bot->x_history = (double *) realloc(bot->x_history, sizeof(double) * bot->n_hist);
@@ -173,6 +174,8 @@ void manage_bot_history_memory(kilobot *bot)
 
 void update_bot_history(kilobot *bot)
 {
+  /* Update the bot's history of its where it has been. */
+
   bot->x_history[bot->p_hist] = bot->x;
   bot->y_history[bot->p_hist] = bot->y;
   bot->p_hist++;
@@ -182,6 +185,8 @@ void update_bot_history(kilobot *bot)
 
 void move_bot_forward(kilobot *bot, float timestep)
 {
+  /* Move the bot forwards by a timestep increment. */
+
   int velocity = 0.5 * (bot->left_motor_power + bot->right_motor_power);
   bot->y += timestep * velocity * cos(bot->direction);
   bot->x += timestep * velocity * sin(bot->direction);
@@ -189,6 +194,8 @@ void move_bot_forward(kilobot *bot, float timestep)
 
 void turn_bot_right(kilobot *bot, float timestep)
 {
+  /* Turn the bot to the right by a timestep increment. */
+
   int r = bot->radius;
   double x_r = bot->x + r * cos(bot->direction);
   double y_r = bot->y - r * sin(bot->direction);
@@ -199,6 +206,8 @@ void turn_bot_right(kilobot *bot, float timestep)
 
 void turn_bot_left(kilobot *bot, float timestep)
 {
+  /* Turn the bot to the left by a timestep increment. */
+
   int r = bot->radius;
   double x_l = bot->x - r * cos(bot->direction);
   double y_l = bot->y + r * sin(bot->direction);
@@ -209,6 +218,7 @@ void turn_bot_left(kilobot *bot, float timestep)
 
 void update_bot_location(kilobot *bot, float timestep)
 {
+  /* Update the bot's location by a timestep increment. */
   if (bot->right_motor_power && bot->left_motor_power) { // forward movement
     move_bot_forward(bot, timestep);
   }
@@ -224,6 +234,10 @@ void update_bot_location(kilobot *bot, float timestep)
 
 void update_bot(kilobot *bot, float timestep)
 {
+  /* Update a bot by a timestep.
+   *
+   * Save the history (if required) before updating the location.
+   */
   if (storeHistory) {
     update_bot_history(bot);
   }
@@ -232,6 +246,8 @@ void update_bot(kilobot *bot, float timestep)
 
 double bot_dist(kilobot *bot1, kilobot *bot2)
 {
+  /* Return the bot2bot distance. */
+
   double x1 = bot1->x;
   double x2 = bot2->x;
   double y1 = bot1->y;
@@ -246,6 +262,7 @@ coord2D normalise(coord2D c)
    *
    * If c is 0 or very short, special case: choose o.x=1, o.y=0.
    */
+
   coord2D o;
   double l = sqrt(c.x * c.x + c.y * c.y);
 
@@ -266,6 +283,8 @@ coord2D normalise(coord2D c)
 
 coord2D separation_unit_vector(kilobot* bot1, kilobot* bot2)
 {
+  /* Return the separation unit vector between the two bots. */
+
   coord2D separation_vector;
 
   separation_vector.x = bot2->x - bot1->x;
@@ -276,6 +295,11 @@ coord2D separation_unit_vector(kilobot* bot1, kilobot* bot2)
 
 void reset_n_in_range_indices(int n_bots)
 {
+  /* Set all n_in_range variables to 0.
+   *
+   * I.e. the bots have no bots within communication range.
+   */
+
   for (int i=0; i<n_bots; i++) {
     allbots[i]->n_in_range = 0;
   }
@@ -283,12 +307,19 @@ void reset_n_in_range_indices(int n_bots)
 
 void update_n_in_range_indices(kilobot* bot1, kilobot* bot2)
 {
+  /* Set bot1 and bot2 to be within commuication range of each other. */
+
   bot1->in_range[bot1->n_in_range++] = bot2->ID;
   bot2->in_range[bot2->n_in_range++] = bot1->ID;
 }
 
 void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
 {
+  /* Move bot1 and bot2 apart.
+   *
+   * Each bot takes moves one unit away from the other.
+   */
+
   coord2D suv = separation_unit_vector(bot1, bot2);
   bot1->x -= suv.x;
   bot1->y -= suv.y;
@@ -298,6 +329,12 @@ void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
 
 void update_interactions(int n_bots)
 {
+  /* Update the bots' interactions with each other.
+   *
+   * - Move clashing bots apart.
+   * - Update which bots can communicate with each other.
+   */
+
   //double r = (double) allbots[0].radius;
   double r = allbots[0]->radius;
   double communication_radius = allbots[0]->cr;
@@ -329,6 +366,8 @@ void update_interactions(int n_bots)
 
 void addCommLine(kilobot *from, kilobot *to)
 {
+  /* Add a communication line between two bots. */
+
   commLines[NcommLines].from = from;
   commLines[NcommLines].to = to;
   commLines[NcommLines].time = 0;
@@ -339,6 +378,8 @@ void addCommLine(kilobot *from, kilobot *to)
 
 void removeOldCommLines(int dt, int maxt)
 {
+  /* Remove old communication lines. */
+
   int i;
   for (i = NcommLines-1; i >= 0; i--) {
     commLines[i].time += dt;
@@ -412,6 +453,8 @@ void process_messaging(int n_bots)
 
 void update_all_bots(int n_bots, float timestep)
 {
+  /* Progress the simulation by a timestep. */
+
   for (int i=0; i<n_bots; i++) {
     update_bot(allbots[i], timestep);
   }
