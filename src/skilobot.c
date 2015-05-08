@@ -49,6 +49,8 @@ int NcommLines = 0;
 
 void register_callback(Callback_t type, void (*fp)(void))
 {
+  /* Register a callback. */
+
   switch (type)
     {
     case CALLBACK_PARAMS:
@@ -68,6 +70,8 @@ void register_callback(Callback_t type, void (*fp)(void))
 
 kilobot *new_kilobot(int ID, int n_bots)
 {
+  /* Return a pointer to a kilobot. */
+
   kilobot* bot = (kilobot*) calloc(1, sizeof(kilobot));
   // calloc sets the memory area to 0 - guarantees initialization of user data.
 
@@ -103,6 +107,12 @@ kilobot *new_kilobot(int ID, int n_bots)
 
 void create_bots(int n_bots)
 {
+  /* Create the bots.
+   *
+   * Allocate the memory required to store n_bots and
+   * populate the allbots array with new kilobots.
+   */
+
   allbots = (kilobot**) malloc(sizeof(kilobot*) * n_bots);
 
   for (int i=0; i<n_bots; i++) {
@@ -112,6 +122,8 @@ void create_bots(int n_bots)
 
 void init_all_bots(int n_bots)
 {
+  /* Initialise the first n_bots stored in allbots. */
+
   for (int i=0; i<n_bots; i++) {
     current_bot = i;      // For Me() to return the right bot.
     mydata = Me()->data;
