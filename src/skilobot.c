@@ -14,26 +14,34 @@
 /* Global variables.
  */
 
-kilobot** allbots;          // All the bots in the simulation.
-int current_bot;            // The current bot that the simulation is processing.
+// The size (in bytes) of the USERDATA structure.
+// Filled in by the user program.
+extern int UserdataSize ;
 
+// Variables used to simulate many bots.
+kilobot** allbots;
+int current_bot;
+
+// Internal settings of the simulation.
+int tx_period_ticks = 15;  // Message twice a second.
+int storeHistory = 1;
+
+// Function pointers to user defined callback functions.
+// The user defined callback functions are called when the relevant function
+// keys are pressed during a simulation.
+void (*callback_F5) (void) = NULL;
+void (*callback_F6) (void) = NULL;
+
+// Callback function prototype and function pointer for simple reporting.
+char *botinfo_simple();                            // Default only returns ID.
+char* (*callback_botinfo) (void) = botinfo_simple; // Returns a string.
+
+// Callback function pointer for saving the bot's internal state as JSON.
+json_t* (*callback_json_state) (void) = NULL;
+
+// Variables used to display communication lines.
 CommLine commLines[MAXCOMMLINES];
 int NcommLines = 0;
-
-extern int UserdataSize ;  // the size (in bytes) of the USERDATA structure.
-                           // filled in by the user program.
-
-int tx_period_ticks = 15;  // message twice a second
-
-
-char *botinfo_simple();            // default bot_info function, only returns ID
-void (*callback_F5) (void) = NULL; // function pointer to user-defined callback function
-                                   // this function is called when F5 is pressed
-void (*callback_F6) (void) = NULL; // for F6
-char* (*callback_botinfo) (void) = botinfo_simple; // function for bot info, returns a string 
-json_t* (*callback_json_state) (void) = NULL; //callback for saving the bot's internal state as JSON
-
-int storeHistory = 1;
 
 
 /* Functions.
