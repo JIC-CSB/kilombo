@@ -297,7 +297,8 @@ void reset_n_in_range_indices(int n_bots)
 {
   /* Set all n_in_range variables to 0.
    *
-   * I.e. the bots have no bots within communication range.
+   * I.e. after this function has been called the bots will have no bots within
+   * communication range.
    */
 
   for (int i=0; i<n_bots; i++) {
@@ -317,7 +318,7 @@ void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
 {
   /* Move bot1 and bot2 apart.
    *
-   * Each bot takes moves one unit away from the other.
+   * Each bot moves one unit away from the other.
    */
 
   coord2D suv = separation_unit_vector(bot1, bot2);
