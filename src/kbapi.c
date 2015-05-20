@@ -178,22 +178,22 @@ int16_t get_ambientlight()
   kilobot* self = Me();
 
   // linear light gradient
-  // int l = self->x/.01;
-
+  int l = (self->x+500)/2;
+   
   // gravity well
   // int l = -10000000 / hypot(self->x, self->y);
 
   // parabolic well
-  int l = ( pow(self->x, 2) + pow(self->y, 2) )/10;
+  // int l = ( pow(self->x, 2) + pow(self->y, 2) )/10;
   
   
-  /*
+  
   if (l > 1023)
     l = 1023;
   
   if (l < 0)
     l = 0;
-  */
+  
   return l;
 }
 
