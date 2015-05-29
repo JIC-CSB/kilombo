@@ -55,6 +55,7 @@ extern kilobot** allbots;
 void create_bots(int n_bots);
 kilobot *new_kilobot(int ID, int n_bots);
 void init_all_bots(int n_bots);
+void user_setup_all_bots(int n_bots);
 void run_all_bots(int n_bots);
 void dump_all_bots(int n_bots);
 void update_all_bots(int n_bots, float timestep);
