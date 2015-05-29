@@ -72,38 +72,6 @@ float get_float_param(const char *param_name, float default_val)
   return f_param;
 }
 
-float get_float_array_param(const char * param_name, int index, float default_val)
-{
-  if (!simparams) {
-    fprintf(stderr, "Error: attempted to read parameter without loading parameter file\n");
-    exit(2);
-  }
-
-  json_t *param = json_object_get(simparams->root, param_name);
-
-  if (!json_is_array(param)) {
-    fprintf(stderr, "Requested parameter: %s is not an array.\n Using default value %f.\n", param_name, default_val);
-    return default_val;
-  }
-
-  if (index >= json_array_size(param)) {
-	  fprintf(stderr, "Index %d out of bound in array parameter %s.\n Using default value %f.\n",
-		  index, param_name, default_val);
-	  return default_val;
-  }
-
-  json_t *elem = json_array_get(param, index);
-
-  if (!json_is_number(elem)) {
-    fprintf(stderr, "Requested element %d of parameter: %s is not a number.\n Using default value %f.\n", index, param_name, default_val);
-    return default_val;
-  }
-
-  float f_param = json_number_value(elem);
-
-  return f_param;
-}
-
 const char* get_string_param(const char *param_name, char *default_val)
 {
   if (!simparams) {
