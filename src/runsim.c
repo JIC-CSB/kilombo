@@ -411,6 +411,10 @@ int main(int argc, char *argv[])
   if (callback_global_setup != NULL)
 	  callback_global_setup();
 
+  // call the per-bot setup here so that global setup can provide
+  // e.g. simulation-specific parameter values to it
+  user_setup_all_bots(n_bots);
+
   char buf[2000];
 
   FPSmanager manager;

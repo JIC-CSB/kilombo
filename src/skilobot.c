@@ -108,6 +108,18 @@ void init_all_bots(int n_bots)
     }
 }
 
+void user_setup_all_bots(int n_bots)
+{
+  for (int i=0; i<n_bots; i++)
+    {
+      current_bot = i;      // for Me() to return the right bot
+      mydata = Me()->data;
+      kilo_uid = i;         // in case the bot's main() uses ID
+	  user_setup();
+    }
+}
+
+
 kilobot *Me()
 {
   /* Return the current bot to the calling function, using the global variable
