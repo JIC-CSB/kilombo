@@ -55,7 +55,7 @@
 #define SIMULATOR
 
 /* Callback interface for communication between a bot and the simulator */
-typedef enum {CALLBACK_PARAMS, CALLBACK_RESET, CALLBACK_BOTINFO, CALLBACK_JSON_STATE} Callback_t;
+typedef enum {CALLBACK_PARAMS, CALLBACK_RESET, CALLBACK_BOTINFO, CALLBACK_JSON_STATE, CALLBACK_GLOBAL_SETUP} Callback_t;
 void register_callback(Callback_t type, void (*fp)(void));
 
 

@@ -22,6 +22,8 @@ void (*callback_F6) (void) = NULL; // for F6
 char* (*callback_botinfo) (void) = botinfo_simple; // function for bot info, returns a string 
 json_t* (*callback_json_state) (void) = NULL; //callback for saving the bot's internal state as JSON
 
+void (*callback_global_setup) (void) = NULL;
+
 
 void register_callback(Callback_t type, void (*fp)(void))
 {
@@ -39,6 +41,9 @@ void register_callback(Callback_t type, void (*fp)(void))
     case CALLBACK_JSON_STATE:
       callback_json_state = (json_t*(*)(void)) fp;
       break;
+	case CALLBACK_GLOBAL_SETUP:
+	  callback_global_setup = fp;
+	  break;
     }
 }
 
