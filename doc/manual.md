@@ -57,7 +57,7 @@ A solution is to explicitly specify the size of the types, e.g. declaring variab
 
 
 ## Callback functions
-For convenience, the simulator implements a system of callback functions for communication with the user-specified robot program. The callbacks are registered by calling `register_callback(type, function_pointer)`, typically at the beginning of main() before calling `kilo_init()`. All callback functions are optional. If the bot does not register them, they are mot used.
+For convenience, the simulator implements a system of callback functions for communication with the user-specified robot program. The callbacks are registered by calling `register_callback(type, function_pointer)`, typically at the beginning of main() before calling `kilo_init()`. All callback functions are optional. If the bot does not register them, they are not used.
 
 |type  | function definition  |  use | 
 | ------------- |-------------| -------|
@@ -65,6 +65,7 @@ For convenience, the simulator implements a system of callback functions for com
 | `CALLBACK_RESET`      |   `void  callback_F6(void)` |  Reset bot. Called for every bot, when F6 is pressed. |
 | `CALLBACK_BOTINFO` | `char *botinfo()` |   Return a string describing the internal state of the current bot, used for the simulator status bar.|
 |`CALLBACK_JSON_STATE` | `json_t* json_state(void)`| Return a json object describing the bot's internal state. Used to store snapshots of the simulation. |
+|`CALLBACK_GLOBAL_SETUP`| `void callback_global_setup` | Perform global setup, such as reading additional simulation-specific parameters. Called once, after the parameter file has been read but before the bot-specific setup.|
 
  Since the callback system is present only in the simulator and not in the real kilobot, the callback functions and the call to register_callback() should be conditionally compiled. An example:
 
