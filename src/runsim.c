@@ -34,6 +34,7 @@ int stepsPerFrame = 1; // number of simulation steps to take between frames
 extern int storeHistory;  //whether to save the history of all bot positions
 
 
+extern void (*callback_global_setup) (void);
 
 /* Dummy functions for messaging. exactly as in kilolib.c */
 void message_rx_dummy(message_t *m, distance_measurement_t *d) { }
@@ -405,6 +406,15 @@ int main(int argc, char *argv[])
   int stateFileSteps = get_int_param("stateFileSteps", 100);
   stepsPerFrame = get_int_param("stepsPerFrame", 1);
     
+  // call user-supplied global setup after reading parameters but before
+  // doing any real work
+  if (callback_global_setup != NULL)
+	  callback_global_setup();
+
+  // call the per-bot setup here so that global setup can provide
+  // e.g. simulation-specific parameter values to it
+  user_setup_all_bots(n_bots);
+
   char buf[2000];
 
   FPSmanager manager;
