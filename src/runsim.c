@@ -15,12 +15,17 @@
    SDL_main on OSX, so SDL_main.h needs to be included after this.
 */
 
+#ifndef SKILO_HEADLESS
 #include<SDL/SDL.h>
 #include<SDL/SDL_main.h>
 #include"gfx/SDL_framerate.h"
+#include"display.h"
+#else
+int display_w = 1200;
+int display_h = 800;
+#endif
 
 #include"skilobot.h"
-#include"display.h"
 #include"params.h"
 #include"stateio.h"
 
@@ -330,7 +335,6 @@ int main(int argc, char *argv[])
   n_bots = 100;
   double time = 0;
   double frameTimeAvg = 0;
-  Uint32 lastTicks;
   
   char param_filename[1000];
   sprintf (param_filename, "%s%s", argv[0], ".json");
@@ -365,7 +369,9 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+#ifndef SKILO_HEADLESS
   screen = makeWindow(display_w, display_h);
+#endif
 
   kilo_message_tx = message_tx_dummy;
   kilo_message_tx_success = message_tx_success_dummy;
@@ -415,13 +421,14 @@ int main(int argc, char *argv[])
   // e.g. simulation-specific parameter values to it
   user_setup_all_bots(n_bots);
 
+#ifndef SKILO_HEADLESS
   char buf[2000];
 
   FPSmanager manager;
   SDL_initFramerate(&manager);
   double FPS = 1.0 / timeStep;
   SDL_setFramerate(&manager, FPS);
-  
+#endif
 
   json_t *j_state = json_array();
     
@@ -433,11 +440,16 @@ int main(int argc, char *argv[])
   //  int n_timesteps = (int) (1 + (maxTime / timeStep));
 
   int n_step = 0;
-  lastTicks = SDL_GetTicks();
-  
+#ifndef SKILO_HEADLESS
+  Uint32 lastTicks = SDL_GetTicks();
+#else
+  int quit = 0;
+#endif
+
   while(!quit && (time < maxTime || maxTime <= 0)) {
      //printf("Time = %f (pause %d)\n", t, pause);
 
+#ifndef SKILO_HEADLESS
     input(); // process input here for fastest response.
 
     SDL_FillRect(screen, NULL, 0x00000000);
@@ -450,7 +462,8 @@ int main(int argc, char *argv[])
    
     for (int i=0; i <n_bots; i++) 
       draw_bot(screen, display_w, display_h, allbots[i]);
-    
+#endif
+
 
     //   printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
     
@@ -459,6 +472,7 @@ int main(int argc, char *argv[])
 	{
 	  process_bots(n_bots, timeStep);
 
+#ifndef SKILO_HEADLESS
 	  // save screenshots for video
 	  if (imageName && saveVideo)
 	    if (n_step % saveVideoN == 0)
@@ -468,6 +482,7 @@ int main(int argc, char *argv[])
 		frame++;
 		SDL_SaveBMP(screen, buf);
 	      }
+#endif
 
 	  // save state as JSON
 	  if (stateFileName)
@@ -482,6 +497,7 @@ int main(int argc, char *argv[])
 	  kilo_ticks = time * TICKS_PER_SEC;
 	}    
   
+#ifndef SKILO_HEADLESS
     draw_status(screen, display_w, display_h, 1000.0/frameTimeAvg);
     // draw status here, after video capture
     
@@ -489,10 +505,12 @@ int main(int argc, char *argv[])
     if (!fullSpeed)
       SDL_framerateDelay(&manager);
     
-    Uint32 t = SDL_GetTicks();
-    double w = .02;
+	Uint32 t = SDL_GetTicks();
+
+   	double w = .02;
     frameTimeAvg = (1-w) * frameTimeAvg + w*(t-lastTicks);
     lastTicks = t;    
+#endif   
   }
 
   save_bot_state_to_file(allbots, n_bots, "endstate.json");

@@ -15,7 +15,15 @@ int current_bot;
 
 int tx_period_ticks = 15;  // message twice a second
 
-char *botinfo_simple();            // default bot_info function, only returns ID
+char botinfo_buffer[100];
+
+// default bot_info function, only returns ID
+char *botinfo_simple()
+{
+  sprintf (botinfo_buffer, "%d", kilo_uid);
+  return botinfo_buffer;
+}
+
 void (*callback_F5) (void) = NULL; // function pointer to user-defined callback function
                                    // this function is called when F5 is pressed
 void (*callback_F6) (void) = NULL; // for F6

@@ -424,14 +424,6 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
 
 }
 
-char botinfo_buffer[100];
-
-//default callback_botinfo function
-char *botinfo_simple()
-{
-  sprintf (botinfo_buffer, "%d", kilo_uid);
-  return botinfo_buffer;
-}
 
 void displayString (SDL_Surface *surface, int x, int y, char *s)
 {
