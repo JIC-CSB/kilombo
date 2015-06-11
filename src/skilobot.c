@@ -209,6 +209,17 @@ void update_bot(kilobot *bot, float timestep)
   }
 }
 
+
+double bot_sq_dist(kilobot *bot1, kilobot *bot2)
+{
+  double x1 = bot1->x;
+  double x2 = bot2->x;
+  double y1 = bot1->y;
+  double y2 = bot2->y;
+
+  return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+}
+
 double bot_dist(kilobot *bot1, kilobot *bot2)
 {
   double x1 = bot1->x;
@@ -254,8 +265,10 @@ coord2D unit_sep(kilobot* bot1, kilobot* bot2)
 void collision_detection(int n_bots)
 {
   //double r = (double) allbots[0].radius;
-  double r = allbots[0]->radius;
-  double cr = allbots[0]->cr;
+  //double r = allbots[0]->radius;
+  double sq_r = allbots[0]->radius * allbots[0]->radius;
+  //double cr = allbots[0]->cr;
+  double sq_cr = allbots[0]->cr * allbots[0]->cr;
 
   for (int i=0; i<n_bots; i++) {
     allbots[i]->n_in_range = 0;
@@ -264,9 +277,10 @@ void collision_detection(int n_bots)
   for (int i=0; i<n_bots; i++) {
     for (int j=i+1; j<n_bots; j++) {
       {
-	double bd = bot_dist(allbots[i], allbots[j]);
+	//double bd = bot_dist(allbots[i], allbots[j]);
+	double sq_bd = bot_sq_dist(allbots[i], allbots[j]);
 	
-	if (bd < (2 * r)) {
+	if (sq_bd < (4 * sq_r)) {
 	  //	  printf("Whack %d %d\n", i, j);
 	  coord2D us = unit_sep(allbots[i], allbots[j]);
 	  allbots[i]->x -= us.x;
@@ -279,7 +293,7 @@ void collision_detection(int n_bots)
 	  // in communications range, and after resolving the collision, they will still be
 	  // ... unless they are densely packed and a bot is moved very far, unlikely.
 	}
-	if (bd < cr) {
+	if (sq_bd < sq_cr) {
 	  //if (i == 0) printf("%d and %d in range\n", i, j);
 	  allbots[i]->in_range[allbots[i]->n_in_range++] = j;
 	  allbots[j]->in_range[allbots[j]->n_in_range++] = i;
