@@ -170,16 +170,11 @@ void dump_all_bots(int n_bots)
 void update_bot(kilobot *bot, float timestep)
 {
   int r = bot->radius;
-
-  double cos_dir = cos(bot->direction);
-  double sin_dir = sin(bot->direction);
-  double r_cos = r * cos_dir;
-  double r_sin = r * sin_dir;
   
-  double x_l = bot->x - r_cos;
-  double y_l = bot->y + r_sin;
-  double x_r = bot->x + r_cos;
-  double y_r = bot->y - r_sin;
+  double x_l = bot->x - r * cos(bot->direction);
+  double y_l = bot->y + r * sin(bot->direction);
+  double x_r = bot->x + r * cos(bot->direction);
+  double y_r = bot->y - r * sin(bot->direction);
 
   if (storeHistory)
     {
@@ -198,18 +193,18 @@ void update_bot(kilobot *bot, float timestep)
   if (bot->cwm && bot->ccwm) { // forward movement
 
     int velocity = 0.5 * (bot->ccwm + bot->cwm);
-    bot->y += timestep * velocity * cos_dir;
-    bot->x += timestep * velocity * sin_dir;
+    bot->y += timestep * velocity * cos(bot->direction);
+    bot->x += timestep * velocity * sin(bot->direction);
   } else {
     if (bot->ccwm) {
       bot->direction += timestep * (double) (bot->ccwm) / 30;
-      bot->x = x_r - r_cos;
-      bot->y = y_r + r_sin;
+      bot->x = x_r - r * cos(bot->direction);
+      bot->y = y_r + r * sin(bot->direction);
     }
     if (bot->cwm) {
       bot->direction -= timestep * (double) (bot->cwm) / 30;
-      bot->x = x_l + r_cos;
-      bot->y = y_l - r_sin;
+      bot->x = x_l + r * cos(bot->direction);
+      bot->y = y_l - r * sin(bot->direction);
     }
   }
 }
