@@ -8,7 +8,7 @@
 
 #define MAXCOMMLINES 10000
 
-typedef struct {
+typedef struct kilobot {
   double x, y;
   double *x_history, *y_history;
   int p_hist, n_hist;
@@ -19,7 +19,7 @@ typedef struct {
   int r_led, g_led, b_led;
   int radius;
 
-  int *in_range;
+  struct kilobot **in_range;
   int n_in_range;
 
   /* Messaging */
