@@ -196,13 +196,14 @@ void update_bot(kilobot *bot, float timestep)
 
   double cos_dir = cos(bot->direction);
   double sin_dir = sin(bot->direction);
-  double r_cos = r * cos_dir;
-  double r_sin = r * sin_dir;
+
+  double r_cos_dir = r * cos_dir;
+  double r_sin_dir = r * sin_dir;
   
-  double x_l = bot->x - r_cos;
-  double y_l = bot->y + r_sin;
-  double x_r = bot->x + r_cos;
-  double y_r = bot->y - r_sin;
+  double x_l = bot->x - r_cos_dir;
+  double y_l = bot->y + r_sin_dir;
+  double x_r = bot->x + r_cos_dir;
+  double y_r = bot->y - r_sin_dir;
 
   if (storeHistory)
     {
@@ -226,13 +227,13 @@ void update_bot(kilobot *bot, float timestep)
   } else {
     if (bot->ccwm) {
       bot->direction += timestep * (double) (bot->ccwm) / 30;
-      bot->x = x_r - r_cos;
-      bot->y = y_r + r_sin;
+      bot->x = x_r - r * cos(bot->direction);
+      bot->y = y_r + r * sin(bot->direction);
     }
     if (bot->cwm) {
       bot->direction -= timestep * (double) (bot->cwm) / 30;
-      bot->x = x_l + r_cos;
-      bot->y = y_l - r_sin;
+      bot->x = x_l + r * cos(bot->direction);
+      bot->y = y_l - r * sin(bot->direction);
     }
   }
 
