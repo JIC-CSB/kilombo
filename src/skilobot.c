@@ -358,6 +358,8 @@ void collision_detection(int n_bots)
   for (int i=0; i<n_bots; i++) {
 
 	  kilobot * cur = allbots[i];
+
+	  // range of cells we have to check
 	  size_t low_x = bot2gc_x(cur->x - cr);
 	  size_t high_x = bot2gc_x(cur->x + cr);
 	  size_t low_y = bot2gc_y(cur->y - cr);
@@ -374,7 +376,7 @@ void collision_detection(int n_bots)
 			  for (size_t b=0; b<cell->size; b++)
 				  {
 				  kilobot * other = cell->data[b];
-				  assert(other != NULL);
+				  //assert(other != NULL);
 
 				  // only process each pair once and don't pair with self
 				  if (other <= cur)
@@ -383,7 +385,6 @@ void collision_detection(int n_bots)
   				  double sq_bd = bot_sq_dist(cur, other);
 				  if (sq_bd < (4 * sq_r)) {
 					  //	  printf("Whack %d %d\n", i, j);
-					  	  printf("Whack ");
 					  coord2D us = unit_sep(cur, other);
 					  cur->x -= us.x;
 					  cur->y -= us.y;
@@ -405,34 +406,6 @@ void collision_detection(int n_bots)
 			  }
 
   		}
-
- /* for (int i=0; i<n_bots; i++) {
-    for (int j=i+1; j<n_bots; j++) {
-      {
-	//double bd = bot_dist(allbots[i], allbots[j]);
-	double sq_bd = bot_sq_dist(allbots[i], allbots[j]);
-	
-	if (sq_bd < (4 * sq_r)) {
-	  //	  printf("Whack %d %d\n", i, j);
-	  coord2D us = unit_sep(allbots[i], allbots[j]);
-	  allbots[i]->x -= us.x;
-	  allbots[i]->y -= us.y;
-	  allbots[j]->x += us.x;
-	  allbots[j]->y += us.y;
-	  // we move the bots, this changes the distance.
-	  // so bd should be recalculated.
-	  // but we only need it below to tell if the bots are
-	  // in communications range, and after resolving the collision, they will still be
-	  // ... unless they are densely packed and a bot is moved very far, unlikely.
-	}
-	if (sq_bd < sq_cr) {
-	  //if (i == 0) printf("%d and %d in range\n", i, j);
-	  allbots[i]->in_range[allbots[i]->n_in_range++] = j;
-	  allbots[j]->in_range[allbots[j]->n_in_range++] = i;
-	}
-      }
-    }
-  }*/
 }
 
 

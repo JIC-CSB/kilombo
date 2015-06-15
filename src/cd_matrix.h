@@ -39,7 +39,7 @@ void p_vec_reserve(p_vec * v, size_t new_size)
 
 void p_vec_push(p_vec * v, void * el) 
 	{
-	assert(v->size <= v->allocated);
+	//assert(v->size <= v->allocated);
 
 	if (v->size == v->allocated)
 		p_vec_reserve(v, (v->allocated == 0 ? 1 : 2*v->allocated));
@@ -75,7 +75,7 @@ typedef struct {
 
 size_t matrix_c2i(pv_matrix * m, size_t x, size_t y)
 	{
-	assert(x < m->x_size && y < m->y_size);
+	//assert(x < m->x_size && y < m->y_size);
 
 	return y*m->x_size + x;
 	}
@@ -95,8 +95,8 @@ void matrix_init(pv_matrix * m, size_t x, size_t y)
 
 p_vec * matrix_get(pv_matrix * m, size_t x, size_t y)
 	{
-	assert(x>=0 && x<m->x_size);
-	assert(y>=0 && y<m->y_size);
+	//assert(x>=0 && x<m->x_size);
+	//assert(y>=0 && y<m->y_size);
 
 	return &(m->data[matrix_c2i(m, x, y)]);
 	}
