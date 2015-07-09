@@ -53,8 +53,6 @@ void kilo_init(void)
 void kilo_start(void (*setup)(void), void (*loop)(void))
 {
   user_setup = setup;
-  user_setup(); 
-
   user_loop = loop;
 }
 

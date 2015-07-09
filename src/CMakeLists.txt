@@ -10,7 +10,7 @@ INSTALL(TARGETS sim headless
   ARCHIVE DESTINATION lib
 )
 
-INSTALL(FILES kilolib.h message.h message_crc.h
+INSTALL(FILES kilolib.h message.h message_crc.h params.h
 	DESTINATION include
 )
 

@@ -43,9 +43,11 @@ json_t* (*callback_json_state) (void) = NULL;
 CommLine commLines[MAXCOMMLINES];
 int NcommLines = 0;
 
+void (*callback_global_setup) (void) = NULL;
 
 /* Functions.
  */
+
 
 void register_callback(Callback_t type, void (*fp)(void))
 {
@@ -65,6 +67,9 @@ void register_callback(Callback_t type, void (*fp)(void))
     case CALLBACK_JSON_STATE:
       callback_json_state = (json_t*(*)(void)) fp;
       break;
+	case CALLBACK_GLOBAL_SETUP:
+	  callback_global_setup = fp;
+	  break;
     }
 }
 
@@ -137,6 +142,17 @@ void init_all_bots(int n_bots)
 
 
 /* Helper functions for working with the current bot. */
+void user_setup_all_bots(int n_bots)
+{
+  for (int i=0; i<n_bots; i++)
+    {
+      current_bot = i;      // for Me() to return the right bot
+      mydata = Me()->data;
+      kilo_uid = i;         // in case the bot's main() uses ID
+	  user_setup();
+    }
+}
+
 
 kilobot *Me()
 {
@@ -204,6 +220,7 @@ void move_bot_forward(kilobot *bot, float timestep)
   bot->y += timestep * velocity * cos(bot->direction);
   bot->x += timestep * velocity * sin(bot->direction);
 }
+
 
 void turn_bot_right(kilobot *bot, float timestep)
 {
