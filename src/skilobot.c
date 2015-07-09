@@ -162,12 +162,14 @@ void dump_all_bots(int n_bots)
 void update_bot(kilobot *bot, float timestep)
 {
   int r = bot->radius;
-  
+
+  // position of left and right rear leg 
   double x_l = bot->x - r * cos(bot->direction);
   double y_l = bot->y + r * sin(bot->direction);
   double x_r = bot->x + r * cos(bot->direction);
   double y_r = bot->y - r * sin(bot->direction);
-
+  
+  
   if (storeHistory)
     {
       bot->x_history[bot->p_hist] = bot->x;
@@ -189,13 +191,13 @@ void update_bot(kilobot *bot, float timestep)
     bot->x += timestep * velocity * sin(bot->direction);
   } else {
     if (bot->ccwm) {
-      bot->direction += timestep * (double) (bot->ccwm) / 30;
-      bot->x = x_r - r * cos(bot->direction);
+      bot->direction += timestep * (double) (bot->ccwm) / 30;      
+      bot->x = x_r - r * cos(bot->direction); // New position of center. Right rear leg stays in place.
       bot->y = y_r + r * sin(bot->direction);
     }
     if (bot->cwm) {
       bot->direction -= timestep * (double) (bot->cwm) / 30;
-      bot->x = x_l + r * cos(bot->direction);
+      bot->x = x_l + r * cos(bot->direction); // New position of center. Left rear leg stays in place.
       bot->y = y_l - r * sin(bot->direction);
     }
   }
