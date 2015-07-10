@@ -5,6 +5,7 @@
 #include "kilolib.h"
 #undef main   // to avoid warning when SDL redefines main
 
+#include <SDL/SDL.h>
 #include "display.h"
 #include "params.h"
 #include "rom8x8.h"
@@ -25,10 +26,35 @@
 extern void (*callback_F5) (void) ; // function pointer to user-defined callback function for F5 press
 extern void (*callback_F6) (void) ; // function pointer to user-defined callback function for F6 press
                                     // run for *ALL* bots in sequence, used for reset
-
 extern char* (*callback_botinfo) (void) ; // function pointer to user-defined callback function for bot info
 
 SDL_Surface *screen;
+
+ColorScheme darkColors = {
+  .background     = 0x00000000,
+  .text           = 0xffffffff,
+  .bot_border     = 0xffffffff,
+  .bot_left_leg   = 0xffaaaaff,
+  .bot_right_leg  = 0xaaffaaff,
+  .bot_line_front = 0x0000ffff,
+  .bot_arrow      = 0xffffffff,
+  .comm           = 0xffffff66, 
+};
+
+ColorScheme brightColors = {
+  .background     = 0xffffffff,
+  .text           = 0x000000ff,
+  .bot_border     = 0x333333ff,
+  .bot_left_leg   = 0x770000ff,
+  .bot_right_leg  = 0x007700ff,
+  .bot_line_front = 0x0000ffff,
+  .bot_arrow      = 0x000000ff,
+  .comm           = 0x00000066, 
+};
+
+ColorScheme *colorscheme = &darkColors;
+
+
 
 int quit = 0;
 
@@ -338,7 +364,7 @@ void draw_commLines(SDL_Surface *surface)
       int x2 = display_w/2 + display_scale * (to->x - c_x); 
       int y2 = display_h/2 + display_scale * (to->y - c_y);  
 
-      lineRGBA (surface, x1, y1, x2, y2, 160, 160, 160, 255);
+      lineColor (surface, x1, y1, x2, y2, colorscheme->comm);
     }
 }
 
@@ -372,13 +398,13 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   bot->screen_x = draw_x;
   bot->screen_y = draw_y;
   int rBody = display_scale * r;
-  filledCircleColor(surface, draw_x, draw_y, rBody, 0xffffffff);
+  filledCircleColor(surface, draw_x, draw_y, rBody, colorscheme->bot_border);
 
 
   /* Draw line to front */
   int x_front = draw_x + display_scale * r * sin(bot->direction);
   int y_front = draw_y + display_scale * r * cos(bot->direction);
-  lineColor(screen, draw_x, draw_y, x_front, y_front, 0x0000ffff);
+  lineColor(screen, draw_x, draw_y, x_front, y_front, colorscheme->bot_line_front);
 
   
   /* Draw legs */
@@ -386,13 +412,13 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   //int y_l = draw_y + display_scale * r * sin(bot->direction);
   int x_l = draw_x + display_scale * r * sin(bot->direction + bot->leg_angle);
   int y_l = draw_y + display_scale * r * cos(bot->direction + bot->leg_angle);
-  filledCircleColor(surface, x_l, y_l, display_scale * 2, 0xff7777ff);
+  filledCircleColor(surface, x_l, y_l, display_scale * 2, colorscheme->bot_left_leg);
 
   //int x_r = draw_x + display_scale * r * cos(bot->direction);
   //int y_r = draw_y - display_scale * r * sin(bot->direction);
   int x_r = draw_x + display_scale * r * sin(bot->direction - bot->leg_angle);
   int y_r = draw_y + display_scale * r * cos(bot->direction - bot->leg_angle);
-  filledCircleColor(surface, x_r, y_r, display_scale * 2, 0x77ff77ff);
+  filledCircleColor(surface, x_r, y_r, display_scale * 2, colorscheme->bot_right_leg);
 
   /* Draw LED */
   Uint32 led_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, 255);
@@ -406,7 +432,7 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   filledCircleColor(surface, draw_x, draw_y, rLED, led_color);
 
   
-  /* draw a triangle pointing forward */
+  /* Draw a triangle pointing forward */
   int txf = draw_x + display_scale * r*.4 * sin(bot->direction);
   int tyf = draw_y + display_scale * r*.4 * cos(bot->direction);
   int tx1 = draw_x + display_scale * r*.4 * sin(bot->direction+2*M_PI*.4);
@@ -414,15 +440,13 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   int tx2 = draw_x + display_scale * r*.4 * sin(bot->direction-2*M_PI*.4);
   int ty2 = draw_y + display_scale * r*.4 * cos(bot->direction-2*M_PI*.4);
   
-  filledTrigonColor (screen, txf, tyf, tx1, ty1, tx2, ty2, 0xffffffff);
-
+  filledTrigonColor (screen, txf, tyf, tx1, ty1, tx2, ty2, colorscheme->bot_arrow);
   
 
   /* Draw transmit radius */
-
   if (get_int_param("showCommsRadius", 1)) {
     if (bot->tx_enabled == 1) {
-      circleColor(surface, draw_x, draw_y, display_scale * bot->cr, 0xffffff66);
+      circleColor(surface, draw_x, draw_y, display_scale * bot->cr, colorscheme->comm);
     }
   }
 
@@ -450,7 +474,7 @@ void displayString (SDL_Surface *surface, int x, int y, char *s)
       done = 1;
     s[i] = 0;
     
-    stringColor (surface, x, y, s, 0xffffffff);
+    stringColor (surface, x, y, s, colorscheme->text);
     s += i+1;
     y += 10;
   } while (!done);

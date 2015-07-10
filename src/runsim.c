@@ -405,7 +405,19 @@ int main(int argc, char *argv[])
   const char *stateFileName = get_string_param("stateFileName", NULL);
   int stateFileSteps = get_int_param("stateFileSteps", 100);
   stepsPerFrame = get_int_param("stepsPerFrame", 1);
-    
+
+  
+  const char *s = get_string_param("colorscheme", NULL);
+  if (s != NULL)
+    {
+      printf("Colorscheme chosen: %s\n", s);
+      if (strcasecmp(s, "bright") == 0)
+	{
+	  printf("bright colors selected.\n");
+	  colorscheme = &brightColors;
+	}
+    }
+  
   // call user-supplied global setup after reading parameters but before
   // doing any real work
   if (callback_global_setup != NULL)
@@ -440,7 +452,7 @@ int main(int argc, char *argv[])
 
     input(); // process input here for fastest response.
 
-    SDL_FillRect(screen, NULL, 0x00000000);
+    SDL_FillRect(screen, NULL, colorscheme->background);
 
     for (int i=0; i <n_bots; i++) 
       draw_bot_history(screen, display_w, display_h, allbots[i]);

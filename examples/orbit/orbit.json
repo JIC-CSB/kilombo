@@ -10,8 +10,11 @@
     "showComms" : 0,
     "showCommsRadius" : 0,
     "distributePercent" : 0.8,
-    "displayWidth"  : 640,
-    "displayHeight" : 424,
+    "__displayWidth"  : 640,
+    "__displayHeight" : 424,
+    "displayWidth"  : 1290,
+    "displayHeight" : 972,
+
     "displayScale"  : 1,
     "showHist" : 1,
     "storeHistory": 1,
@@ -20,6 +23,7 @@
     "stepsPerFrame" : 1,
     "__stateFileName" : "simstates.json",
     "stateFileSteps" : 100,
-    "__imageName" : "/home/fjansson/code/csimulator/movie2/f%04d.bmp"
+    "__imageName" : "/home/fjansson/code/csimulator/movie2/f%04d.bmp",
+    "colorscheme" : "bright"
 }
 
