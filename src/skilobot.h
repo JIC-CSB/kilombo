@@ -4,6 +4,12 @@
 #ifndef SKILOBOT_H
 #define SKILOBOT_H
 
+
+#ifndef M_PI
+// C99 doesn't define M_PI
+#define M_PI 3.14159265358979323846264338327950288
+#endif
+
 //#include "userdata.h" //declarations of user data
 
 #define MAXCOMMLINES 10000
@@ -15,9 +21,10 @@ typedef struct {
   
   int right_motor_power, left_motor_power;
   int ID;
-  double direction; //Angle relative to constant x, +ve y in radians
+  double direction; // Angle relative to constant x, +ve y in radians
   int r_led, g_led, b_led;
-  int radius;
+  int radius;       // kilobot radius in mm
+  double leg_angle; // angle front leg - center - rear leg in radians
 
   int *in_range;
   int n_in_range;

@@ -93,8 +93,10 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->y_history = (double *) calloc(bot->n_hist, sizeof(double));
   bot->p_hist = 0;
 
-  bot->radius = 17; // mm
-
+  bot->radius = 17;                  // mm
+  bot->leg_angle = 125.5 * M_PI/180; // angle front leg - center - rear leg. 
+                                     // 125.5 degrees measured from kilobot PCB design files
+  
   bot->right_motor_power = 0;
   bot->left_motor_power = 0;
   bot->direction = (2 * 3.1415927 / 4);
@@ -227,11 +229,13 @@ void turn_bot_right(kilobot *bot, float timestep)
   /* Turn the bot to the right by a timestep dependent increment. */
 
   int r = bot->radius;
-  double x_r = bot->x + r * cos(bot->direction);
-  double y_r = bot->y - r * sin(bot->direction);
+  // double x_r = bot->x + r * cos(bot->direction);
+  // double y_r = bot->y - r * sin(bot->direction);
+  double x_r = bot->x + r * sin(bot->direction + bot->leg_angle);
+  double y_r = bot->y + r * cos(bot->direction + bot->leg_angle);
   bot->direction += timestep * (double) (bot->left_motor_power) / 30;
-  bot->x = x_r - r * cos(bot->direction);
-  bot->y = y_r + r * sin(bot->direction);
+  bot->x = x_r - r * sin(bot->direction + bot->leg_angle);
+  bot->y = y_r - r * cos(bot->direction + bot->leg_angle);
 }
 
 void turn_bot_left(kilobot *bot, float timestep)
@@ -239,11 +243,13 @@ void turn_bot_left(kilobot *bot, float timestep)
   /* Turn the bot to the left by a timestep dependent increment. */
 
   int r = bot->radius;
-  double x_l = bot->x - r * cos(bot->direction);
-  double y_l = bot->y + r * sin(bot->direction);
+  // double x_l = bot->x - r * cos(bot->direction);
+  // double y_l = bot->y + r * sin(bot->direction);
+  double x_l = bot->x + r * sin(bot->direction - bot->leg_angle);
+  double y_l = bot->y + r * cos(bot->direction - bot->leg_angle);
   bot->direction -= timestep * (double) (bot->right_motor_power) / 30;
-  bot->x = x_l + r * cos(bot->direction);
-  bot->y = y_l - r * sin(bot->direction);
+  bot->x = x_l - r * sin(bot->direction - bot->leg_angle);
+  bot->y = y_l - r * cos(bot->direction - bot->leg_angle);
 }
 
 void update_bot_location(kilobot *bot, float timestep)
