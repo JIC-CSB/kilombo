@@ -7,6 +7,7 @@
 
 #include <jansson.h>
 
+#include "params.h"
 #include "skilobot.h"
 #include "kilolib.h"
 
