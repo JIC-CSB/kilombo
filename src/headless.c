@@ -33,7 +33,7 @@ void distribute_rand(int n_bots, int w, int h)
   for (int i=0; i < n_bots; i++) {
     allbots[i]->x = rand()%w - w/2;
     allbots[i]->y = rand()%h - h/2;
-    allbots[i]->direction = 2 * 3.141 * (float) rand() / (float) RAND_MAX;
+    allbots[i]->direction = 2 * M_PI * (float) rand() / (float) RAND_MAX;
   }
 }
 

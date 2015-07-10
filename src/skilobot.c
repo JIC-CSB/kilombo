@@ -99,7 +99,7 @@ kilobot *new_kilobot(int ID, int n_bots)
   
   bot->right_motor_power = 0;
   bot->left_motor_power = 0;
-  bot->direction = (2 * 3.1415927 / 4);
+  bot->direction = (2 * M_PI / 4);
   bot->r_led = 0;
   bot->g_led = 0;
   bot->b_led = 0;
