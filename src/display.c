@@ -30,6 +30,7 @@ extern char* (*callback_botinfo) (void) ; // function pointer to user-defined ca
 
 SDL_Surface *screen;
 
+// note! background is different from the rest, in the format 0x00RRGGBB
 ColorScheme darkColors = {
   .background     = 0x00000000,
   .text           = 0xffffffff,
@@ -53,7 +54,6 @@ ColorScheme brightColors = {
 };
 
 ColorScheme *colorscheme = &darkColors;
-
 
 
 int quit = 0;
@@ -371,12 +371,12 @@ void draw_commLines(SDL_Surface *surface)
 /* Draw history */
 void draw_bot_history(SDL_Surface *surface, int w, int h, kilobot *bot)
 {
-  int HLEN = 2000; // number of history points to draw
+  int histLength = get_int_param("histLength", 2000); // number of history points to draw
   if (get_int_param("showHist", 0)) {
     float i_alpha = 255.;
-    for (int i=bot->p_hist-1; i>=bot->p_hist-HLEN && i >= 0; i--) {
+    for (int i=bot->p_hist-1; i>=bot->p_hist-histLength && i >= 0; i--) {
       Uint32 ui_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, (int) i_alpha);
-      i_alpha = i_alpha * (1-3.0/HLEN);
+      i_alpha = i_alpha * (1-3.0/histLength);
       filledCircleColor(surface,
 			display_w/2 + display_scale * (bot->x_history[i] - c_x),
 			display_h/2 + display_scale * (bot->y_history[i] - c_y),
