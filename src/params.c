@@ -14,7 +14,7 @@ simulation_params* parse_param_file(const char *filename)
   root = json_load_file(filename, 0, &error);
 
   if (!root) {
-    fprintf(stderr, "Failed to parse %s\n", filename);
+    fprintf(stderr, "Failed to parse %s.\nLine %d: %s\n", filename, error.line,error.text);
     return NULL;
   }
 
