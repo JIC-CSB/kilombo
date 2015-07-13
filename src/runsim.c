@@ -472,13 +472,20 @@ int main(int argc, char *argv[])
 	  process_bots(n_bots, timeStep);
 
 	  // save screenshots for video
+	  // note: step logic is broken if stepsPerFrame > 1
+	  // (except if stepsPerFrame divides saveVideoN.
 	  if (imageName && saveVideo)
 	    if (n_step % saveVideoN == 0)
 	      {
 		static int frame = 0;
 		snprintf (buf, 2000, imageName, frame);
+		printf("Saving video screenshot to %s\n", buf);
 		frame++;
-		SDL_SaveBMP(screen, buf);
+		if (SDL_SaveBMP(screen, buf))
+		  {
+		    fprintf(stderr, "Error saving video frame to file %s\n", buf);
+		    exit(1);
+		  }
 	      }
 
 	  // save state as JSON
