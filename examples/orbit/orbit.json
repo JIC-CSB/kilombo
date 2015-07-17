@@ -12,18 +12,19 @@
     "distributePercent" : 0.8,
     "__displayWidth"  : 640,
     "__displayHeight" : 424,
-    "displayWidth"  : 1290,
-    "displayHeight" : 972,
-
+    "_displayWidth"  : 1290,
+    "_displayHeight" : 972,
+    "displayWidth"  : 430,
+    "displayHeight" : 324,
     "displayScale"  : 1,
     "showHist" : 1,
+    "histLength": 4000,
     "storeHistory": 1,
-    "imageName" : "./movie1/f%04d.bmp",
-    "saveVideoN" : 30,
+    "imageName" : "./movie4/f%04d.bmp",
+    "saveVideoN" : 1,
     "stepsPerFrame" : 1,
     "__stateFileName" : "simstates.json",
     "stateFileSteps" : 100,
-    "__imageName" : "/home/fjansson/code/csimulator/movie2/f%04d.bmp",
     "colorscheme" : "bright"
 }
 
