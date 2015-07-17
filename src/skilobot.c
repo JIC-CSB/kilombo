@@ -299,6 +299,17 @@ double bot_dist(kilobot *bot1, kilobot *bot2)
   return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
+double bot_sq_dist(kilobot *bot1, kilobot *bot2)
+{
+  double x1 = bot1->x;
+  double x2 = bot2->x;
+  double y1 = bot1->y;
+  double y2 = bot2->y;
+
+  return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+}
+
+
 coord2D normalise(coord2D c)
 {
   /* Return a unit vector parallel to c (treating c as a vector).
@@ -387,15 +398,17 @@ void update_interactions(int n_bots)
 
   //double r = (double) allbots[0].radius;
   double r = allbots[0]->radius;
+  double d_sq = 4*r*r;
   double communication_radius = allbots[0]->cr;
-
+  double communication_radius_sq = communication_radius * communication_radius;
+  
   reset_n_in_range_indices(n_bots);
 
   for (int i=0; i<n_bots; i++) {
     for (int j=i+1; j<n_bots; j++) {
-      double bot2bot_distance = bot_dist(allbots[i], allbots[j]);
+      double bot2bot_sq_distance = bot_sq_dist(allbots[i], allbots[j]);
 
-      if (bot2bot_distance < (2 * r)) {
+      if (bot2bot_sq_distance < d_sq) {
         //printf("Whack %d %d\n", i, j);
         separate_clashing_bots(allbots[i], allbots[j]);
         // We move the bots, this changes the distance.
@@ -406,7 +419,7 @@ void update_interactions(int n_bots)
         // Unless they are densely packed and a bot is moved
         // very far, which is unlikely.
       }
-      if (bot2bot_distance < communication_radius) {
+      if (bot2bot_sq_distance < communication_radius_sq) {
         //if (i == 0) printf("%d and %d in range\n", i, j);
         update_n_in_range_indices(allbots[i], allbots[j]);
       }

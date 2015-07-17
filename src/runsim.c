@@ -299,23 +299,13 @@ void process_bots(int n_bots, float timestep)
     update_all_bots(n_bots, timestep);
 }
 
-float cbot_dist(kilobot *bot1, kilobot *bot2)
-{
-  float x1 = bot1->x;
-  float x2 = bot2->x;
-  float y1 = bot1->y;
-  float y2 = bot2->y;
-
-  return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-}
-
 float calc_dists(int n_bots)
 {
   float sum_dist = 0;
   for (int i=0; i<n_bots; i++) {
     for (int j=i; j<n_bots; j++) {
       if (i != j) {
-	sum_dist += cbot_dist(allbots[i], allbots[j]);
+	sum_dist += bot_dist(allbots[i], allbots[j]);
       }
     }
   }
@@ -458,7 +448,7 @@ int main(int argc, char *argv[])
   while(!quit && (time < maxTime || maxTime <= 0)) {
     //   printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
 
-    if (state == RUNNING)
+    if (state == RUNNING && stepsPerFrame > 0)
       {
 	// Do one time step
 	process_bots(n_bots, timeStep);
@@ -493,7 +483,7 @@ int main(int argc, char *argv[])
       } // if RUNNING
 
     // Draw on screen
-    if (steps_since_draw > stepsPerFrame  || state != RUNNING)
+    if (steps_since_draw > stepsPerFrame  || state != RUNNING || stepsPerFrame == 0)
 	{     // avoiding n_step % stepsPerFrame here because of weird behaviour when changing speed
 	  steps_since_draw = 0;
 	  input(); 

@@ -72,6 +72,7 @@ void run_all_bots(int n_bots);
 void dump_all_bots(int n_bots);
 void update_all_bots(int n_bots, float timestep);
 void spread_out(double k);
+double bot_dist(kilobot *bot1, kilobot *bot2);
 
 void update_interactions(int n_bots);
 
