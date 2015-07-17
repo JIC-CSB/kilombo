@@ -212,7 +212,6 @@ void update_bot_history(kilobot *bot)
   manage_bot_history_memory(bot);
 }
 
-
 /* Functions for moving the bots. */
 
 void move_bot_forward(kilobot *bot, float timestep)
