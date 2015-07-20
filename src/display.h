@@ -13,7 +13,9 @@ typedef struct {
   Uint32 bot_right_leg;
   Uint32 bot_arrow;
   Uint32 bot_line_front;
-  Uint32 comm;  
+  Uint32 comm;
+  double LEDa, LEDb;
+  int anti_alias;
 } ColorScheme;
 // SDL_GFX uses Uint32 for colors, format: 0xRRGGBBAA. alpha = 0xff is opaque
 

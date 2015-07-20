@@ -40,17 +40,23 @@ ColorScheme darkColors = {
   .bot_line_front = 0x0000ffff,
   .bot_arrow      = 0xffffffff,
   .comm           = 0xffffff66, 
+  .LEDa           = 0,
+  .LEDb           = 85,
+  .anti_alias      = 0,
 };
 
 ColorScheme brightColors = {
   .background     = 0xffffffff,
   .text           = 0x000000ff,
-  .bot_border     = 0x333333ff,
-  .bot_left_leg   = 0x770000ff,
-  .bot_right_leg  = 0x007700ff,
-  .bot_line_front = 0x0000ffff,
+  .bot_border     = 0x000000ff,
+  .bot_left_leg   = 0x000000ff,
+  .bot_right_leg  = 0x000000ff,
+  .bot_line_front = 0x000000ff, // not visible, same color as outline
   .bot_arrow      = 0x000000ff,
-  .comm           = 0x00000066, 
+  .comm           = 0x000000ff,
+  .LEDa           = 63,
+  .LEDb           = 64,
+  .anti_alias     = 1
 };
 
 ColorScheme *colorscheme = &darkColors;
@@ -364,8 +370,20 @@ void draw_commLines(SDL_Surface *surface)
       int x2 = display_w/2 + display_scale * (to->x - c_x); 
       int y2 = display_h/2 + display_scale * (to->y - c_y);  
 
-      lineColor (surface, x1, y1, x2, y2, colorscheme->comm);
+      if (colorscheme->anti_alias)
+	aalineColor (surface, x1, y1, x2, y2, colorscheme->comm);
+      else
+	lineColor (surface, x1, y1, x2, y2, colorscheme->comm);
     }
+}
+
+Uint32 LEDcolor (kilobot *bot, float i_alpha)
+{
+  //Uint32 ui_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, (int) i_alpha);
+  double a = colorscheme->LEDa;
+  double b = colorscheme->LEDb;
+  Uint32 ui_color = conv_RGBA(a + b * bot->r_led, a + b * bot->g_led, a + b * bot->b_led, (int) i_alpha);
+  return ui_color;
 }
 
 /* Draw history */
@@ -375,7 +393,8 @@ void draw_bot_history(SDL_Surface *surface, int w, int h, kilobot *bot)
   if (get_int_param("showHist", 0)) {
     float i_alpha = 255.;
     for (int i=bot->p_hist-1; i>=bot->p_hist-histLength && i >= 0; i--) {
-      Uint32 ui_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, (int) i_alpha);
+      //Uint32 ui_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, (int) i_alpha);
+      Uint32 ui_color = LEDcolor(bot, i_alpha);
       i_alpha = i_alpha * (1-3.0/histLength);
       filledCircleColor(surface,
 			display_w/2 + display_scale * (bot->x_history[i] - c_x),
@@ -386,6 +405,13 @@ void draw_bot_history(SDL_Surface *surface, int w, int h, kilobot *bot)
   
 }
 
+/* Draw the kilobots.
+ * 
+ * Experimental anti-alias support can be enabled by setting .anti_alias = 1 in the color scheme.
+ * Antialiasing is done using the aa-primitives from the gfx_library.
+ * Unfortunately, filled circles and triangles are not implemented, so antialiasing for those
+ * is done by drawing a non-filled, anti-aliased primitive before the filled, regular one.
+ */
 void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
 {
   int r = bot->radius;
@@ -398,6 +424,9 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   bot->screen_x = draw_x;
   bot->screen_y = draw_y;
   int rBody = display_scale * r;
+
+  if (colorscheme->anti_alias)
+    aacircleColor(surface, draw_x, draw_y, rBody, colorscheme->bot_border);
   filledCircleColor(surface, draw_x, draw_y, rBody, colorscheme->bot_border);
 
 
@@ -412,16 +441,21 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   //int y_l = draw_y + display_scale * r * sin(bot->direction);
   int x_l = draw_x + display_scale * r * sin(bot->direction + bot->leg_angle);
   int y_l = draw_y + display_scale * r * cos(bot->direction + bot->leg_angle);
+  if (colorscheme->anti_alias)
+    aacircleColor(surface, x_l, y_l, display_scale * 2, colorscheme->bot_left_leg);
   filledCircleColor(surface, x_l, y_l, display_scale * 2, colorscheme->bot_left_leg);
 
   //int x_r = draw_x + display_scale * r * cos(bot->direction);
   //int y_r = draw_y - display_scale * r * sin(bot->direction);
   int x_r = draw_x + display_scale * r * sin(bot->direction - bot->leg_angle);
   int y_r = draw_y + display_scale * r * cos(bot->direction - bot->leg_angle);
+  if (colorscheme->anti_alias)
+    aacircleColor(surface, x_r, y_r, display_scale * 2, colorscheme->bot_right_leg);
   filledCircleColor(surface, x_r, y_r, display_scale * 2, colorscheme->bot_right_leg);
 
   /* Draw LED */
-  Uint32 led_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, 255);
+  //  Uint32 led_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, 255);
+  Uint32 led_color = LEDcolor(bot, 255);
   int rLED = display_scale * r * 0.9;
   // don't allow the LED to cover the body circle completely
   if (rLED >= rBody)
@@ -429,6 +463,9 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   // don't allow the LED to vanish either
   if (rLED < 1)
     rLED = 1;
+
+  if (colorscheme->anti_alias)
+    aacircleColor(surface, draw_x, draw_y, rLED, led_color);
   filledCircleColor(surface, draw_x, draw_y, rLED, led_color);
 
   
@@ -439,14 +476,20 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   int ty1 = draw_y + display_scale * r*.4 * cos(bot->direction+2*M_PI*.4);
   int tx2 = draw_x + display_scale * r*.4 * sin(bot->direction-2*M_PI*.4);
   int ty2 = draw_y + display_scale * r*.4 * cos(bot->direction-2*M_PI*.4);
-  
+
+  if (colorscheme->anti_alias)
+    aatrigonColor (screen, txf, tyf, tx1, ty1, tx2, ty2, colorscheme->bot_arrow);
   filledTrigonColor (screen, txf, tyf, tx1, ty1, tx2, ty2, colorscheme->bot_arrow);
   
 
   /* Draw transmit radius */
   if (get_int_param("showCommsRadius", 1)) {
     if (bot->tx_enabled == 1) {
-      circleColor(surface, draw_x, draw_y, display_scale * bot->cr, colorscheme->comm);
+      if (colorscheme->anti_alias)
+	aacircleColor(surface, draw_x, draw_y, display_scale * bot->cr, colorscheme->comm);
+      else
+	circleColor(surface, draw_x, draw_y, display_scale * bot->cr, colorscheme->comm);
+      
     }
   }
 
