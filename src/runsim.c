@@ -18,9 +18,9 @@
 #include<SDL/SDL.h>
 #include<SDL/SDL_main.h>
 #include"gfx/SDL_framerate.h"
+#include"display.h"
 
 #include"skilobot.h"
-#include"display.h"
 #include"params.h"
 #include"stateio.h"
 
@@ -48,31 +48,6 @@ void die(char *s)
   exit(1);
 }
 
-void spread_out(double k)
-{
-  int i, j;
-  for (j = 0; j < n_bots; j++)
-    for (i = 0; i < j; i++)
-      {
-	double dx = allbots[i]->x - allbots[j]->x;
-	double dy = allbots[i]->y - allbots[j]->y;
-	double r = hypot(dx, dy);
-
-	// arbitrary cap to avoid large forces
-	if (r < 5)
-	  r = 5;
-	
-	// a force
-	double fx = 1/(r*r) * dx/r ;
-	double fy = 1/(r*r) * dy/r;
-
-	allbots[i]->x += fx * k;
-	allbots[i]->y += fy * k;
-	allbots[j]->x -= fx * k;
-	allbots[j]->y -= fy * k;	
-      }
-}
-
 
 void initialise_simulator(const char *param_filename)
 {
@@ -88,26 +63,6 @@ void initialise_simulator(const char *param_filename)
     srand(rand_seed);
   }
 
-}
-
-void process_bots(int n_bots, float timestep)
-{
-    run_all_bots(n_bots);
-    update_all_bots(n_bots, timestep);
-}
-
-float calc_dists(int n_bots)
-{
-  float sum_dist = 0;
-  for (int i=0; i<n_bots; i++) {
-    for (int j=i; j<n_bots; j++) {
-      if (i != j) {
-	sum_dist += bot_dist(allbots[i], allbots[j]);
-      }
-    }
-  }
-
-  return sum_dist;
 }
 
 void draw()
@@ -129,15 +84,12 @@ int main(int argc, char *argv[])
   n_bots = 100;
   double time = 0;
   double frameTimeAvg = 0;
-  Uint32 lastTicks;
   char *bot_state_file = (char *) NULL;
   int c;  
   char param_filename[1000];
   sprintf (param_filename, "%s%s", argv[0], ".json");
   //default to <program name>.json
   
-
-
   while ((c = getopt(argc, argv, "n:p:b:")) != -1) {
     switch (c) {
     case 'n':
@@ -157,14 +109,13 @@ int main(int argc, char *argv[])
 
   initialise_simulator(param_filename);
 
-
   if (!simparams) {
     fprintf(stderr, "Couldn't load parameter file\n");
     return 1;
   }
-
+  
   screen = makeWindow(display_w, display_h);
-
+  
   kilo_message_tx = message_tx_dummy;
   kilo_message_tx_success = message_tx_success_dummy;
   kilo_message_rx = message_rx_dummy;
@@ -239,8 +190,12 @@ int main(int argc, char *argv[])
 	 n_bots, timeStep, maxTime);
 
   int n_step = 0;
-  
+
+
+
+  Uint32 lastTicks;
   lastTicks = SDL_GetTicks();
+
   
   while(!quit && (time < maxTime || maxTime <= 0)) {
     //   printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
@@ -261,7 +216,6 @@ int main(int argc, char *argv[])
 	    json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
 	    json_array_append(j_state, t);
 	  }
-	
 	// save screenshots for video
 	if (imageName && saveVideo)
 	  if (n_step % saveVideoN == 0)
@@ -298,7 +252,6 @@ int main(int argc, char *argv[])
 	  frameTimeAvg = (1-w) * frameTimeAvg + w*(t-lastTicks); 
 	  lastTicks = t;    
 	}    
-  
   }
 
   save_bot_state_to_file(allbots, n_bots, "endstate.json");

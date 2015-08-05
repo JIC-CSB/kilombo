@@ -302,10 +302,10 @@ void input(void)
    if (stepsPerFrame > 0)
      stepsPerFrame--;
  if (keystates[SDLK_F1])
-   spread_out(500);
+   spread_out(n_bots, 500);
  if (keystates[SDLK_F2])
    {
-     spread_out(-200);
+     spread_out(n_bots, -200);
      update_interactions(n_bots);
    }
 }
@@ -495,14 +495,6 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
 
 }
 
-char botinfo_buffer[100];
-
-//default callback_botinfo function
-char *botinfo_simple()
-{
-  sprintf (botinfo_buffer, "%d", kilo_uid);
-  return botinfo_buffer;
-}
 
 void displayString (SDL_Surface *surface, int x, int y, char *s)
 {

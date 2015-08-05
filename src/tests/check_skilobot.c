@@ -23,7 +23,7 @@ void update_n_in_range_indices(kilobot *bot1, kilobot *bot2);
 typedef struct { int num_bot_steps; } USERDATA;
 int UserdataSize = sizeof(USERDATA);
 void *mydata;
-char* botinfo_simple(void) { return NULL; };
+//char* botinfo_simple(void) { return NULL; }; 
 extern uint16_t kilo_uid;
 
 // Needed to setup a new kilobot.

@@ -71,10 +71,11 @@ void user_setup_all_bots(int n_bots);
 void run_all_bots(int n_bots);
 void dump_all_bots(int n_bots);
 void update_all_bots(int n_bots, float timestep);
-void spread_out(double k);
 double bot_dist(kilobot *bot1, kilobot *bot2);
-
+void process_bots(int n_bots, float timestep);
 void update_interactions(int n_bots);
+
+void spread_out(int n_bots, double k);
 
 extern int current_bot;
 extern void* mydata;
@@ -88,5 +89,7 @@ extern int state;   //simulator state. PAUSE or RUNNING.
 extern int tx_period_ticks;
 extern int fullSpeed;
 extern int stepsPerFrame;
+
+
 
 #endif

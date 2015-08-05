@@ -543,3 +543,43 @@ void update_all_bots(int n_bots, float timestep)
 
   process_messaging(n_bots);
 }
+
+char botinfo_buffer[100];
+
+//default callback_botinfo function
+char *botinfo_simple()
+{
+  sprintf (botinfo_buffer, "%d", kilo_uid);
+  return botinfo_buffer;
+}
+
+void spread_out(int n_bots, double k)
+{
+  int i, j;
+  for (j = 0; j < n_bots; j++)
+    for (i = 0; i < j; i++)
+      {
+	double dx = allbots[i]->x - allbots[j]->x;
+	double dy = allbots[i]->y - allbots[j]->y;
+	double r = hypot(dx, dy);
+
+	// arbitrary cap to avoid large forces
+	if (r < 5)
+	  r = 5;
+	
+	// a force
+	double fx = 1/(r*r) * dx/r ;
+	double fy = 1/(r*r) * dy/r;
+
+	allbots[i]->x += fx * k;
+	allbots[i]->y += fy * k;
+	allbots[j]->x -= fx * k;
+	allbots[j]->y -= fy * k;	
+      }
+}
+
+void process_bots(int n_bots, float timestep)
+{
+    run_all_bots(n_bots);
+    update_all_bots(n_bots, timestep);
+}
