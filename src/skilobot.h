@@ -17,7 +17,7 @@
 typedef struct {
   double x, y;
   double *x_history, *y_history;
-  int p_hist, n_hist;
+  int p_hist, n_hist, l_hist;
   
   int right_motor_power, left_motor_power;
   int ID;

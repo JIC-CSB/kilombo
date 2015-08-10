@@ -89,11 +89,12 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->x = 0;
   bot->y = 0;
 
-  bot->n_hist = 100;
+  bot->n_hist = simparams->histLength;
   bot->x_history = (double *) calloc(bot->n_hist, sizeof(double));
   bot->y_history = (double *) calloc(bot->n_hist, sizeof(double));
   bot->p_hist = 0;
-
+  bot->l_hist = 0;
+  
   bot->radius = 17;                  // mm
   bot->leg_angle = 125.5 * M_PI/180; // angle front leg - center - rear leg. 
                                      // 125.5 degrees measured from kilobot PCB design files
@@ -212,6 +213,22 @@ void update_bot_history(kilobot *bot)
   manage_bot_history_memory(bot);
 }
 
+void update_bot_history_ring(kilobot *bot)
+{
+  /* Update the bot's history of where it has been, using a ring buffer,
+     of size simparams->histLength */
+
+  bot->p_hist %= simparams->histLength;
+  bot->x_history[bot->p_hist] = bot->x;
+  bot->y_history[bot->p_hist] = bot->y;
+  bot->p_hist++;
+
+  // count valid history entries in the buffer 
+  if (bot->l_hist < simparams->histLength)
+    bot->l_hist++;
+}
+
+
 /* Functions for moving the bots. */
 
 void move_bot_forward(kilobot *bot, float timestep)
@@ -278,7 +295,7 @@ void update_bot(kilobot *bot, float timestep)
    * Save the history (if required) before updating the location.
    */
   if (storeHistory) {
-    update_bot_history(bot);
+    update_bot_history_ring(bot);
   }
   update_bot_location(bot, timestep);
 }

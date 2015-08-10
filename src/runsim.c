@@ -25,12 +25,10 @@
 #include"stateio.h"
 
 
-
 int n_bots = 100;
 int state = RUNNING;
 int fullSpeed = 0;     // if nonzero, run without delay between frames
 
-extern int storeHistory;  //whether to save the history of all bot positions
 
 void distribute_bots(int n_bots);
 extern void (*callback_global_setup) (void);
@@ -61,7 +59,6 @@ void initialise_simulator(const char *param_filename)
   } else {
     srand(simparams->randSeed);
   }
-
 }
 
 void draw()
@@ -69,7 +66,7 @@ void draw()
   SDL_FillRect(screen, NULL, colorscheme->background);
   
   for (int i=0; i <n_bots; i++) 
-    draw_bot_history(screen, simparams->display_w, simparams->display_h, allbots[i]);
+    draw_bot_history_ring(screen, simparams->display_w, simparams->display_h, allbots[i]);
   
   if (simparams->showComms) 
     draw_commLines(screen);

@@ -378,7 +378,6 @@ Uint32 LEDcolor (kilobot *bot, float i_alpha)
 /* Draw history */
 void draw_bot_history(SDL_Surface *surface, int w, int h, kilobot *bot)
 {
-
   if (simparams->showHist) {
     float i_alpha = 255.;
     for (int i=bot->p_hist-1; i>=bot->p_hist-simparams->histLength && i >= 0; i--) {
@@ -391,8 +390,30 @@ void draw_bot_history(SDL_Surface *surface, int w, int h, kilobot *bot)
 			simparams->display_scale * 2, ui_color);
     }
   }
-  
 }
+
+/* Draw history using a ring buffer of length simparams->histLength */
+void draw_bot_history_ring(SDL_Surface *surface, int w, int h, kilobot *bot)
+{
+  if (simparams->showHist) {
+    float i_alpha = 255.;
+    //    for (int i=bot->p_hist-1; i!=bot->p_hist; i = (i-1+simparams->histLength)%simparams->histLength)
+    for (int ii=0; ii < bot->l_hist; ii++)
+      {
+	int i = (bot->p_hist - ii + simparams->histLength) % simparams->histLength;
+
+	//Uint32 ui_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, (int) i_alpha);
+	Uint32 ui_color = LEDcolor(bot, i_alpha);
+	i_alpha = i_alpha * (1-3.0/simparams->histLength);
+	filledCircleColor(surface,
+			  simparams->display_w/2 + simparams->display_scale * (bot->x_history[i] - c_x),
+			  simparams->display_h/2 + simparams->display_scale * (bot->y_history[i] - c_y),
+			  simparams->display_scale * 2, ui_color);
+      }
+  }
+}
+
+
 
 /* Draw the kilobots.
  * 

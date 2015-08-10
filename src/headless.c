@@ -25,7 +25,6 @@
 int n_bots = 100;
 int state = RUNNING;
 int fullSpeed = 0;     // if nonzero, run without delay between frames
-int stepsPerFrame = 1; // number of simulation steps to take between frames
 
 extern int storeHistory;  //whether to save the history of all bot positions
 
@@ -44,7 +43,6 @@ void die(char *s)
   exit(1);
 }
 
-
 void initialise_simulator(const char *param_filename)
 {
   /* Parse parameter file and perform initialisation */
@@ -53,14 +51,11 @@ void initialise_simulator(const char *param_filename)
   // fill in the global simparams structure
   parse_param_file(param_filename);
 
-  int rand_seed = get_int_param("randSeed", 0);
-
-  if (!rand_seed) {
+  if (!simparams->randSeed) {
     srand(time(0));
   } else {
-    srand(rand_seed);
+    srand(simparams->randSeed);
   }
-
 }
 
 
@@ -128,16 +123,6 @@ int main(int argc, char *argv[])
 
   // maxTime <= 0 for unlimited simulation
 
-  float maxTime   = get_float_param("simulationTime", 0);
-  float timeStep  = get_float_param("timeStep", 0.02);
-  storeHistory = get_int_param("storeHistory", 1);
-
-  const char *stateFileName = get_string_param("stateFileName", NULL);
-  int stateFileSteps = get_int_param("stateFileSteps", 100);
-  stepsPerFrame = get_int_param("stepsPerFrame", 1);
-
-  
- 
   // call user-supplied global setup after reading parameters but before
   // doing any real work
   if (callback_global_setup != NULL)
@@ -151,22 +136,22 @@ int main(int argc, char *argv[])
   json_t *j_state = json_array();
     
   printf("Running %d bots with timestep %f for total time %f\n", 
-	 n_bots, timeStep, maxTime);
+	 n_bots, simparams->timeStep, simparams->maxTime);
 
   int n_step = 0;
 
-  while(time < maxTime || maxTime <= 0)
+  while(time < simparams->maxTime || simparams->maxTime <= 0)
     {
     //   printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
 
       // Do one time step
-      process_bots(n_bots, timeStep);
+      process_bots(n_bots, simparams->timeStep);
       n_step++;
-      time += timeStep;
+      time += simparams->timeStep;
       kilo_ticks = time * TICKS_PER_SEC;
       
       // save simulation state as JSON
-      if (stateFileName && n_step % stateFileSteps == 0)
+      if (simparams->stateFileName && n_step % simparams->stateFileSteps == 0)
 	{
 	  // printf("Saving state to JSON at %6d steps\n", n_step);
 	  json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
@@ -176,9 +161,9 @@ int main(int argc, char *argv[])
 
   save_bot_state_to_file(allbots, n_bots, "endstate.json");
 
-  if (stateFileName)
+  if (simparams->stateFileName)
     {
-      json_dump_file(j_state, stateFileName, JSON_INDENT(2) | JSON_SORT_KEYS);
+      json_dump_file(j_state, simparams->stateFileName, JSON_INDENT(2) | JSON_SORT_KEYS);
     }  
   return 0;
 }
