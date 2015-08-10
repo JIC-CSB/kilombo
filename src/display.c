@@ -66,9 +66,6 @@ int quit = 0;
 
 int c_x = 0;
 int c_y = 0;
-float display_scale = 1;  
-int display_w = 1200;
-int display_h = 800;
 int saveVideo = 0;  //if non-zero, save screenshot every Nth frame
 
 void dieSDL(char *reason)
@@ -88,7 +85,7 @@ int rotX0;
  */
 int find_bot_index (int x, int y)
 {
-  int RR = allbots[0]->radius * display_scale;
+  int RR = allbots[0]->radius * simparams->display_scale;
   RR *= RR; // radius squared
 
   int i;
@@ -121,8 +118,8 @@ void move_bot_to_mouse(kilobot *bot)
 {
   int x, y;
   SDL_GetMouseState (&x, &y);
-  bot->x = (x - display_w/2) / display_scale + c_x;
-  bot->y = (y - display_h/2) / display_scale + c_y;
+  bot->x = (x - simparams->display_w/2) / simparams->display_scale + c_x;
+  bot->y = (y - simparams->display_h/2) / simparams->display_scale + c_y;
 }
 
 /* try to grab a bot with the mouse*/
@@ -178,10 +175,10 @@ void screenshot (SDL_Surface *s)
   // windows: use _mkdir ("screenshots");
   
   char fileName[200];
-  const char *bot_name = get_string_param("botName", "default");
+
   while(1)
     {
-      sprintf (fileName, "screenshots/%s%03d.bmp", bot_name, screenshotN);
+      sprintf (fileName, "screenshots/%s%03d.bmp", simparams->bot_name, screenshotN);
       if (!fileExists(fileName))
 	break;
       screenshotN++;
@@ -280,14 +277,14 @@ void input(void)
   Uint8 *keystates = SDL_GetKeyState(NULL);
   
   double s = 1.05; // magnification factor per frame
-  int d = 20/display_scale;      // amount to move per frame
+  int d = 20/simparams->display_scale;      // amount to move per frame
   if (d < 1)
     d = 1;
   
   if (keystates[SDLK_KP_PLUS] || keystates[SDLK_PLUS])
-   display_scale *= s;
+   simparams->display_scale *= s;
  if (keystates[SDLK_KP_MINUS] || keystates[SDLK_MINUS])
-   display_scale *= 1/s;
+   simparams->display_scale *= 1/s;
  if (keystates[SDLK_RIGHT])
    c_x += d;
  if (keystates[SDLK_LEFT])
@@ -297,10 +294,10 @@ void input(void)
  if (keystates[SDLK_DOWN])
    c_y += d;
  if (keystates[SDLK_KP_MULTIPLY]) // faster
-   stepsPerFrame++;
+   simparams->stepsPerFrame++;
  if (keystates[SDLK_KP_DIVIDE])   // slower
-   if (stepsPerFrame > 0)
-     stepsPerFrame--;
+   if (simparams->stepsPerFrame > 0)
+     simparams->stepsPerFrame--;
  if (keystates[SDLK_F1])
    spread_out(n_bots, 500);
  if (keystates[SDLK_F2])
@@ -323,25 +320,17 @@ SDL_Surface *makeWindow(int width, int height)
   //printf("Screen %d x %d\n", info->current_w, info->current_h);
 
   // if an absolute size is specieied, use it
-  display_w = get_int_param("displayWidth",  -1);
-  display_h = get_int_param("displayHeight", -1);
-  display_scale = get_float_param("displayScale", 1.0);
-
   // if no absolute size was given, try a relative one
-  if (display_w <= 0 && display_h <= 0)
+  if (simparams->display_w <= 0 && simparams->display_h <= 0)
     {
-      float d_w_percent = get_float_param("displayWidthPercent",  0.9);
-      float d_h_percent = get_float_param("displayHeightPercent", 0.9);
-
-      display_w = info->current_w * d_w_percent;
-      display_h = info->current_h * d_h_percent;
+      simparams->display_w = info->current_w * simparams->displayWidthPercent;
+      simparams->display_h = info->current_h * simparams->displayHeightPercent;
     }
   
     
-  const char *bot_name = get_string_param("botName", "default");
-  SDL_WM_SetCaption(bot_name, bot_name);
+  SDL_WM_SetCaption(simparams->bot_name, simparams->bot_name);
 
-  screen = SDL_SetVideoMode(display_w, display_h, 32,
+  screen = SDL_SetVideoMode(simparams->display_w, simparams->display_h, 32,
 			    SDL_SWSURFACE|SDL_DOUBLEBUF);
 
   if (screen == NULL) dieSDL("SDL_SetVideoMode failed: %s\n"); // FIXME: Hmmm
@@ -365,10 +354,10 @@ void draw_commLines(SDL_Surface *surface)
       kilobot *from = commLines[i].from;
       kilobot *to   = commLines[i].to;
 
-      int x1 = display_w/2 + display_scale * (from->x - c_x); 
-      int y1 = display_h/2 + display_scale * (from->y - c_y);
-      int x2 = display_w/2 + display_scale * (to->x - c_x); 
-      int y2 = display_h/2 + display_scale * (to->y - c_y);  
+      int x1 = simparams->display_w/2 + simparams->display_scale * (from->x - c_x); 
+      int y1 = simparams->display_h/2 + simparams->display_scale * (from->y - c_y);
+      int x2 = simparams->display_w/2 + simparams->display_scale * (to->x - c_x); 
+      int y2 = simparams->display_h/2 + simparams->display_scale * (to->y - c_y);  
 
       if (colorscheme->anti_alias)
 	aalineColor (surface, x1, y1, x2, y2, colorscheme->comm);
@@ -389,17 +378,17 @@ Uint32 LEDcolor (kilobot *bot, float i_alpha)
 /* Draw history */
 void draw_bot_history(SDL_Surface *surface, int w, int h, kilobot *bot)
 {
-  int histLength = get_int_param("histLength", 2000); // number of history points to draw
-  if (get_int_param("showHist", 0)) {
+
+  if (simparams->showHist) {
     float i_alpha = 255.;
-    for (int i=bot->p_hist-1; i>=bot->p_hist-histLength && i >= 0; i--) {
+    for (int i=bot->p_hist-1; i>=bot->p_hist-simparams->histLength && i >= 0; i--) {
       //Uint32 ui_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, (int) i_alpha);
       Uint32 ui_color = LEDcolor(bot, i_alpha);
-      i_alpha = i_alpha * (1-3.0/histLength);
+      i_alpha = i_alpha * (1-3.0/simparams->histLength);
       filledCircleColor(surface,
-			display_w/2 + display_scale * (bot->x_history[i] - c_x),
-			display_h/2 + display_scale * (bot->y_history[i] - c_y),
-			display_scale * 2, ui_color);
+			simparams->display_w/2 + simparams->display_scale * (bot->x_history[i] - c_x),
+			simparams->display_h/2 + simparams->display_scale * (bot->y_history[i] - c_y),
+			simparams->display_scale * 2, ui_color);
     }
   }
   
@@ -415,15 +404,16 @@ void draw_bot_history(SDL_Surface *surface, int w, int h, kilobot *bot)
 void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
 {
   int r = bot->radius;
-
+  float scale = simparams->display_scale;
+ 
   /* Draw the bot's body */
-
-  int draw_x = w/2 + display_scale * (bot->x - c_x);
-  int draw_y = h/2 + display_scale * (bot->y - c_y);
+    
+  int draw_x = w/2 + scale * (bot->x - c_x);
+  int draw_y = h/2 + scale * (bot->y - c_y);
   
   bot->screen_x = draw_x;
   bot->screen_y = draw_y;
-  int rBody = display_scale * r;
+  int rBody = scale * r;
 
   if (colorscheme->anti_alias)
     aacircleColor(surface, draw_x, draw_y, rBody, colorscheme->bot_border);
@@ -431,32 +421,32 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
 
 
   /* Draw line to front */
-  int x_front = draw_x + display_scale * r * sin(bot->direction);
-  int y_front = draw_y + display_scale * r * cos(bot->direction);
+  int x_front = draw_x + scale * r * sin(bot->direction);
+  int y_front = draw_y + scale * r * cos(bot->direction);
   lineColor(screen, draw_x, draw_y, x_front, y_front, colorscheme->bot_line_front);
 
   
   /* Draw legs */
-  //int x_l = draw_x - display_scale * r * cos(bot->direction);
-  //int y_l = draw_y + display_scale * r * sin(bot->direction);
-  int x_l = draw_x + display_scale * r * sin(bot->direction + bot->leg_angle);
-  int y_l = draw_y + display_scale * r * cos(bot->direction + bot->leg_angle);
+  //int x_l = draw_x - scale * r * cos(bot->direction);
+  //int y_l = draw_y + scale * r * sin(bot->direction);
+  int x_l = draw_x + scale * r * sin(bot->direction + bot->leg_angle);
+  int y_l = draw_y + scale * r * cos(bot->direction + bot->leg_angle);
   if (colorscheme->anti_alias)
-    aacircleColor(surface, x_l, y_l, display_scale * 2, colorscheme->bot_left_leg);
-  filledCircleColor(surface, x_l, y_l, display_scale * 2, colorscheme->bot_left_leg);
+    aacircleColor(surface, x_l, y_l, scale * 2, colorscheme->bot_left_leg);
+  filledCircleColor(surface, x_l, y_l, scale * 2, colorscheme->bot_left_leg);
 
-  //int x_r = draw_x + display_scale * r * cos(bot->direction);
-  //int y_r = draw_y - display_scale * r * sin(bot->direction);
-  int x_r = draw_x + display_scale * r * sin(bot->direction - bot->leg_angle);
-  int y_r = draw_y + display_scale * r * cos(bot->direction - bot->leg_angle);
+  //int x_r = draw_x + scale * r * cos(bot->direction);
+  //int y_r = draw_y - scale * r * sin(bot->direction);
+  int x_r = draw_x + scale * r * sin(bot->direction - bot->leg_angle);
+  int y_r = draw_y + scale * r * cos(bot->direction - bot->leg_angle);
   if (colorscheme->anti_alias)
-    aacircleColor(surface, x_r, y_r, display_scale * 2, colorscheme->bot_right_leg);
-  filledCircleColor(surface, x_r, y_r, display_scale * 2, colorscheme->bot_right_leg);
+    aacircleColor(surface, x_r, y_r, scale * 2, colorscheme->bot_right_leg);
+  filledCircleColor(surface, x_r, y_r, scale * 2, colorscheme->bot_right_leg);
 
   /* Draw LED */
   //  Uint32 led_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, 255);
   Uint32 led_color = LEDcolor(bot, 255);
-  int rLED = display_scale * r * 0.9;
+  int rLED = scale * r * 0.9;
   // don't allow the LED to cover the body circle completely
   if (rLED >= rBody)
     rLED = rBody - 1;
@@ -470,12 +460,12 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
 
   
   /* Draw a triangle pointing forward */
-  int txf = draw_x + display_scale * r*.4 * sin(bot->direction);
-  int tyf = draw_y + display_scale * r*.4 * cos(bot->direction);
-  int tx1 = draw_x + display_scale * r*.4 * sin(bot->direction+2*M_PI*.4);
-  int ty1 = draw_y + display_scale * r*.4 * cos(bot->direction+2*M_PI*.4);
-  int tx2 = draw_x + display_scale * r*.4 * sin(bot->direction-2*M_PI*.4);
-  int ty2 = draw_y + display_scale * r*.4 * cos(bot->direction-2*M_PI*.4);
+  int txf = draw_x + scale * r*.4 * sin(bot->direction);
+  int tyf = draw_y + scale * r*.4 * cos(bot->direction);
+  int tx1 = draw_x + scale * r*.4 * sin(bot->direction+2*M_PI*.4);
+  int ty1 = draw_y + scale * r*.4 * cos(bot->direction+2*M_PI*.4);
+  int tx2 = draw_x + scale * r*.4 * sin(bot->direction-2*M_PI*.4);
+  int ty2 = draw_y + scale * r*.4 * cos(bot->direction-2*M_PI*.4);
 
   if (colorscheme->anti_alias)
     aatrigonColor (screen, txf, tyf, tx1, ty1, tx2, ty2, colorscheme->bot_arrow);
@@ -483,13 +473,12 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   
 
   /* Draw transmit radius */
-  if (get_int_param("showCommsRadius", 1)) {
+  if (simparams->showCommsRadius) {
     if (bot->tx_enabled == 1) {
       if (colorscheme->anti_alias)
-	aacircleColor(surface, draw_x, draw_y, display_scale * bot->cr, colorscheme->comm);
+	aacircleColor(surface, draw_x, draw_y, scale * bot->cr, colorscheme->comm);
       else
-	circleColor(surface, draw_x, draw_y, display_scale * bot->cr, colorscheme->comm);
-      
+	circleColor(surface, draw_x, draw_y, scale * bot->cr, colorscheme->comm);      
     }
   }
 
@@ -521,7 +510,7 @@ void displayString (SDL_Surface *surface, int x, int y, char *s)
 void draw_status(SDL_Surface *surface, int w, int h, double FPS)
 {
   char buf[100];
-  sprintf(buf, "%3dx  %8d  %5.1f FPS", stepsPerFrame, kilo_ticks, FPS);
+  sprintf(buf, "%3dx  %8d  %5.1f FPS", simparams->stepsPerFrame, kilo_ticks, FPS);
   displayString(surface, 10, 2, buf);
   
   

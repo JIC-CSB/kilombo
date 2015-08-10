@@ -34,9 +34,6 @@ void draw_status(SDL_Surface *surface, int w, int h, double FPS);
 extern SDL_Surface *screen;
 extern int quit;
 extern int sim_pause;
-extern int display_w;
-extern int display_h;
-extern float display_scale;
 extern int saveVideo;
 
 

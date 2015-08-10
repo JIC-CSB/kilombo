@@ -49,7 +49,9 @@ void initialise_simulator(const char *param_filename)
 {
   /* Parse parameter file and perform initialisation */
 
-  simparams = parse_param_file(param_filename);
+  // Read simulator parameters from JSON,
+  // fill in the global simparams structure
+  parse_param_file(param_filename);
 
   int rand_seed = get_int_param("randSeed", 0);
 
