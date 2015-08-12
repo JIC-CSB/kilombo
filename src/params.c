@@ -13,7 +13,7 @@ void parse_param_file(const char *filename)
 
   if (!root) {
     fprintf(stderr, "Failed to parse %s.\nLine %d: %s\n", filename, error.line,error.text);
-    return NULL;
+    return;
   }
 
   if (json_is_object(root)) {
@@ -24,7 +24,7 @@ void parse_param_file(const char *filename)
 
   if (!json_is_object(data)) {
     fprintf(stderr, "error: not an object\n");
-    return NULL;
+    return;
   }
 
   simparams->root = root;
