@@ -14,6 +14,7 @@ typedef struct {
   float maxTime; 
   float timeStep;
   const char *imageName;
+  const char *finalImage;
   int storeHistory;
   int saveVideoN;
   int saveVideo;

@@ -37,6 +37,7 @@ void parse_param_file(const char *filename)
   simparams->maxTime         = get_float_param ("simulationTime", 0);
   simparams->timeStep        = get_float_param ("timeStep",       0.02);
   simparams->imageName       = get_string_param("imageName",      NULL);
+  simparams->finalImage      = get_string_param("finalImage",     NULL);
   simparams->storeHistory    = get_int_param   ("storeHistory",   1);
   simparams->saveVideoN      = get_int_param   ("saveVideoN",     1); // save video screenshot every Nth frame
   simparams->saveVideo       = get_int_param   ("saveVideo",      0); // whether to save video.
@@ -55,7 +56,7 @@ void parse_param_file(const char *filename)
   simparams->histLength      = get_int_param("histLength", 2000); // number of history points to draw
   simparams->showHist        = get_int_param("showHist", 0);
   simparams->randSeed        = get_int_param("randSeed", 0);
-  simparams->GUI           = get_int_param("GUI", 0);
+  simparams->GUI             = get_int_param("GUI", 1);
 }
 
 int get_int_param(const char *param_name, int default_val)

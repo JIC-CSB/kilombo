@@ -252,6 +252,17 @@ int main(int argc, char *argv[])
   if (simparams->stateFileName)
     {
       json_dump_file(j_state, simparams->stateFileName, JSON_INDENT(2) | JSON_SORT_KEYS);
-    }  
+    }
+
+  if (simparams->finalImage)
+    {
+      draw();
+      if (SDL_SaveBMP(screen, simparams->finalImage))
+	{
+	  fprintf(stderr, "Error saving video frame to file %s\n", simparams->finalImage);
+	  exit(1);
+	}
+    }
+  
   return 0;
 }
