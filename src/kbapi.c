@@ -53,22 +53,15 @@ void kilo_init(void)
 void kilo_start(void (*setup)(void), void (*loop)(void))
 {
   user_setup = setup;
-  user_setup(); 
-
   user_loop = loop;
 }
 
 void set_motors(uint8_t left, uint8_t right)
 {
-  /* int aID = GetBotID(); */
-
-  /* allbots[aID]->cwm = cw; */
-  /* allbots[aID]->ccwm = ccw; */
-
   kilobot* self = Me();
 
-  self->ccwm = left;
-  self->cwm  = right;
+  self->left_motor_power = left;
+  self->right_motor_power  = right;
   return;
 }
 
@@ -183,22 +176,22 @@ int16_t get_ambientlight()
   kilobot* self = Me();
 
   // linear light gradient
-  // int l = self->x/.01;
-
+  int l = (self->x+500)/2;
+   
   // gravity well
   // int l = -10000000 / hypot(self->x, self->y);
 
   // parabolic well
-  int l = ( pow(self->x, 2) + pow(self->y, 2) )/10;
+  // int l = ( pow(self->x, 2) + pow(self->y, 2) )/10;
   
   
-  /*
+  
   if (l > 1023)
     l = 1023;
   
   if (l < 0)
     l = 0;
-  */
+  
   return l;
 }
 

@@ -274,7 +274,7 @@ void input(void)
  if (keystates[SDLK_F2])
    {
      spread_out(-200);
-     collision_detection(n_bots);
+     update_interactions(n_bots);
    }
 }
 
@@ -382,13 +382,17 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
 
   
   /* Draw legs */
-  int x_l = draw_x - display_scale * r * cos(bot->direction);
-  int y_l = draw_y + display_scale * r * sin(bot->direction);
-  filledCircleColor(surface, x_l, y_l, display_scale * 2, 0xffffffff);
+  //int x_l = draw_x - display_scale * r * cos(bot->direction);
+  //int y_l = draw_y + display_scale * r * sin(bot->direction);
+  int x_l = draw_x + display_scale * r * sin(bot->direction + bot->leg_angle);
+  int y_l = draw_y + display_scale * r * cos(bot->direction + bot->leg_angle);
+  filledCircleColor(surface, x_l, y_l, display_scale * 2, 0xff7777ff);
 
-  int x_r = draw_x + display_scale * r * cos(bot->direction);
-  int y_r = draw_y - display_scale * r * sin(bot->direction);
-  filledCircleColor(surface, x_r, y_r, display_scale * 2, 0xffffffff);
+  //int x_r = draw_x + display_scale * r * cos(bot->direction);
+  //int y_r = draw_y - display_scale * r * sin(bot->direction);
+  int x_r = draw_x + display_scale * r * sin(bot->direction - bot->leg_angle);
+  int y_r = draw_y + display_scale * r * cos(bot->direction - bot->leg_angle);
+  filledCircleColor(surface, x_r, y_r, display_scale * 2, 0x77ff77ff);
 
   /* Draw LED */
   Uint32 led_color = conv_RGBA(85 * bot->r_led, 85 * bot->g_led, 85 * bot->b_led, 255);

@@ -4,6 +4,12 @@
 #ifndef SKILOBOT_H
 #define SKILOBOT_H
 
+
+#ifndef M_PI
+// C99 doesn't define M_PI
+#define M_PI 3.14159265358979323846264338327950288
+#endif
+
 //#include "userdata.h" //declarations of user data
 
 #define MAXCOMMLINES 10000
@@ -13,11 +19,12 @@ typedef struct {
   double *x_history, *y_history;
   int p_hist, n_hist;
   
-  int cwm, ccwm;
+  int right_motor_power, left_motor_power;
   int ID;
-  double direction; //Angle relative to constant x, +ve y in radians
+  double direction; // Angle relative to constant x, +ve y in radians
   int r_led, g_led, b_led;
-  int radius;
+  int radius;       // kilobot radius in mm
+  double leg_angle; // angle front leg - center - rear leg in radians
 
   int *in_range;
   int n_in_range;
@@ -35,6 +42,11 @@ typedef struct {
   void *data;
 
 } kilobot;
+
+typedef struct {
+  double x;
+  double y;
+} coord2D;
 
 typedef struct 
 {
@@ -55,13 +67,13 @@ extern kilobot** allbots;
 void create_bots(int n_bots);
 kilobot *new_kilobot(int ID, int n_bots);
 void init_all_bots(int n_bots);
+void user_setup_all_bots(int n_bots);
 void run_all_bots(int n_bots);
 void dump_all_bots(int n_bots);
 void update_all_bots(int n_bots, float timestep);
 void spread_out(double k);
 
-
-void collision_detection(int n_bots);
+void update_interactions(int n_bots);
 
 extern int current_bot;
 extern void* mydata;
@@ -69,8 +81,6 @@ extern void* mydata;
 kilobot *Me();
 
 int bot_main (void);
-
-int GetBotID();
 
 enum {PAUSE, RUNNING};
 extern int state;   //simulator state. PAUSE or RUNNING.

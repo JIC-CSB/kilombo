@@ -34,6 +34,7 @@ int stepsPerFrame = 1; // number of simulation steps to take between frames
 extern int storeHistory;  //whether to save the history of all bot positions
 
 
+extern void (*callback_global_setup) (void);
 
 /* Dummy functions for messaging. exactly as in kilolib.c */
 void message_rx_dummy(message_t *m, distance_measurement_t *d) { }
@@ -60,7 +61,7 @@ void distribute_rand(int n_bots, int w, int h)
   for (int i=0; i < n_bots; i++) {
     allbots[i]->x = rand()%w - w/2;
     allbots[i]->y = rand()%h - h/2;
-    allbots[i]->direction = 2 * 3.141 * (float) rand() / (float) RAND_MAX;
+    allbots[i]->direction = 2 * M_PI * (float) rand() / (float) RAND_MAX;
   }
 }
 
@@ -68,10 +69,10 @@ void distribute_circle(int n_bots){
 
 	int bot = 0;
 	float bot_radius = 1.8 * allbots[0]->radius;
-	float radius = n_bots * bot_radius/3.1415927;
+	float radius = n_bots * bot_radius/M_PI;
 	float theta = 0;
-	float delta_theta = 2 * 3.1415927/n_bots;
-	float alpha = theta - 3.1415927/4;
+	float delta_theta = 2 * M_PI/n_bots;
+	float alpha = theta - M_PI/4;
 	float x_value = radius * sin(theta);
 	float y_value = radius * cos(theta);
 
@@ -82,7 +83,7 @@ void distribute_circle(int n_bots){
 		allbots[bot]->direction = alpha;
 
 		theta += delta_theta;
-		alpha = theta - 3.1415927/4;
+		alpha = theta - M_PI/4;
 		x_value = radius * sin(theta);
 		y_value = radius * cos(theta);
 
@@ -100,7 +101,7 @@ void distribute_pile(int n_bots){
 	float y_value = 0;
 	float theta = 0;
 	float delta_theta = 0;
-	float alpha = theta - 3.1415927/4;
+	float alpha = theta - M_PI/4;
 
     while(bot < n_bots){
 
@@ -112,7 +113,7 @@ void distribute_pile(int n_bots){
     	if(max_n_bots > 0){
 
     		theta += delta_theta;
-    		alpha = theta - 3.1415927/4;
+    		alpha = theta - M_PI/4;
 
     	}
 
@@ -120,11 +121,11 @@ void distribute_pile(int n_bots){
 
     		radius += 2 * bot_radius + bot_radius/3;
 
-    		max_n_bots = (int) (3.1415927 * radius/bot_radius);
+    		max_n_bots = (int) (M_PI * radius/bot_radius);
 
-    		delta_theta = 2 * 3.1415927/max_n_bots;
+    		delta_theta = 2 * M_PI/max_n_bots;
     		theta = 0;
-    		alpha = theta - 3.1415927/4;
+    		alpha = theta - M_PI/4;
 
 
     	}
@@ -152,7 +153,7 @@ void distribute_elipse(int n_bots){
 	float y_value = 0;
 	float theta = 0;
 	float delta_theta = 0;
-	float alpha = theta - 3.1415927/4;
+	float alpha = theta - M_PI/4;
 
     while(bot < n_bots){
 
@@ -164,7 +165,7 @@ void distribute_elipse(int n_bots){
     	if(max_n_bots > 0){
 
     		theta += delta_theta;
-    		alpha = theta - 3.1415927/4;
+    		alpha = theta - M_PI/4;
 
     	}
 
@@ -172,11 +173,11 @@ void distribute_elipse(int n_bots){
 
     		radius += 2 * bot_radius + bot_radius/3;
 
-    		max_n_bots = (int) (3.1415927 * radius/bot_radius);
+    		max_n_bots = (int) (M_PI * radius/bot_radius);
 
-    		delta_theta = 2 * 3.1415927/max_n_bots;
+    		delta_theta = 2 * M_PI/max_n_bots;
     		theta = 0;
-    		alpha = theta - 3.1415927/4;
+    		alpha = theta - M_PI/4;
 
 
     	}
@@ -213,7 +214,7 @@ void distribute_pile2(int n_bots)
 	{
 	  allbots[cont]->x = pos_x;
 	  allbots[cont]->y = pos_y;
-	  allbots[cont]->direction = ((float)rand()/(float)(RAND_MAX)) * (2*3.1415927);
+	  allbots[cont]->direction = ((float)rand()/(float)(RAND_MAX)) * (2*M_PI);
 	  //allbots[cont]->direction = 0;
 	}
       cont++;
@@ -405,6 +406,15 @@ int main(int argc, char *argv[])
   int stateFileSteps = get_int_param("stateFileSteps", 100);
   stepsPerFrame = get_int_param("stepsPerFrame", 1);
     
+  // call user-supplied global setup after reading parameters but before
+  // doing any real work
+  if (callback_global_setup != NULL)
+	  callback_global_setup();
+
+  // call the per-bot setup here so that global setup can provide
+  // e.g. simulation-specific parameter values to it
+  user_setup_all_bots(n_bots);
+
   char buf[2000];
 
   FPSmanager manager;

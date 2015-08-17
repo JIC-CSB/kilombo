@@ -13,3 +13,5 @@ INSTALL(TARGETS sim headless
 INSTALL(FILES kilolib.h message.h message_crc.h params.h
 	DESTINATION include
 )
+
+add_subdirectory(tests)
