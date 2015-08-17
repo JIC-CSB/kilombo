@@ -72,6 +72,54 @@ float get_float_param(const char *param_name, float default_val)
   return f_param;
 }
 
+size_t get_array_param_size(const char * param_name){
+  if (!simparams) {
+    fprintf(stderr, "Error: attempted to read parameter without loading parameter file\n");
+    exit(2);
+  }
+
+  json_t *param = json_object_get(simparams->root, param_name);
+
+  if (!json_is_array(param)) {
+    fprintf(stderr, "Requested parameter: %s is not an array.\n", param_name);
+    return ~0u;
+  }
+
+  return json_array_size(param);
+}
+
+int get_int_array_param(const char * param_name, int index, int default_val)
+{
+  if (!simparams) {
+    fprintf(stderr, "Error: attempted to read parameter without loading parameter file\n");
+    exit(2);
+  }
+
+  json_t *param = json_object_get(simparams->root, param_name);
+
+  if (!json_is_array(param)) {
+    fprintf(stderr, "Requested parameter: %s is not an array.\n Using default value %d.\n", param_name, default_val);
+    return default_val;
+  }
+
+  if (index >= json_array_size(param)) {
+	  fprintf(stderr, "Index %d out of bound in array parameter %s.\n Using default value %d.\n",
+		  index, param_name, default_val);
+	  return default_val;
+  }
+
+  json_t *elem = json_array_get(param, index);
+
+  if (!json_is_number(elem)) {
+    fprintf(stderr, "Requested element %d of parameter: %s is not a number.\n Using default value %d.\n", index, param_name, default_val);
+    return default_val;
+  }
+
+  int f_param = json_integer_value(elem);
+
+  return f_param;
+}
+
 float get_float_array_param(const char * param_name, int index, float default_val)
 {
   if (!simparams) {
