@@ -23,6 +23,14 @@ You'll need to have:
 ### Debian-based Linux systems
 `sudo apt-get install build-essential git gcc-avr gdb-avr binutils-avr avr-libc avrdude libsdl1.2-dev libjansson-dev cmake check`
 
+### OSX systems (incomplete)
+
+check library:
+`brew install check`
+
+Sometimes, need to compile with
+`C_INCLUDE_PATH=/usr/local/include/ make`
+for the libraries to be found.
 
 ## Build instructions
 

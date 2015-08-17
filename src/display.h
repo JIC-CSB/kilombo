@@ -19,11 +19,9 @@ typedef struct {
 } ColorScheme;
 // SDL_GFX uses Uint32 for colors, format: 0xRRGGBBAA. alpha = 0xff is opaque
 
-
-extern ColorScheme *colorscheme;
-extern ColorScheme darkColors, brightColors;
-
-SDL_Surface *makeWindow(int width, int height);
+void init_SDL(void);
+SDL_Surface *makeWindow(void);
+SDL_Surface * makeSurface(void);
 void input(void);
 
 void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot);
@@ -32,10 +30,12 @@ void draw_bot_history_ring(SDL_Surface *surface, int w, int h, kilobot *bot);
 void draw_commLines(SDL_Surface *surface);
 void draw_status(SDL_Surface *surface, int w, int h, double FPS);
 
+extern ColorScheme *colorscheme;
+extern ColorScheme darkColors, brightColors;
+
 extern SDL_Surface *screen;
 extern int quit;
 extern int sim_pause;
-extern int saveVideo;
 
 
 

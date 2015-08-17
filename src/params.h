@@ -16,6 +16,7 @@ typedef struct {
   const char *imageName;
   int storeHistory;
   int saveVideoN;
+  int saveVideo;
   const char *stateFileName; 
   int stateFileSteps; 
   int stepsPerFrame; 
@@ -30,6 +31,7 @@ typedef struct {
   int showHist;
   int randSeed;
   int commsRadius;
+  int GUI;
 } simulation_params;
 
 void parse_param_file(const char *filename);

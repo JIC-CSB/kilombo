@@ -13,7 +13,8 @@ void parse_param_file(const char *filename)
 
   if (!root) {
     fprintf(stderr, "Failed to parse %s.\nLine %d: %s\n", filename, error.line,error.text);
-    return;
+    exit(1);
+    //    return;
   }
 
   if (json_is_object(root)) {
@@ -38,6 +39,8 @@ void parse_param_file(const char *filename)
   simparams->imageName       = get_string_param("imageName",      NULL);
   simparams->storeHistory    = get_int_param   ("storeHistory",   1);
   simparams->saveVideoN      = get_int_param   ("saveVideoN",     1); // save video screenshot every Nth frame
+  simparams->saveVideo       = get_int_param   ("saveVideo",      0); // whether to save video.
+                                                                      // Toggle with 'v' at runtime
   simparams->stateFileName   = get_string_param("stateFileName",  NULL);
   simparams->stateFileSteps  = get_int_param   ("stateFileSteps", 100);
   simparams->stepsPerFrame   = get_int_param   ("stepsPerFrame",  1);
@@ -52,6 +55,7 @@ void parse_param_file(const char *filename)
   simparams->histLength      = get_int_param("histLength", 2000); // number of history points to draw
   simparams->showHist        = get_int_param("showHist", 0);
   simparams->randSeed        = get_int_param("randSeed", 0);
+  simparams->GUI           = get_int_param("GUI", 0);
 }
 
 int get_int_param(const char *param_name, int default_val)

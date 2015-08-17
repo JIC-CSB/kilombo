@@ -1,5 +1,4 @@
 #include<ctype.h>
-
 #include<stdlib.h>
 #include<unistd.h>
 #include<getopt.h>
@@ -109,8 +108,15 @@ int main(int argc, char *argv[])
     fprintf(stderr, "Couldn't load parameter file\n");
     return 1;
   }
-  
-  screen = makeWindow(simparams->display_w, simparams->display_h);
+
+  init_SDL();
+  if (simparams->GUI)
+    screen = makeWindow();
+  else
+    screen = makeSurface();
+    // when running without a GUI, make an off-screen SDL surface for
+    // saving video or screenshots
+
   
   kilo_message_tx = message_tx_dummy;
   kilo_message_tx_success = message_tx_success_dummy;
@@ -203,7 +209,7 @@ int main(int argc, char *argv[])
 	    json_array_append(j_state, t);
 	  }
 	// save screenshots for video
-	if (simparams->imageName && saveVideo)
+	if (simparams->imageName && simparams->saveVideo)
 	  if (n_step % simparams->saveVideoN == 0)
 	    {
 	      draw(); 
@@ -220,24 +226,25 @@ int main(int argc, char *argv[])
       } // if RUNNING
 
     // Draw on screen
-    if (steps_since_draw > simparams->stepsPerFrame  || state != RUNNING || simparams->stepsPerFrame == 0)
+    if (simparams->GUI)
+      if (steps_since_draw > simparams->stepsPerFrame  || state != RUNNING || simparams->stepsPerFrame == 0)
 	{     // avoiding n_step % stepsPerFrame here because of weird behaviour when changing speed
 	  steps_since_draw = 0;
 	  input(); 
 	  draw(); // The same frame may already be drawn for video, drawing again for simplicity
 	  // Draw status message on screen but not in video
 	  draw_status(screen, simparams->display_w, simparams->display_h, 1000.0/frameTimeAvg);
-    
+	  
 	  SDL_Flip(screen);
 	  if (!fullSpeed)
 	    SDL_framerateDelay(&manager);
-
+	  
 	  // rolling average of the time per frame, just for display
 	  Uint32 t = SDL_GetTicks();
 	  double w = .02;
 	  frameTimeAvg = (1-w) * frameTimeAvg + w*(t-lastTicks); 
 	  lastTicks = t;    
-	}    
+	}
   }
 
   save_bot_state_to_file(allbots, n_bots, "endstate.json");
