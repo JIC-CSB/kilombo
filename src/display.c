@@ -292,9 +292,11 @@ void input(void)
    c_y -= d; 
  if (keystates[SDLK_DOWN])
    c_y += d;
- if (keystates[SDLK_KP_MULTIPLY]) // faster
+ if (keystates[SDLK_KP_MULTIPLY] ||
+     keystates[SDLK_F4] ) // faster
    simparams->stepsPerFrame++;
- if (keystates[SDLK_KP_DIVIDE])   // slower
+ if (keystates[SDLK_KP_DIVIDE] ||
+     keystates[SDLK_F3] )   // slower
    if (simparams->stepsPerFrame > 0)
      simparams->stepsPerFrame--;
  if (keystates[SDLK_F1])
