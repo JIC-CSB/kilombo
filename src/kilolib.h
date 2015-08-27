@@ -58,6 +58,8 @@
 typedef enum {CALLBACK_PARAMS, CALLBACK_RESET, CALLBACK_BOTINFO, CALLBACK_JSON_STATE, CALLBACK_GLOBAL_SETUP} Callback_t;
 void register_callback(Callback_t type, void (*fp)(void));
 
+void register_user_lighting(int16_t (*fp)(double, double));
+
 
 // measure a fictive potential in the environment, for testing
 enum {POT_LINEAR, POT_PARABOLIC, POT_GRAVITY};
