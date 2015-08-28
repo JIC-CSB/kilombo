@@ -14,10 +14,12 @@
    SDL_main on OSX, so SDL_main.h needs to be included after this.
 */
 
+   #ifndef SKILO_HEADLESS
 #include<SDL/SDL.h>
 #include<SDL/SDL_main.h>
 #include"gfx/SDL_framerate.h"
 #include"display.h"
+   #endif
 
 #include"skilobot.h"
 #include"params.h"
@@ -60,6 +62,7 @@ void initialise_simulator(const char *param_filename)
   }
 }
 
+#ifndef SKILO_HEADLESS
 void draw()
 {
   SDL_FillRect(screen, NULL, colorscheme->background);
@@ -73,12 +76,12 @@ void draw()
   for (int i=0; i <n_bots; i++) 
     draw_bot(screen, simparams->display_w, simparams->display_h, allbots[i]);
 }
+#endif
 
 int main(int argc, char *argv[])
 {
   n_bots = 100;
   double time = 0;
-  double frameTimeAvg = 0;
   char *bot_state_file = (char *) NULL;
   int c;  
   char param_filename[1000];
@@ -109,6 +112,9 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+#ifndef SKILO_HEADLESS
+  double frameTimeAvg = 0;
+
   init_SDL();
   if (simparams->GUI)
     screen = makeWindow();
@@ -117,6 +123,17 @@ int main(int argc, char *argv[])
     // when running without a GUI, make an off-screen SDL surface for
     // saving video or screenshots
 
+  const char *s = get_string_param("colorscheme", NULL);
+  if (s != NULL)
+    {
+      printf("Colorscheme chosen: %s\n", s);
+      if (strcasecmp(s, "bright") == 0)
+	{
+	  printf("bright colors selected.\n");
+	  colorscheme = &brightColors;
+	}
+    }
+#endif
   
   kilo_message_tx = message_tx_dummy;
   kilo_message_tx_success = message_tx_success_dummy;
@@ -147,18 +164,7 @@ int main(int argc, char *argv[])
 
   // maxTime <= 0 for unlimited simulation
 
-    
-  const char *s = get_string_param("colorscheme", NULL);
-  if (s != NULL)
-    {
-      printf("Colorscheme chosen: %s\n", s);
-      if (strcasecmp(s, "bright") == 0)
-	{
-	  printf("bright colors selected.\n");
-	  colorscheme = &brightColors;
-	}
-    }
-  
+      
   // call user-supplied global setup after reading parameters but before
   // doing any real work
   if (callback_global_setup != NULL)
@@ -170,12 +176,17 @@ int main(int argc, char *argv[])
 
   char buf[2000];
 
+#ifndef SKILO_HEADLESS
   FPSmanager manager;
   SDL_initFramerate(&manager);
   double FPS = 1.0 / simparams->timeStep;
   SDL_setFramerate(&manager, FPS);
   int steps_since_draw = 0;
 
+  Uint32 lastTicks;
+  lastTicks = SDL_GetTicks();
+#endif
+  
   json_t *j_state = json_array();
     
   printf("Running %d bots with timestep %f for total time %f\n", 
@@ -184,12 +195,7 @@ int main(int argc, char *argv[])
   int n_step = 0;
 
 
-
-  Uint32 lastTicks;
-  lastTicks = SDL_GetTicks();
-
-  
-  while(!quit && (time < simparams->maxTime || simparams->maxTime <= 0)) {
+  while(time < simparams->maxTime || simparams->maxTime <= 0) {
     //   printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
 
     if (state == RUNNING && simparams->stepsPerFrame > 0)
@@ -197,7 +203,6 @@ int main(int argc, char *argv[])
 	// Do one time step
 	process_bots(n_bots, simparams->timeStep);
 	n_step++;
-	steps_since_draw++;
 	time += simparams->timeStep;
 	kilo_ticks = time * TICKS_PER_SEC;
 	
@@ -208,6 +213,7 @@ int main(int argc, char *argv[])
 	    json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
 	    json_array_append(j_state, t);
 	  }
+#ifndef SKILO_HEADLESS	
 	// save screenshots for video
 	if (simparams->imageName && simparams->saveVideo)
 	  if (n_step % simparams->saveVideoN == 0)
@@ -223,14 +229,19 @@ int main(int argc, char *argv[])
 		  exit(1);
 		}
 	    }
+#endif	
       } // if RUNNING
 
+#ifndef SKILO_HEADLESS	
+    steps_since_draw++;
     // Draw on screen
     if (simparams->GUI)
       if (steps_since_draw > simparams->stepsPerFrame  || state != RUNNING || simparams->stepsPerFrame == 0)
 	{     // avoiding n_step % stepsPerFrame here because of weird behaviour when changing speed
 	  steps_since_draw = 0;
-	  input(); 
+	  input();
+	  if (quit)
+	    break;
 	  draw(); // The same frame may already be drawn for video, drawing again for simplicity
 	  // Draw status message on screen but not in video
 	  draw_status(screen, simparams->display_w, simparams->display_h, 1000.0/frameTimeAvg);
@@ -245,7 +256,8 @@ int main(int argc, char *argv[])
 	  frameTimeAvg = (1-w) * frameTimeAvg + w*(t-lastTicks); 
 	  lastTicks = t;    
 	}
-  }
+#endif
+  } // while running
 
   save_bot_state_to_file(allbots, n_bots, "endstate.json");
 
@@ -254,6 +266,7 @@ int main(int argc, char *argv[])
       json_dump_file(j_state, simparams->stateFileName, JSON_INDENT(2) | JSON_SORT_KEYS);
     }
 
+#ifndef SKILO_HEADLESS	
   if (simparams->finalImage)
     {
       draw();
@@ -263,6 +276,7 @@ int main(int argc, char *argv[])
 	  exit(1);
 	}
     }
+#endif
   
   return 0;
 }
