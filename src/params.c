@@ -2,20 +2,19 @@
 
 simulation_params *simparams = NULL;
 
-simulation_params* parse_param_file(const char *filename)
+void parse_param_file(const char *filename)
 {
-  simulation_params* parsed_params;
-
   json_error_t error;
   json_t *root, *data;
 
-  parsed_params = (simulation_params*) malloc(sizeof(simulation_params));
+  simparams = (simulation_params*) malloc(sizeof(simulation_params));
   printf ("Reading simulator parameters from %s\n", filename);
   root = json_load_file(filename, 0, &error);
 
   if (!root) {
-    fprintf(stderr, "Failed to parse %s\n", filename);
-    return NULL;
+    fprintf(stderr, "Failed to parse %s.\nLine %d: %s\n", filename, error.line,error.text);
+    exit(1);
+    //    return;
   }
 
   if (json_is_object(root)) {
@@ -26,12 +25,38 @@ simulation_params* parse_param_file(const char *filename)
 
   if (!json_is_object(data)) {
     fprintf(stderr, "error: not an object\n");
-    return NULL;
+    return;
   }
 
-  parsed_params->root = root;
+  simparams->root = root;
 
-  return parsed_params;
+
+  // extract parameter values, place in simparams struct.
+
+  simparams->showComms       = get_int_param   ("showComms",      1);
+  simparams->maxTime         = get_float_param ("simulationTime", 0);
+  simparams->timeStep        = get_float_param ("timeStep",       0.02);
+  simparams->imageName       = get_string_param("imageName",      NULL);
+  simparams->finalImage      = get_string_param("finalImage",     NULL);
+  simparams->storeHistory    = get_int_param   ("storeHistory",   1);
+  simparams->saveVideoN      = get_int_param   ("saveVideoN",     1); // save video screenshot every Nth frame
+  simparams->saveVideo       = get_int_param   ("saveVideo",      0); // whether to save video.
+                                                                      // Toggle with 'v' at runtime
+  simparams->stateFileName   = get_string_param("stateFileName",  NULL);
+  simparams->stateFileSteps  = get_int_param   ("stateFileSteps", 100);
+  simparams->stepsPerFrame   = get_int_param   ("stepsPerFrame",  1);
+  simparams->bot_name        = get_string_param("botName",        "default");
+  simparams->display_w       = get_int_param   ("displayWidth",  -1);
+  simparams->display_h       = get_int_param   ("displayHeight", -1);
+  simparams->display_scale   = get_float_param ("displayScale",   1.0);
+  simparams->showCommsRadius = get_int_param   ("showCommsRadius", 1);
+  simparams->commsRadius     = get_int_param   ("commsRadius", 70);
+  simparams->displayWidthPercent  = get_float_param("displayWidthPercent",  0.9);
+  simparams->displayHeightPercent = get_float_param("displayHeightPercent", 0.9);
+  simparams->histLength      = get_int_param("histLength", 2000); // number of history points to draw
+  simparams->showHist        = get_int_param("showHist", 0);
+  simparams->randSeed        = get_int_param("randSeed", 0);
+  simparams->GUI             = get_int_param("GUI", 1);
 }
 
 int get_int_param(const char *param_name, int default_val)

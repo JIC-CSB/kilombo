@@ -89,11 +89,12 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->x = 0;
   bot->y = 0;
 
-  bot->n_hist = 100;
+  bot->n_hist = simparams->histLength;
   bot->x_history = (double *) calloc(bot->n_hist, sizeof(double));
   bot->y_history = (double *) calloc(bot->n_hist, sizeof(double));
   bot->p_hist = 0;
-
+  bot->l_hist = 0;
+  
   bot->radius = 17;                  // mm
   bot->leg_angle = 125.5 * M_PI/180; // angle front leg - center - rear leg. 
                                      // 125.5 degrees measured from kilobot PCB design files
@@ -105,8 +106,8 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->g_led = 0;
   bot->b_led = 0;
 
-  bot->cr = get_int_param("commsRadius", 70);
-
+  bot->cr = simparams->commsRadius;
+            
   bot->in_range = (int*) malloc(sizeof(int) * n_bots);
   bot->n_in_range = 0;
 
@@ -212,6 +213,21 @@ void update_bot_history(kilobot *bot)
   manage_bot_history_memory(bot);
 }
 
+void update_bot_history_ring(kilobot *bot)
+{
+  /* Update the bot's history of where it has been, using a ring buffer,
+     of size simparams->histLength */
+
+  bot->p_hist %= simparams->histLength;
+  bot->x_history[bot->p_hist] = bot->x;
+  bot->y_history[bot->p_hist] = bot->y;
+  bot->p_hist++;
+
+  // count valid history entries in the buffer 
+  if (bot->l_hist < simparams->histLength)
+    bot->l_hist++;
+}
+
 
 /* Functions for moving the bots. */
 
@@ -279,7 +295,7 @@ void update_bot(kilobot *bot, float timestep)
    * Save the history (if required) before updating the location.
    */
   if (storeHistory) {
-    update_bot_history(bot);
+    update_bot_history_ring(bot);
   }
   update_bot_location(bot, timestep);
 }
@@ -298,6 +314,17 @@ double bot_dist(kilobot *bot1, kilobot *bot2)
 
   return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
+
+double bot_sq_dist(kilobot *bot1, kilobot *bot2)
+{
+  double x1 = bot1->x;
+  double x2 = bot2->x;
+  double y1 = bot1->y;
+  double y2 = bot2->y;
+
+  return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+}
+
 
 coord2D normalise(coord2D c)
 {
@@ -387,15 +414,17 @@ void update_interactions(int n_bots)
 
   //double r = (double) allbots[0].radius;
   double r = allbots[0]->radius;
+  double d_sq = 4*r*r;
   double communication_radius = allbots[0]->cr;
-
+  double communication_radius_sq = communication_radius * communication_radius;
+  
   reset_n_in_range_indices(n_bots);
 
   for (int i=0; i<n_bots; i++) {
     for (int j=i+1; j<n_bots; j++) {
-      double bot2bot_distance = bot_dist(allbots[i], allbots[j]);
+      double bot2bot_sq_distance = bot_sq_dist(allbots[i], allbots[j]);
 
-      if (bot2bot_distance < (2 * r)) {
+      if (bot2bot_sq_distance < d_sq) {
         //printf("Whack %d %d\n", i, j);
         separate_clashing_bots(allbots[i], allbots[j]);
         // We move the bots, this changes the distance.
@@ -406,7 +435,7 @@ void update_interactions(int n_bots)
         // Unless they are densely packed and a bot is moved
         // very far, which is unlikely.
       }
-      if (bot2bot_distance < communication_radius) {
+      if (bot2bot_sq_distance < communication_radius_sq) {
         //if (i == 0) printf("%d and %d in range\n", i, j);
         update_n_in_range_indices(allbots[i], allbots[j]);
       }
@@ -530,4 +559,44 @@ void update_all_bots(int n_bots, float timestep)
   update_interactions(n_bots);
 
   process_messaging(n_bots);
+}
+
+char botinfo_buffer[100];
+
+//default callback_botinfo function
+char *botinfo_simple()
+{
+  sprintf (botinfo_buffer, "%d", kilo_uid);
+  return botinfo_buffer;
+}
+
+void spread_out(int n_bots, double k)
+{
+  int i, j;
+  for (j = 0; j < n_bots; j++)
+    for (i = 0; i < j; i++)
+      {
+	double dx = allbots[i]->x - allbots[j]->x;
+	double dy = allbots[i]->y - allbots[j]->y;
+	double r = hypot(dx, dy);
+
+	// arbitrary cap to avoid large forces
+	if (r < 5)
+	  r = 5;
+	
+	// a force
+	double fx = 1/(r*r) * dx/r ;
+	double fy = 1/(r*r) * dy/r;
+
+	allbots[i]->x += fx * k;
+	allbots[i]->y += fy * k;
+	allbots[j]->x -= fx * k;
+	allbots[j]->y -= fy * k;	
+      }
+}
+
+void process_bots(int n_bots, float timestep)
+{
+    run_all_bots(n_bots);
+    update_all_bots(n_bots, timestep);
 }

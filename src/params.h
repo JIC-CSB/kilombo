@@ -8,10 +8,34 @@
 
 typedef struct {
   json_t *root;
+
   int timeSteps;
+  int showComms;
+  float maxTime; 
+  float timeStep;
+  const char *imageName;
+  const char *finalImage;
+  int storeHistory;
+  int saveVideoN;
+  int saveVideo;
+  const char *stateFileName; 
+  int stateFileSteps; 
+  int stepsPerFrame; 
+  const char *bot_name;
+  float display_scale;  
+  int display_w;
+  int display_h;
+  int showCommsRadius;
+  float displayWidthPercent;
+  float displayHeightPercent;
+  int histLength;
+  int showHist;
+  int randSeed;
+  int commsRadius;
+  int GUI;
 } simulation_params;
 
-simulation_params* parse_param_file(const char *filename);
+void parse_param_file(const char *filename);
 int get_int_param(const char *param_name, int default_val);
 float get_float_param(const char *param_name, float default_val);
 const char* get_string_param(const char *param_name, char* default_val);

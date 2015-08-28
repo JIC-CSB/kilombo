@@ -144,7 +144,7 @@ kilobot** bot_loader(const char *filename, int *n_bots)
   root = json_load_file(filename, 0, &error);
 
   if (!root) {
-    fprintf(stderr, "Failed to parse %s\n", filename);
+    fprintf(stderr, "Failed to parse %s.\nLine %d: %s\n", filename, error.line,error.text);
     return NULL;
   }
 
