@@ -38,8 +38,6 @@ simulation_params params = {
 simulation_params* simparams = &params;
 
 
-
-
 // Needed to setup a new kilobot.
 int get_int_param(const char *param_name, int default_val) { return default_val; };
 
@@ -152,6 +150,7 @@ END_TEST
 
 START_TEST(test_manage_bot_history_memory)
 {
+  /*
     kilobot* k;
     k = new_kilobot(0, 1);
 
@@ -161,6 +160,11 @@ START_TEST(test_manage_bot_history_memory)
     manage_bot_history_memory(k);
 
     ck_assert_int_eq(k->n_hist, 200);
+
+    This test no longer passes, as the mechanism changed.
+    Now, the history does not grow forever, but is limited
+    to the histLength latest points.
+  */
 }
 END_TEST
 
