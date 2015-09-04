@@ -186,7 +186,7 @@ const char* get_string_param(const char *param_name, char *default_val)
 
   json_t *param = json_object_get(simparams->root, param_name);
 
-  if (!json_is_string(param)) {
+  if (!json_is_string(param) && !json_is_null(param)) {
     fprintf(stderr, "Requested parameter: %s is not a string\n", param_name);
     return default_val;
   }

@@ -126,10 +126,10 @@ int main(int argc, char *argv[])
   const char *s = get_string_param("colorscheme", NULL);
   if (s != NULL)
     {
-      printf("Colorscheme chosen: %s\n", s);
+      //      printf("Colorscheme chosen: %s\n", s);
       if (strcasecmp(s, "bright") == 0)
 	{
-	  printf("bright colors selected.\n");
+	  //  printf("bright colors selected.\n");
 	  colorscheme = &brightColors;
 	}
     }
@@ -207,12 +207,13 @@ int main(int argc, char *argv[])
 	kilo_ticks = time * TICKS_PER_SEC;
 	
 	// save simulation state as JSON
-	if (simparams->stateFileName && n_step % simparams->stateFileSteps == 0)
-	  {
-	    // printf("Saving state to JSON at %6d steps\n", n_step);
-	    json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
-	    json_array_append(j_state, t);
-	  }
+	if (simparams->stateFileSteps != 0)
+	  if (simparams->stateFileName && n_step % simparams->stateFileSteps == 0)
+	    {
+	      // printf("Saving state to JSON at %6d steps\n", n_step);
+	      json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
+	      json_array_append(j_state, t);
+	    }
 #ifndef SKILO_HEADLESS	
 	// save screenshots for video
 	if (simparams->imageName && simparams->saveVideo)
@@ -261,7 +262,7 @@ int main(int argc, char *argv[])
 
   save_bot_state_to_file(allbots, n_bots, "endstate.json");
 
-  if (simparams->stateFileName)
+  if (simparams->stateFileName && simparams->stateFileSteps != 0)
     {
       json_dump_file(j_state, simparams->stateFileName, JSON_INDENT(2) | JSON_SORT_KEYS);
     }
