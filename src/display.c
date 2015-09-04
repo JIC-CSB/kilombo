@@ -444,7 +444,11 @@ void draw_bot_history_ring(SDL_Surface *surface, int w, int h, kilobot *bot)
   if (simparams->showHist) {
     float i_alpha = 255.;
     //    for (int i=bot->p_hist-1; i!=bot->p_hist; i = (i-1+simparams->histLength)%simparams->histLength)
-    for (int ii=0; ii < bot->l_hist; ii++)
+
+    // p_hist is ONE PAST the most recently stored point in the ring buffer
+    // l_hist is the number of history points so far
+    // n_hist is the ring buffer size
+    for (int ii=1; ii < bot->l_hist && ii < bot->n_hist; ii++)
       {
 	int i = (bot->p_hist - ii + simparams->histLength) % simparams->histLength;
 

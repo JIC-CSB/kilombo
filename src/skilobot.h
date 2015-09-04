@@ -17,7 +17,9 @@
 typedef struct {
   double x, y;
   double *x_history, *y_history;
-  int p_hist, n_hist, l_hist;
+  int p_hist; // current index in history (ring) buffer
+  int n_hist; // size of the history ring buffer 
+  int l_hist; // number of history points stored
   
   int right_motor_power, left_motor_power;
   int ID;
