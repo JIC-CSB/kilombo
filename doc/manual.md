@@ -3,12 +3,12 @@ This tool is a simulator for kilobot robots. The kilobot c program is compiled n
 
 The simulator uses SDL for grapical output. All configuration and result files are written in JSON.
 
-The program is distributed under the *WHICH LINCESE??* license, with no warranty. 
-The simulator was developed in the [SWARM Organ](www.swarm-organ.eu) project.
+The program is distributed under the MIT license, with no warranty, please see the file LICENSE for details. 
+The simulator was developed in the [SWARM Organ](www.swarm-organ.eu) European Union FP7 project.
 
 Contact: 
-- Fredrik Jansson fjansson@abo.fi
-- Matthew Hartley 
+- Fredrik Jansson: fjansson@abo.fi
+- Matthew Hartley: Matthew.Hartley@jic.ac.uk
 
 
 # Installation
@@ -57,15 +57,15 @@ A solution is to explicitly specify the size of the types, e.g. declaring variab
 
 
 ## Callback functions
-For convenience, the simulator implements a system of callback functions for communication with the user-specified robot program. The callbacks are registered by calling `register_callback(type, function_pointer)`, typically at the beginning of main() before calling `kilo_init()`. All callback functions are optional. If the bot does not register them, they are not used.
+For convenience, the simulator implements a system of callback functions for communication with the user-specified robot program. The callbacks are registered by calling `register_callback(type, function_pointer)`, typically at the beginning of `main()` before calling `kilo_init()`. All callback functions are optional. If the bot does not register them, they are not used.
 
 |type  | function definition  |  use | 
-| ------------- |-------------| -------|
-|`CALLBACK_PARAMS` |   `void  callback_F5(void)` |  Reload configuration parameters from file. Called once, not for every bot, when F5 is pressed.|
-| `CALLBACK_RESET`      |   `void  callback_F6(void)` |  Reset bot. Called for every bot, when F6 is pressed. |
-| `CALLBACK_BOTINFO` | `char *botinfo()` |   Return a string describing the internal state of the current bot, used for the simulator status bar.|
-|`CALLBACK_JSON_STATE` | `json_t* json_state(void)`| Return a json object describing the bot's internal state. Used to store snapshots of the simulation. |
-|`CALLBACK_GLOBAL_SETUP`| `void callback_global_setup(void)` | Perform global setup, such as reading additional simulation-specific parameters. Called once, after the parameter file has been read but before the bot-specific setup.|
+| ----------------------|-----------------------------------|--------|
+|`CALLBACK_PARAMS`      | `void  callback_F5(void)`         | Reload configuration parameters from file. Called once, not for every bot, when F5 is pressed.|
+|`CALLBACK_RESET`       | `void  callback_F6(void)`         | Reset bot. Called for every bot, when F6 is pressed. |
+|`CALLBACK_BOTINFO`     | `char *botinfo()`                 | Return a string describing the internal state of the current bot, used for the simulator status bar.|
+|`CALLBACK_JSON_STATE`  | `json_t* json_state(void)`        | Return a json object describing the bot's internal state. Used to store snapshots of the simulation. |
+|`CALLBACK_GLOBAL_SETUP`| `void callback_global_setup(void)`| Perform global setup, such as reading additional simulation-specific parameters. Called once, after the parameter file has been read but before the bot-specific setup.|
 
  Since the callback system is present only in the simulator and not in the real kilobot, the callback functions and the call to register_callback() should be conditionally compiled. An example:
 
@@ -82,21 +82,22 @@ For an example of the json state saving callback, see `examples/gradient/gradien
 The following keybindings are active during simulation:
 
 * ESC: terminate simulation
-* Numpad +: zoom in
-* Numpad -: zoom out
-* Numpad *: faster
-* Numpad /: slower
+* + : zoom in
+* - : zoom out
+* Numpad * or F4: faster
+* Numpad / or F3: slower
 * Arrow keys : move display
 * Space : pause/resume simulation
 * Mouse-left: drag bots around
 * Mouse-right: rotate a bot
 * s   : Take screenshot. The screenshot is stored as screenshots/<bot name><number>.bmp
+* v   : start storing screenshots for video, using "imageName" from the simulator parameters as file name, see below.
 * F1  : disperse the bots
 * F2  : compress the bots
 * F5  : Call the bot's parameter reload function (if implemented in the bot)
 * F6  : Call every bot's reset function, (if implemented in the bot)
 * F11 : Toggle full speed simulation (no delay between frames)
-* F12 : Toggle fast communication (message passing every kilotick
+* F12 : Toggle fast communication (message passing every kilotick)
 
 # Configuration file settings
 
@@ -111,28 +112,36 @@ The following keywords are recognized in the simulator JSON configuration file:
 * `commsRadius` : the communication range of the robots in mm
 * `showComms` :  whether or not to draw a line between each pair of bots in communication range, whenever a message is passed between them.
 * `showCommsRadius` :  whether or not to draw a circle for the communications range of each bot
-* `distributePercent` :
+* `distributePercent` : initially distribute the bots over this fraction of the display area
 * `displayWidth`  : absolute width of the window, pixels
 * `displayHeight` : absolute height of the window, pixels
+*  displayScale : initial zoom setting. Default is 1.
 * `showHist` : whether to show the paths the robots have moved
 * `histLength` : the length of the path history to show in number of steps 
+* `saveVideo` : 0 or 1, whether or not to store video frames periodically. Can be toggled during simulation by pressing `v`.
+* "saveVideoN" : store every N:th simulation step while saving video.
 * `imageName` :  file name for storing images during the simulation. Format example: `movie/f%04d.bmp`,
   where the `%...d` will be replaced by an increasing number.
+  
 * `stateFileName` : file name for saving the simulation state as JSON during the simulation.
-* `stateFileSteps` : number of simulator timesteps between storing the simulator state as JSON.
-* `stepsPerFrame`  : number of simulator time steps to perform between drawing. Can be changed interactively using numpad `/` and '*'.
+* `stateFileSteps` : number of simulator timesteps between storing the simulator state as JSON. Use 0 to disable storage. 
 
+* `stepsPerFrame`  : number of simulator time steps to perform between drawing. Can be changed interactively using numpad `/` and '*'. 
+* `finalImage`     : file name for saving an image of the final simulation state. `null` can be specified to disable this.
+* `GUI` : 0 or 1 (default). If 0, the simulator is run as fast as possible, without displaying the progress. Periodic screenshots can still be stored.
+* `colorscheme` : `dark` or `bright`, different color schemes. Bright tends to look better in print.
 
 #Command line options
-* `-p parameterfile.json` : Simulator parameters. Mandatory
+* `-p parameterfile.json` : Simulator parameters. Optional, default is to use the name of the robot, with the suffix `.json`. 
 * `-b bots.json` : starting positions for the bots. Optional.
 
-At the end of the simulation, the simulator stores the final state of the bots in a file named `endstate.json`. This file can be given as a starting state for the next simulation, simply copy it to a new name, and pass that name to the simulator with the -b option. Thus the simulator can be used as an editor of bot starting configurations as well.
+At the end of the simulation, the simulator stores the final state of the robots in a file named `endstate.json`. This file can be given as a starting state for the next simulation, simply copy it to a new name, and pass that name to the simulator with the -b option. Thus the simulator can be used as an editor of bot starting configurations as well.
 
 #Saving state
-At the end of the simulation, and optionally also during the simulation (TODO) the simulator saves the state of the swarm as a JSON file, `endstate.json`.
+At the end of the simulation, and optionally also during the simulation the simulator saves the state of the swarm as JSON.
+`endstate.json` contains the final state. For saving the state periodically during the simulation, use the parameters `stateFileName` and `stateFileSteps`.
 
-The json object contains a n array named `bot_states`.
+The json object contains an array named `bot_states`.
 Each element in this array contains the data for one bot, with the following keys:
 
 | key | value| 
@@ -143,7 +152,6 @@ Each element in this array contains the data for one bot, with the following key
 |y_position | y coordinate, in mm|
 | state| a json object describing the internal state of the bot, optionally provided by the callback function CALLBACK_JSON_STATE|
 
-TODO: a mechanism for saving this data during the simulation
 
 
 
@@ -151,7 +159,7 @@ TODO: a mechanism for saving this data during the simulation
 A few example bots are provided with the simulator. They are found in the directory 'examples/'. Some of them are based on examples from www.kilobotics.com, but modified to work on the simulator.
 
 ## orbit
-One stationary bot, with ID 0, emits messages. Another bot moves and tries to keep a constant distance to the stationary bot.
+One stationary bot, with ID 0, emits messages. Another bot moves and tries to keep a constant distance to the stationary bot, by alternating between turning left and right.
 
 ## gradient
 The robot with ID 0 is initialized ith the gradient_value 0.  Every other bot gets the smallest-value-ever-received + 1 as its own value.  Note that the gradient_value never increases, even if the bots are moved around.  In the simulator one can force a reset by pressing F6, which calls setup()  using the callback mechanism.

@@ -53,6 +53,13 @@ This installs the kilobot simulator in a system-wide location, by default
 under `/usr/local/lib` and `/usr/local/include`.
 
 
+## Compile and run examples
+cd examples
+cd orbit
+make     # or make -f Makefile.osx on OSX
+./orbit -b start_positions.json
+
+
 Note: the simulator uses the [SDL_GFX library](http://cms.ferzkopp.net/index.php/software/13-sdl-gfx)
 by Andreas Schiffler (distributed under the zlib license). The source
 code for the sdl_gfx library is bundled with the simulator due to its
