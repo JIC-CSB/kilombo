@@ -1,14 +1,16 @@
 # ckbsim - C kilobot simulator
 
-Authors: Fredrik Jansson, Matthew Hartley, Martin Hinsch, Tjelvar Olsson
+Authors: Fredrik Jansson, Matthew Hartley, Martin Hinsch, 
+         Tjelvar Olsson, Ivica Slavkov, Noemí Carranza
 
 Contact: 
 Fredrik Jansson: fjansson@abo.fi
 Matthew Hartley: Matthew.Hartley@jic.ac.uk
 
 
-This repository holds the code for ckbsim, a C based kilobot simulator.
-Installation instructions follow below. For detailed usage instruction and programming documentation, see `docs/manual.md` and the example bots in `examples/`.
+This repository holds the code for ckbsim, a C based kilobot simulator. The simulator was developed in the [Swarm Organ project](www.swarm-organ.eu), and is distributed under the MIT license (see the file LICENSE for details). Installation instructions follow below. For detailed usage instruction and programming documentation, see `docs/manual.md` and the example bots in `examples/`.
+
+
 
 ## Prerequisites
 You'll need to have:
@@ -60,4 +62,5 @@ source code.
 
 The simulator also includes the API definitions of kilolib, the C
 library for the physical kilobot robot. These are located in the file
-src/kilolib.h, with minor, simulator-specific changes. The full kilolib source code is here: https://github.com/acornejo/kilolib .
+src/kilolib.h, with minor, simulator-specific changes.
+The full kilolib source code is here: https://github.com/acornejo/kilolib .
