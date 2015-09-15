@@ -84,7 +84,7 @@ In many situation it is desirable to let bots interact with their environment. F
 | function | callback type | use |
 |----------|---------------|-----|
 | `register_user_lighting` | `int16_t (*)(double, double)` | Set user-defined light levels. |
-| `register_user_obstacles` | `int (*)(double, double, double *, double *) | Set user-defined physical obstacles. |
+| `register_user_obstacles` | `int (*)(double, double, double *, double *)` | Set user-defined physical obstacles. |
 
 ### Lighting
 
