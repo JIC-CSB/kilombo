@@ -77,6 +77,23 @@ For convenience, the simulator implements a system of callback functions for com
 For an example of the json state saving callback, see `examples/gradient/gradient.c`.
 
 
+## User-defined environment
+
+In many situation it is desirable to let bots interact with their environment. For simple cases the simulator provides facilities to let users define a lighting regime as well as physical obstacles without having to change the code of the simulator itself.
+
+| function | callback type | use |
+|----------|---------------|-----|
+| `register_user_lighting` | `int16_t (*)(double, double)` | Set user-defined light levels. |
+| `register_user_obstacles` | `int (*)(double, double, double *, double *) | Set user-defined physical obstacles. |
+
+### Lighting
+
+Using the function `register_user_lighting` a callback function can be set that calculates light levels from x,y coordinates. Important note: In order to stay as close as possible to the physical limitations of the real kilobots the result of the callback function will be truncated to the interval [0,1023] before supplying the value to the bots.
+
+### Obstacles
+
+In a similar way obstacles can be defined by setting a callback function using `register_user_obstacles`. The user-supplied function receives x,y coordinates and pointers to x,y delta values. It has to return 0 if *no* obstacle is present at the coordinates and any other value otherwise. The motion that results from colliding with the obstacle is provided by setting the second set of coordinates.
+
 # Controls
 
 The following keybindings are active during simulation:
