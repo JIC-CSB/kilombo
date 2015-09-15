@@ -14,8 +14,8 @@ message_tx_success_t kilo_message_tx_success = NULL;
 message_rx_t kilo_message_rx = NULL;
 void (*user_setup)(void) = NULL;
 void (*user_loop)(void) = NULL;
-int16_t (*user_light)(double, double) = NULL;
 
+int16_t (*user_light)(double, double) = NULL;
 
 /* the clock variable. Counts ticks since beginning of the program.
  * Each bot really has it's own, but for now we have just one.

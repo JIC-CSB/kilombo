@@ -59,6 +59,7 @@ typedef enum {CALLBACK_PARAMS, CALLBACK_RESET, CALLBACK_BOTINFO, CALLBACK_JSON_S
 void register_callback(Callback_t type, void (*fp)(void));
 
 void register_user_lighting(int16_t (*fp)(double, double));
+void register_user_obstacles(int16_t (*fp)(double, double, double *, double *));
 
 
 // measure a fictive potential in the environment, for testing

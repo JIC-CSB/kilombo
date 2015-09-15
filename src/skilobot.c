@@ -48,6 +48,7 @@ void (*callback_global_setup) (void) = NULL;
 
 /* Functions.
  */
+int16_t (*user_obstacles)(double, double, double *, double *) = NULL;
 
 
 void register_callback(Callback_t type, void (*fp)(void))
@@ -72,6 +73,10 @@ void register_callback(Callback_t type, void (*fp)(void))
 	  callback_global_setup = fp;
 	  break;
     }
+}
+
+void register_user_obstacles(int16_t (*fp)(double, double, double *, double *)){
+  user_obstacles = fp;
 }
 
 
@@ -419,6 +424,17 @@ void update_interactions(int n_bots)
   double communication_radius_sq = communication_radius * communication_radius;
   
   reset_n_in_range_indices(n_bots);
+
+  if (user_obstacles != NULL) {
+    double push_x, push_y;
+
+    for (int i=0; i<n_bots; i++) {
+      if (user_obstacles(allbots[i]->x, allbots[i]->y, &push_x, &push_y)){
+        allbots[i]->x += push_x;
+		allbots[i]->y += push_y;
+      }
+    }
+  }
 
   for (int i=0; i<n_bots; i++) {
     for (int j=i+1; j<n_bots; j++) {
