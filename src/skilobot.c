@@ -469,6 +469,48 @@ void removeOldCommLines(int dt, int maxt)
   }
 }
 
+// random number between 0 and 1
+// NOTE: this can return 1!
+double rnd_uniform()
+{
+  return rand() / (double)RAND_MAX;
+}
+
+double rnd_gauss (double mean, double sig)
+	{
+	double x, y, r2;
+	
+	do
+		{
+		// choose x,y in uniform square (-1,-1) to (+1,+1)
+		x = -1.0 + 2.0 * rnd_uniform();
+		y = -1.0 + 2.0 * rnd_uniform();
+		
+		// see if it is in the unit circle
+		r2 = x * x + y * y;
+		}
+	while (r2 > 1.0 || r2 == 0.0);
+	
+	// Box-Muller transform
+	return mean + sig * y * sqrt (-2.0 * log (r2) / r2);
+	}
+
+double noisy_distance(double dist)
+{
+  if (simparams->distance_noise == 0.0)
+	  return dist;
+
+  const double n_dist = rnd_gauss(dist, simparams->distance_noise);
+  
+  return n_dist > 0 ? n_dist : 0;
+}
+
+int message_success()
+{
+  return simparams->msg_success_rate >= 1 ? 
+    1 : (double)rand() / RAND_MAX <= simparams->msg_success_rate;
+}
+
 void pass_message(kilobot* tx)
 {
   /* Pass message from tx to all bots in range. */
@@ -496,15 +538,16 @@ void pass_message(kilobot* tx)
       * The estimate_distance() will just return high_gain.
       */
       distm.low_gain = 0;
-      distm.high_gain = bot_dist(tx, rx);
-
-      kilo_message_rx(msg, &distm);
+      distm.high_gain = noisy_distance(bot_dist(tx, rx));
+      if (message_success())
+         kilo_message_rx(msg, &distm);
     }
 
     // Switch to the transmitting bot, to call kilo_message_tx_success().
     kilo_uid = tx->ID;
     mydata = tx->data;
-    kilo_message_tx_success();
+    // TODO: currently noise-free, but might be affected by noise as well
+	kilo_message_tx_success();
   }
   else {
     tx->tx_enabled = 0;

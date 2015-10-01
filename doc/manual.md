@@ -112,6 +112,8 @@ The following keywords are recognized in the simulator JSON configuration file:
 * `commsRadius` : the communication range of the robots in mm
 * `showComms` :  whether or not to draw a line between each pair of bots in communication range, whenever a message is passed between them.
 * `showCommsRadius` :  whether or not to draw a circle for the communications range of each bot
+* `msg_success_rate` : probability of messages between robots to be transmitted successfully
+* `distance_noise` : stochasticity of distance measurements (standard deviation)
 * `distributePercent` : initially distribute the bots over this fraction of the display area
 * `displayWidth`  : absolute width of the window, pixels
 * `displayHeight` : absolute height of the window, pixels

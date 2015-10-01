@@ -33,6 +33,8 @@ typedef struct {
   int randSeed;
   int commsRadius;
   int GUI;
+  float msg_success_rate;
+  float distance_noise;
 } simulation_params;
 
 void parse_param_file(const char *filename);

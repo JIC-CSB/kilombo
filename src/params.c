@@ -57,6 +57,8 @@ void parse_param_file(const char *filename)
   simparams->showHist        = get_int_param("showHist", 0);
   simparams->randSeed        = get_int_param("randSeed", 0);
   simparams->GUI             = get_int_param("GUI", 1);
+  simparams->distance_noise  = get_float_param("distanceNoise", 0);
+  simparams->msg_success_rate= get_float_param("msgSuccessRate", 1);
 }
 
 int get_int_param(const char *param_name, int default_val)
