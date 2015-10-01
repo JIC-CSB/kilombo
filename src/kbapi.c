@@ -12,8 +12,8 @@
 message_tx_t kilo_message_tx = NULL;
 message_tx_success_t kilo_message_tx_success = NULL;
 message_rx_t kilo_message_rx = NULL;
-void (*user_setup)(void) = NULL;
-void (*user_loop)(void) = NULL;
+
+
 
 int16_t (*user_light)(double, double) = NULL;
 
@@ -54,8 +54,8 @@ void kilo_init(void)
  */
 void kilo_start(void (*setup)(void), void (*loop)(void))
 {
-  user_setup = setup;
-  user_loop = loop;
+  allbots[current_bot]->user_setup = setup;
+  allbots[current_bot]->user_loop = loop;
 }
 
 void set_motors(uint8_t left, uint8_t right)

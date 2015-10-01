@@ -113,9 +113,10 @@ START_TEST(test_run_all_bots)
     for (int i=0; i<n; i++) {
         current_bot = i;
         mydata = (USERDATA* )(Me()->data);
-        setup();
+	allbots[current_bot]->user_loop = &dummy_loop;
+	setup();
     }
-    user_loop = &dummy_loop;
+    
     run_all_bots(n);
     for (int i=0; i<n; i++) {
         current_bot = i;

@@ -117,6 +117,10 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->n_in_range = 0;
 
   bot->tx_ticks = rand() % tx_period_ticks;
+
+
+  bot->user_setup = NULL;
+  bot->user_loop  = NULL;
   
   bot->data = malloc(UserdataSize);
   
@@ -158,7 +162,7 @@ void user_setup_all_bots(int n_bots)
       current_bot = i;      // for Me() to return the right bot
       mydata = Me()->data;
       kilo_uid = i;         // in case the bot's main() uses ID
-	  user_setup();
+      allbots[current_bot]->user_setup();
     }
 }
 
@@ -560,7 +564,7 @@ void run_all_bots(int n_bots)
     mydata = allbots[current_bot]->data;
     kilo_uid = allbots[current_bot]->ID;
     //printf ("running bot %d ID: %d\n", current_bot, kilo_uid);
-    user_loop();
+    allbots[current_bot]->user_loop();
   }
 }
 

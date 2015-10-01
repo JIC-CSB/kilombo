@@ -37,12 +37,17 @@ typedef struct {
   int tx_ticks;    //the time in ticks when this bot is to transmit next
   
   int screen_x, screen_y; //where the bot is drawn on screen
-  
+
+  /* Random number generator */ 
   uint8_t seed;  //for the software random number generator
   uint8_t accumulator;
 
+  /* Setup and loop functions */
+  void (*user_setup)(void);
+  void (*user_loop)(void);
+  
   void *data;
-
+  
 } kilobot;
 
 typedef struct {
@@ -62,8 +67,8 @@ extern int NcommLines;
 
 
 extern int n_bots;
-extern void (*user_setup)(void);
-extern void (*user_loop)(void);
+//extern void (*user_setup)(void);
+//extern void (*user_loop)(void);
 
 extern kilobot** allbots;
 void create_bots(int n_bots);
