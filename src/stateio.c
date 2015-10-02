@@ -59,8 +59,6 @@ json_t* json_bot_rep(kilobot *bot)
     {
       // switch to the current bot
       prepare_bot(bot);
-      //kilo_uid = bot->ID;
-      //mydata = bot->data;
       j_state = callback_json_state();
     }  
   else // if the bot did not define a callback function

@@ -54,8 +54,8 @@ void kilo_init(void)
  */
 void kilo_start(void (*setup)(void), void (*loop)(void))
 {
-  allbots[current_bot]->user_setup = setup;
-  allbots[current_bot]->user_loop = loop;
+  current_bot->user_setup = setup;
+  current_bot->user_loop = loop;
 }
 
 void set_motors(uint8_t left, uint8_t right)

@@ -100,8 +100,8 @@ START_TEST(test_me)
     int n = 3;
     create_bots(n);
     for (int i=0; i<n; i++) {
-        current_bot = i;
-        ck_assert_int_eq(Me()->ID, i);
+      prepare_bot(allbots[i]);
+      ck_assert_int_eq(Me()->ID, i);
     }
 }
 END_TEST
@@ -113,17 +113,17 @@ START_TEST(test_run_all_bots)
     create_bots(n);
     init_all_bots(n);
     for (int i=0; i<n; i++) {
-        current_bot = i;
-        mydata = (USERDATA* )(Me()->data);
-	allbots[current_bot]->user_loop = &dummy_loop;
-	setup();
+      prepare_bot(allbots[i]);
+      mydata = (USERDATA* )(Me()->data);
+      current_bot->user_loop = &dummy_loop;
+      setup();
     }
     
     run_all_bots(n);
     for (int i=0; i<n; i++) {
-        current_bot = i;
-        d = ((USERDATA* )Me()->data);
-        ck_assert_int_eq(d->num_bot_steps, 1);
+      prepare_bot(allbots[i]);
+      d = ((USERDATA* )Me()->data);
+      ck_assert_int_eq(d->num_bot_steps, 1);
     }
 }
 END_TEST

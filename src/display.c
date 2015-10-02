@@ -233,9 +233,6 @@ void input(void)
 	      for (i = 0; i < n_bots; i++)
 		{
 		  prepare_bot(allbots[i]);
-		  //current_bot = i;      // for Me() to return the right bot
-		  //mydata = Me()->data;
-		  //kilo_uid = i;         // XXX careful...
 		  callback_F6();
 		}
 	    break;
@@ -595,10 +592,6 @@ void draw_status(SDL_Surface *surface, int w, int h, double FPS)
     {
       //switch to this bot
       prepare_bot(allbots[i]);
-      //current_bot = i;      // for Me() to return the right bot
-      //mydata = Me()->data;
-      //kilo_uid = i;         // XXX careful...
-      
       char *s = callback_botinfo();
       displayString(surface, 10, h-30, s);
     }

@@ -21,7 +21,7 @@ extern int UserdataSize ;
 
 // Variables used to simulate many bots.
 kilobot** allbots;
-int current_bot;
+kilobot* current_bot;
 
 // Settings of the simulation.
 int tx_period_ticks = 15;  // Message twice a second.
@@ -156,9 +156,6 @@ void init_all_bots(int n_bots)
 
   for (int i=0; i<n_bots; i++) {
     prepare_bot(allbots[i]);
-    //current_bot = i;      // For Me() to return the right bot.
-    //mydata = Me()->data;
-    //kilo_uid = i;         // In case the bot's main() uses ID.
     bot_main();
     finalize_bot(allbots[i]);
   }
@@ -171,10 +168,7 @@ void user_setup_all_bots(int n_bots)
   for (int i=0; i<n_bots; i++)
     {
       prepare_bot(allbots[i]);
-      //current_bot = i;      // for Me() to return the right bot
-      //mydata = Me()->data;
-      //kilo_uid = i;         // in case the bot's main() uses ID
-      allbots[current_bot]->user_setup();
+      current_bot->user_setup();
       finalize_bot(allbots[i]);
     }
 }
@@ -187,7 +181,7 @@ kilobot *Me()
    * Uses the global variable current_bot to work out which bot is active.
    */
 
-  return allbots[current_bot];
+  return current_bot;
 }
 
 /* prepare Bot i for running
@@ -196,7 +190,7 @@ kilobot *Me()
  */
 void prepare_bot(kilobot *bot)
 {
-  current_bot = bot->ID; // hack! assumes ID is index. 
+  current_bot = bot; 
   kilo_uid                = bot->ID;
   mydata                  = bot->data;
   kilo_message_rx         = bot->kilo_message_rx;
@@ -599,17 +593,12 @@ void process_messaging(int n_bots)
 void run_all_bots(int n_bots)
 {
   /* Run the user program for each bot. */
-
-  for (current_bot=0; current_bot<n_bots; current_bot++) {
-    //me = & (allbots[current_bot]->data);
-
-    prepare_bot(allbots[current_bot]);
-    // mydata = allbots[current_bot]->data;
-    // kilo_uid = allbots[current_bot]->ID;
-    
-    //printf ("running bot %d ID: %d\n", current_bot, kilo_uid);
-    allbots[current_bot]->user_loop();
-    finalize_bot(allbots[current_bot]);
+  int i;
+  for (i=0; i<n_bots; i++) {
+    prepare_bot(allbots[i]);
+    //printf ("running bot %d.\n", kilo_uid);
+    current_bot->user_loop();
+    finalize_bot(allbots[i]);
   }
 }
 

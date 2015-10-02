@@ -90,7 +90,7 @@ void update_interactions(int n_bots);
 
 void spread_out(int n_bots, double k);
 
-extern int current_bot;
+extern kilobot* current_bot;
 extern void* mydata;
 
 kilobot *Me();
