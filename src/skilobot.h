@@ -1,5 +1,6 @@
 #include<stdlib.h>
 #include<stdint.h>
+#include"kilolib.h"
 
 #ifndef SKILOBOT_H
 #define SKILOBOT_H
@@ -45,6 +46,11 @@ typedef struct {
   /* Setup and loop functions */
   void (*user_setup)(void);
   void (*user_loop)(void);
+
+  // 
+  message_tx_t kilo_message_tx;
+  message_tx_success_t kilo_message_tx_success;
+  message_rx_t kilo_message_rx;
   
   void *data;
   
@@ -88,6 +94,8 @@ extern int current_bot;
 extern void* mydata;
 
 kilobot *Me();
+void prepare_bot(kilobot *bot);
+void finalize_bot(kilobot *bot);
 
 int bot_main (void);
 

@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include "skilobot.h"
+#undef main // to prevent main here from being re-defined
+
 #include "params.h"
 
 

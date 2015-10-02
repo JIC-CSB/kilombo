@@ -50,6 +50,11 @@ void (*callback_global_setup) (void) = NULL;
  */
 int16_t (*user_obstacles)(double, double, double *, double *) = NULL;
 
+/* Dummy functions for messaging. exactly as in kilolib.c */
+void message_rx_dummy(message_t *m, distance_measurement_t *d) { }
+message_t *message_tx_dummy() { return NULL; }
+void message_tx_success_dummy() {}
+
 
 void register_callback(Callback_t type, void (*fp)(void))
 {
@@ -122,6 +127,10 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->user_setup = NULL;
   bot->user_loop  = NULL;
   
+  bot->kilo_message_tx = message_tx_dummy;
+  bot->kilo_message_tx_success = message_tx_success_dummy;
+  bot->kilo_message_rx = message_rx_dummy;
+
   bot->data = malloc(UserdataSize);
   
   return bot;
@@ -146,10 +155,12 @@ void init_all_bots(int n_bots)
   /* Call the setup function of the user's bot. */
 
   for (int i=0; i<n_bots; i++) {
-    current_bot = i;      // For Me() to return the right bot.
-    mydata = Me()->data;
-    kilo_uid = i;         // In case the bot's main() uses ID.
+    prepare_bot(allbots[i]);
+    //current_bot = i;      // For Me() to return the right bot.
+    //mydata = Me()->data;
+    //kilo_uid = i;         // In case the bot's main() uses ID.
     bot_main();
+    finalize_bot(allbots[i]);
   }
 }
 
@@ -159,10 +170,12 @@ void user_setup_all_bots(int n_bots)
 {
   for (int i=0; i<n_bots; i++)
     {
-      current_bot = i;      // for Me() to return the right bot
-      mydata = Me()->data;
-      kilo_uid = i;         // in case the bot's main() uses ID
+      prepare_bot(allbots[i]);
+      //current_bot = i;      // for Me() to return the right bot
+      //mydata = Me()->data;
+      //kilo_uid = i;         // in case the bot's main() uses ID
       allbots[current_bot]->user_setup();
+      finalize_bot(allbots[i]);
     }
 }
 
@@ -175,6 +188,32 @@ kilobot *Me()
    */
 
   return allbots[current_bot];
+}
+
+/* prepare Bot i for running
+ * mydata
+ * kilo_uid
+ */
+void prepare_bot(kilobot *bot)
+{
+  current_bot = bot->ID; // hack! assumes ID is index. 
+  kilo_uid                = bot->ID;
+  mydata                  = bot->data;
+  kilo_message_rx         = bot->kilo_message_rx;
+  kilo_message_tx         = bot->kilo_message_tx;
+  kilo_message_tx_success = bot->kilo_message_tx_success;
+}
+
+/* store the values of kilo_message_* poiners in the per-robot variables
+ * to make it possible to have different functions in different bots.
+ * Kilolib specifies these to be set by assigning to global variables,
+ * to be compatible we have to copy the values.
+ */
+void finalize_bot(kilobot *bot)
+{
+  bot->kilo_message_rx         =  kilo_message_rx;
+  bot->kilo_message_tx         =  kilo_message_tx;
+  bot->kilo_message_tx_success =  kilo_message_tx_success;
 }
 
 
@@ -445,7 +484,7 @@ void update_interactions(int n_bots)
       double bot2bot_sq_distance = bot_sq_dist(allbots[i], allbots[j]);
 
       if (bot2bot_sq_distance < d_sq) {
-        //printf("Whack %d %d\n", i, j);
+        //printf("Whack %d %d\n", i, j); 
         separate_clashing_bots(allbots[i], allbots[j]);
         // We move the bots, this changes the distance.
         // So bot2bot_distance should be recalculated.
@@ -492,24 +531,25 @@ void removeOldCommLines(int dt, int maxt)
 void pass_message(kilobot* tx)
 {
   /* Pass message from tx to all bots in range. */
-
-  int i;
-
-  kilo_uid = tx->ID;
-  mydata = tx->data;
-  message_t * msg = kilo_message_tx();
   distance_measurement_t distm;
+  int i;
+  prepare_bot(tx);
+  //  kilo_uid = tx->ID;
+  //  mydata = tx->data;
+  message_t * msg = kilo_message_tx();
+  finalize_bot(tx);
 
   if (msg) {
     tx->tx_enabled = 1;
     //printf ("n_in_range=%d\n",tx->n_in_range);
     for (i = 0; i < tx->n_in_range; i++) {
-      // Switch to next receiving bot.
       kilobot *rx = allbots[tx->in_range[i]];
       addCommLine(tx, rx);
- 
-      kilo_uid = rx->ID;
-      mydata = rx->data;
+
+      // Switch to next receiving bot.
+      prepare_bot(rx);
+      // kilo_uid = rx->ID;
+      // mydata = rx->data;
 
      /* Set up a distance measurement structure.
       * We know the true distance, so we just store it in the structure.
@@ -519,12 +559,15 @@ void pass_message(kilobot* tx)
       distm.high_gain = bot_dist(tx, rx);
 
       kilo_message_rx(msg, &distm);
+      finalize_bot(rx);
     }
 
     // Switch to the transmitting bot, to call kilo_message_tx_success().
-    kilo_uid = tx->ID;
-    mydata = tx->data;
+    // kilo_uid = tx->ID;
+    // mydata = tx->data;
+    prepare_bot(tx);
     kilo_message_tx_success();
+    finalize_bot(tx);
   }
   else {
     tx->tx_enabled = 0;
@@ -560,11 +603,13 @@ void run_all_bots(int n_bots)
   for (current_bot=0; current_bot<n_bots; current_bot++) {
     //me = & (allbots[current_bot]->data);
 
-    //  alternative way for each bot to access its own data - less copying - FJ
-    mydata = allbots[current_bot]->data;
-    kilo_uid = allbots[current_bot]->ID;
+    prepare_bot(allbots[current_bot]);
+    // mydata = allbots[current_bot]->data;
+    // kilo_uid = allbots[current_bot]->ID;
+    
     //printf ("running bot %d ID: %d\n", current_bot, kilo_uid);
     allbots[current_bot]->user_loop();
+    finalize_bot(allbots[current_bot]);
   }
 }
 

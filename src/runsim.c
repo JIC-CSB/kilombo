@@ -34,11 +34,6 @@ int fullSpeed = 0;     // if nonzero, run without delay between frames
 void distribute_bots(int n_bots);
 extern void (*callback_global_setup) (void);
 
-/* Dummy functions for messaging. exactly as in kilolib.c */
-void message_rx_dummy(message_t *m, distance_measurement_t *d) { }
-message_t *message_tx_dummy() { return NULL; }
-void message_tx_success_dummy() {}
-
 
 void die(char *s)
 {
@@ -135,10 +130,6 @@ int main(int argc, char *argv[])
     }
 #endif
   
-  kilo_message_tx = message_tx_dummy;
-  kilo_message_tx_success = message_tx_success_dummy;
-  kilo_message_rx = message_rx_dummy;
-
   allbots = NULL;
   if (bot_state_file) {
     allbots = bot_loader(bot_state_file, &n_bots);
@@ -196,7 +187,7 @@ int main(int argc, char *argv[])
 
 
   while(time < simparams->maxTime || simparams->maxTime <= 0) {
-    //   printf("-- %d  kilo_ticks:%d--\n", n_step, kilo_ticks);
+    //printf("-- step:%d  kilo_ticks:%d  time:%6.1f--\n", n_step, kilo_ticks, time);
 
     if (state == RUNNING && simparams->stepsPerFrame > 0)
       {
@@ -205,7 +196,7 @@ int main(int argc, char *argv[])
 	n_step++;
 	time += simparams->timeStep;
 	kilo_ticks = time * TICKS_PER_SEC;
-	
+       
 	// save simulation state as JSON
 	if (simparams->stateFileSteps != 0)
 	  if (simparams->stateFileName && n_step % simparams->stateFileSteps == 0)
