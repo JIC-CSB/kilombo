@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
     steps_since_draw++;
     // Draw on screen
     if (simparams->GUI)
-      if (steps_since_draw > simparams->stepsPerFrame  || state != RUNNING || simparams->stepsPerFrame == 0)
+      if (steps_since_draw >= simparams->stepsPerFrame  || state != RUNNING || simparams->stepsPerFrame == 0)
 	{     // avoiding n_step % stepsPerFrame here because of weird behaviour when changing speed
 	  steps_since_draw = 0;
 	  input();
