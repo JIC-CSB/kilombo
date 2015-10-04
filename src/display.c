@@ -336,7 +336,8 @@ SDL_Surface* surf_from_pnm(char *data)
   // n  contains the number of characters used
   // white space after last %d is important
   
-  printf ("image is %dx%d. header is %s. maxval is %d\n", x, y, header, maxval);
+  //printf ("image is %dx%d. header is %s. maxval is %d\n",
+  //x, y, header, maxval);
 
   // find start of the raw data
   img = data + n;
@@ -382,7 +383,7 @@ SDL_Surface *makeWindow(void)
   if (screen == NULL) dieSDL("SDL_SetVideoMode failed: %s\n"); // FIXME: Hmmm
 
   SDL_Surface *icon; // = SDL_LoadBMP("icon2-24px.bmp");
-  icon = surf_from_pnm(MagickImage);
+  icon = surf_from_pnm((char*)MagickImage);
   if (icon)
     SDL_WM_SetIcon(icon, NULL);
   else
