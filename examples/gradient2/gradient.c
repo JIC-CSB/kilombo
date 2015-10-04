@@ -227,9 +227,9 @@ int main(void) {
     kilo_start(setup, loop);
 
 #ifdef SIMULATOR
-     register_callback(CALLBACK_BOTINFO, (void(*)(void))botinfo);
-     register_callback(CALLBACK_RESET, setup);
-     register_callback(CALLBACK_JSON_STATE, (void(*)(void))json_state);
+    set_callback_botinfo(botinfo);
+    set_callback_reset(setup);
+    set_callback_json_state(json_state);
 #endif
     
     

@@ -4,6 +4,7 @@
  * Lightly modified to work in the simulator, in particular:
  * - mydata->variable for global variables
  * - callback function botinfo() to report bot state back to the simulator for display
+ * - spin-up motors only when required, using the helper function  smooth_set_motors()
  *
  * Modifications by Fredrik Jansson 2015
  */
@@ -175,7 +176,7 @@ int main() {
     kilo_message_rx = message_rx;
 
 #ifdef SIMULATOR
-    register_callback(CALLBACK_BOTINFO, (void(*)(void))botinfo);
+    set_callback_botinfo(botinfo);
 #endif
     
     // bot 0 is stationary and transmits messages. Other bots orbit around it.

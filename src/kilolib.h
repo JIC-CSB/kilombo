@@ -1,6 +1,8 @@
 #ifndef __KILOLIB_H__
 #define __KILOLIB_H__
 
+#include<jansson.h>  // needed for json_t, in set_callback_json_state()
+
 /**
  * @file kilolib.h
  * @mainpage Kilobot Library API
@@ -54,12 +56,22 @@
    for the simulator */
 #define SIMULATOR
 
-/* Callback interface for communication between a bot and the simulator */
+/* OBSOLETE Callback interface for communication between a bot and the simulator */
+// will be removed
 typedef enum {CALLBACK_PARAMS, CALLBACK_RESET, CALLBACK_BOTINFO, CALLBACK_JSON_STATE, CALLBACK_GLOBAL_SETUP} Callback_t;
 void register_callback(Callback_t type, void (*fp)(void));
-
 void register_user_lighting(int16_t (*fp)(double, double));
 void register_user_obstacles(int16_t (*fp)(double, double, double *, double *));
+/* End of obsolete callback setters*/
+
+// Callback interface for a bot program to interact with the simulator
+void set_callback_params(void (*fp)(void));
+void set_callback_reset(void (*fp)(void));
+void set_callback_botinfo(char*(*fp)(void));
+void set_callback_json_state(json_t*(*fp)(void));
+void set_callback_global_setup(void(*fp)(void));
+void set_callback_obstacles(int16_t (*fp)(double, double, double *, double *));
+void set_callback_lighting(int16_t (*fp)(double, double));
 
 
 // measure a fictive potential in the environment, for testing
