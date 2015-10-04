@@ -31,9 +31,8 @@ typedef struct
 #include <userdata.h>
 
 #ifdef SIMULATOR
-#include <stdio.h> // for printf
+#include <stdio.h>    // for printf
 #else
-#include <avr/io.h>   // for microcontroller register defs
 #define DEBUG         // for printf to serial port
 #include "debug.h"
 #endif

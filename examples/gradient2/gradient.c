@@ -28,26 +28,13 @@
 #include <kilolib.h>
 #include <stdint.h>   // for uint8_t and friends
 
-#include "gradient.h"
+#include "gradient.h"  // defines the USERDATA structure
+#include <userdata.h> // for definition of the mydata pointer
+
 
 #define CUTOFF 100 //neighbors further away are ignored. (mm)
 
-#ifdef SIMULATOR
-// fill in the size of the USERDATA structure,
-// used by the simulator to allocate space for it.
-int UserdataSize = sizeof(USERDATA);
-USERDATA *mydata;
-#include <stdio.h> // for printf
 
-#else
-
-  USERDATA myuserdata;             
-  USERDATA *mydata = &myuserdata;
- 
-  #define DEBUG          // for printf to serial port
-  #include "debug.h"
-
-#endif
 
 // rainbow colors
 uint8_t colors[] = {

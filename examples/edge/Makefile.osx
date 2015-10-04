@@ -25,9 +25,6 @@ SIM_CFLAGS = -framework cocoa -c -g -O2 -Wall -std=c99
 #linking flags for simulated version
 SIM_LFLAGS = -framework cocoa -lsim -lSDLmain -lSDL -lm -ljansson
 
-#compiling and linking flags with address sanitizer:
-#SIM_CFLAGS = -c -g -O2 -Wall -std=c99  -I$(KILOHEADERS) -fsanitize=address -fno-omit-frame-pointer
-#SIM_LFLAGS = $(SIMLIB) -lSDL -lm -ljansson -fsanitize=address
 
 # # # # # # # # # # The following should be generic and not need changes # # # # # # # # # # # # # 
 

@@ -68,7 +68,7 @@ extern USERDATA *mydata;
     mydata->RXTail = (mydata->RXTail+1)%RB_SIZE;\
     if (RB_empty())\
       { mydata->RXHead = (mydata->RXHead+1)%RB_SIZE;	\
-	printf("Full.\n"); }				\
+	/*printf("Full.\n"); */}			\
   }
 
 /*

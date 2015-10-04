@@ -14,22 +14,14 @@
 #include "kilolib.h"
 #include "orbit.h"
 
-#ifdef SIMULATOR
-// fill in the size of the USERDATA structure,
-// used by the simulator to allocate space for it.
-int UserdataSize = sizeof(USERDATA);
-USERDATA *mydata;
-#include <stdio.h> // for printf
+#include<userdata.h>
 
+#ifdef SIMULATOR
+#include <stdio.h> // for printf
 #else
 #include <avr/io.h>  // for microcontroller register defs
-
-  USERDATA myuserdata;             
-  USERDATA *mydata = &myuserdata;
- 
 //  #define DEBUG          // for printf to serial port
 //  #include "debug.h"
-
 #endif
 
 

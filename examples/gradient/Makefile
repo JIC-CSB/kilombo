@@ -13,18 +13,19 @@ EXECUTABLE=gradient
 #path to the official kilolib, used for real bots only
 KILOHEADERS=../../../swarmbots/kilolib
 
+# path of userdata.h distributed with the simulator but needed
+# when compiling the user program
+SIMHEADERS=/usr/local/include
+
 #path to kilolib.a in the official kilolib, needed for real bots only
 KILOLIB    =$(KILOHEADERS)/build/kilolib.a
 
 
 #compilation flags for simulated version
-SIM_CFLAGS = -c -g -O2 -Wall -std=c99  #-I$(KILOHEADERS)
+SIM_CFLAGS = -c -g -O2 -Wall -std=c99  
 #linking flags for simulated version
 SIM_LFLAGS = -lsim -lSDL -lm -ljansson
 
-#compiling and linking flags with address sanitizer:
-#SIM_CFLAGS = -c -g -O2 -Wall -std=c99  -I$(KILOHEADERS) -fsanitize=address -fno-omit-frame-pointer
-#SIM_LFLAGS = $(SIMLIB) -lSDL -lm -ljansson -fsanitize=address
 
 # # # # # # # # # # The following should be generic and not need changes # # # # # # # # # # # # # 
 
@@ -41,7 +42,7 @@ AVRUP = avrdude
 
 #PFLAGS = -P usb -c avrispmkII # user to reprogram OHC
 CFLAGS = -mmcu=atmega328p -Wall -gdwarf-2 -O3 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
-CFLAGS += -DF_CPU=8000000 -I$(KILOHEADERS) -DKILOBOT
+CFLAGS += -DF_CPU=8000000 -I$(KILOHEADERS) -I$(SIMHEADERS) -DKILOBOT
 
 #for a floating point printf
 CFLAGS += -Wl,-u,vfprintf -lprintf_flt -lm
