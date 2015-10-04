@@ -79,9 +79,7 @@ int main(int argc, char *argv[])
   double time = 0;
   char *bot_state_file = (char *) NULL;
   int c;  
-  char param_filename[1000];
-  sprintf (param_filename, "%s%s", argv[0], ".json");
-  //default to <program name>.json
+  char param_filename[1000] = "kilombo.json"; // Default parameter file name 
   
   while ((c = getopt(argc, argv, "n:p:b:")) != -1) {
     switch (c) {

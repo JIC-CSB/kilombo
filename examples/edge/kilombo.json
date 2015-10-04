@@ -5,6 +5,7 @@
     "formation": "line",
     "timeStep" : 0.0416666,
     "simulationTime" : 0,
+    "commsRadius" : 70,
     "showCommsRadius" : 0,
     "showComms" : 1,
     "distributePercent" : 0.9,
