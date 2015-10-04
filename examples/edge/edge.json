@@ -1,0 +1,18 @@
+{
+    "botName" : "follow bot",
+    "randSeed" : 1,
+    "nBots" : 10,
+    "formation": "line",
+    "timeStep" : 0.0416666,
+    "simulationTime" : 0,
+    "showCommsRadius" : 0,
+    "showComms" : 1,
+    "distributePercent" : 0.9,
+    "displayWidth"  : 1200,
+    "displayHeight" : 800,
+    "displayScale"  : 0.75,
+    "showHist" : 0,
+    "storeHistory": 0,
+    "imageName" : "movie2/f%04d.bmp",
+    "saveVideoN" : 10
+}
