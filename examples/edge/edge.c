@@ -234,7 +234,7 @@ void loop()
   receive_inputs();
   if(kilo_uid == 0)
     {
-      set_color(RGB(0,1,0));
+      set_color(RGB(3,0,0));
       follow_edge();
     }
   

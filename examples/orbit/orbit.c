@@ -147,7 +147,7 @@ void setup()
   setup_message();
 
   if (kilo_uid == 0)
-    set_color(RGB(0,3,0)); // color of the stationary bot
+    set_color(RGB(0,0,0)); // color of the stationary bot
   else
     set_color(RGB(3,0,0)); // color of the moving bot
 }
