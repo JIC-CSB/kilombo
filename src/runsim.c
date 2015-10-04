@@ -165,7 +165,6 @@ int main(int argc, char *argv[])
   // e.g. simulation-specific parameter values to it
   user_setup_all_bots(n_bots);
 
-  char buf[2000];
 
 #ifndef SKILO_HEADLESS
   FPSmanager manager;
@@ -176,6 +175,7 @@ int main(int argc, char *argv[])
 
   Uint32 lastTicks;
   lastTicks = SDL_GetTicks();
+  char buf[2000];  
 #endif
   
   json_t *j_state = json_array();
