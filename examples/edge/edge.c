@@ -254,8 +254,8 @@ int main(void)
 #endif
 
 #ifdef SIMULATOR
-  register_callback(CALLBACK_BOTINFO, (void(*)(void))botinfo);
-  register_callback(CALLBACK_RESET, setup);
+  set_callback_botinfo(botinfo);
+  set_callback_reset(setup);
 #endif
 
   RB_init();                       // initialize ring buffer

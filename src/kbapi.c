@@ -14,9 +14,6 @@ message_tx_success_t kilo_message_tx_success = NULL;
 message_rx_t kilo_message_rx = NULL;
 
 
-
-int16_t (*user_light)(double, double) = NULL;
-
 /* the clock variable. Counts ticks since beginning of the program.
  * Each bot really has it's own, but for now we have just one.
  * Declared volatile to match declaration in kilolib.h
@@ -170,21 +167,12 @@ float get_potential(int type)
   
 }
 
-void register_user_lighting(int16_t (*fp)(double, double))
-	{
-	user_light = fp;
-	}
-
 // 10 bit measurement of ambient light
 // return the x coordinate as the light intensity
 // - simulates a light gradient in x
 int16_t get_ambientlight()
 {
   kilobot* self = Me();
-
-  // gravity well
-  // int l = -10000000 / hypot(self->x, self->y);
-
   int l;
 
   if (user_light != NULL)
@@ -192,7 +180,8 @@ int16_t get_ambientlight()
   else
   // parabolic well
   	  l = ( pow(self->x, 2) + pow(self->y, 2) )/1000;
-  
+
+  // constrain to interval [0,1023]
   if (l > 1023)
     l = 1023;
   

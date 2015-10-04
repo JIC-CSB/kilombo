@@ -27,8 +27,17 @@ kilobot* current_bot;
 int tx_period_ticks = 15;  // Message twice a second.
 int storeHistory = 1;
 
+// Callback function pointer for saving the bot's internal state as JSON.
+json_t* (*callback_json_state) (void) = NULL;
+
+// Variables used to display communication lines.
+CommLine commLines[MAXCOMMLINES];
+int NcommLines = 0;
+
+
 // Function pointers to user defined callback functions.
-// The user defined callback functions are called when the relevant function
+
+// These user defined callback functions are called when the relevant function
 // keys are pressed during a simulation.
 void (*callback_F5) (void) = NULL;
 void (*callback_F6) (void) = NULL;
@@ -37,18 +46,9 @@ void (*callback_F6) (void) = NULL;
 char *botinfo_simple();
 char* (*callback_botinfo) (void) = botinfo_simple;
 
-// Callback function pointer for saving the bot's internal state as JSON.
-json_t* (*callback_json_state) (void) = NULL;
-
-// Variables used to display communication lines.
-CommLine commLines[MAXCOMMLINES];
-int NcommLines = 0;
-
-void (*callback_global_setup) (void) = NULL;
-
-/* Functions.
- */
 int16_t (*user_obstacles)(double, double, double *, double *) = NULL;
+int16_t (*user_light)(double, double) = NULL;
+void (*callback_global_setup) (void) = NULL;
 
 /* Dummy functions for messaging. exactly as in kilolib.c */
 void message_rx_dummy(message_t *m, distance_measurement_t *d) { }
@@ -56,9 +56,55 @@ message_t *message_tx_dummy() { return NULL; }
 void message_tx_success_dummy() {}
 
 
+void set_callback_params(void (*fp)(void))
+{
+  callback_F5 = fp;
+}
+
+void set_callback_reset(void (*fp)(void))
+{
+  callback_F6 = fp;
+}
+
+void set_callback_botinfo(char*(*fp)(void))
+{
+  callback_botinfo = fp; 
+}
+
+void set_callback_json_state(json_t*(*fp)(void))
+{
+  callback_json_state = fp;
+}
+
+void set_callback_global_setup(void(*fp)(void))
+{
+  callback_global_setup = fp;
+}
+
+void set_callback_obstacles(int16_t (*fp)(double, double, double *, double *))
+{
+  user_obstacles = fp;
+}
+
+void set_callback_lighting(int16_t (*fp)(double, double))
+{
+  user_light = fp;
+}
+  
+// OBSOLETE callback setting functions - will be removed
+
+void register_user_obstacles(int16_t (*fp)(double, double, double *, double *)){
+  user_obstacles = fp;
+}
+
+void register_user_lighting(int16_t (*fp)(double, double))
+{
+  user_light = fp;
+}
+
 void register_callback(Callback_t type, void (*fp)(void))
 {
-  /* Register a callback. */
+  // Register a callback. 
 
   switch (type)
     {
@@ -74,15 +120,13 @@ void register_callback(Callback_t type, void (*fp)(void))
     case CALLBACK_JSON_STATE:
       callback_json_state = (json_t*(*)(void)) fp;
       break;
-	case CALLBACK_GLOBAL_SETUP:
-	  callback_global_setup = fp;
-	  break;
+    case CALLBACK_GLOBAL_SETUP:
+      callback_global_setup = fp;
+      break;
     }
 }
+/* End of obsolete callback setters */
 
-void register_user_obstacles(int16_t (*fp)(double, double, double *, double *)){
-  user_obstacles = fp;
-}
 
 
 /* Functions for initialising the bots to be used in the simulation. */

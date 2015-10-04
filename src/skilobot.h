@@ -105,6 +105,7 @@ extern int tx_period_ticks;
 extern int fullSpeed;
 extern int stepsPerFrame;
 
-
+extern int16_t (*user_obstacles)(double, double, double *, double *);
+extern int16_t (*user_light)(double, double);
 
 #endif
