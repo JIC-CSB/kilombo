@@ -26,6 +26,8 @@
     "stateFileName" : "simstates.json",
     "stateFileSteps" : 0,
     "colorscheme" : "bright",
-    "GUI"  : 1 
+    "GUI"  : 1 ,
+	"msgSuccessRate" : 0.8,
+	"distanceNoise" : 2
 }
 

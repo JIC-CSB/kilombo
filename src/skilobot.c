@@ -522,6 +522,48 @@ void removeOldCommLines(int dt, int maxt)
   }
 }
 
+// random number between 0 and 1
+// NOTE: this can return 1!
+double rnd_uniform()
+{
+  return rand() / (double)RAND_MAX;
+}
+
+double rnd_gauss (double mean, double sig)
+	{
+	double x, y, r2;
+	
+	do
+		{
+		// choose x,y in uniform square (-1,-1) to (+1,+1)
+		x = -1.0 + 2.0 * rnd_uniform();
+		y = -1.0 + 2.0 * rnd_uniform();
+		
+		// see if it is in the unit circle
+		r2 = x * x + y * y;
+		}
+	while (r2 > 1.0 || r2 == 0.0);
+	
+	// Box-Muller transform
+	return mean + sig * y * sqrt (-2.0 * log (r2) / r2);
+	}
+
+double noisy_distance(double dist)
+{
+  if (simparams->distance_noise == 0.0)
+	  return dist;
+
+  const double n_dist = rnd_gauss(dist, simparams->distance_noise);
+  
+  return n_dist > 0 ? n_dist : 0;
+}
+
+int message_success()
+{
+  return simparams->msg_success_rate >= 1 ? 
+    1 : (double)rand() / RAND_MAX <= simparams->msg_success_rate;
+}
+
 void pass_message(kilobot* tx)
 {
   /* Pass message from tx to all bots in range. */
@@ -533,39 +575,38 @@ void pass_message(kilobot* tx)
   message_t * msg = kilo_message_tx();
   finalize_bot(tx);
 
-  if (msg) {
-    tx->tx_enabled = 1;
-    //printf ("n_in_range=%d\n",tx->n_in_range);
-    for (i = 0; i < tx->n_in_range; i++) {
-      kilobot *rx = allbots[tx->in_range[i]];
-      addCommLine(tx, rx);
-
-      // Switch to next receiving bot.
-      prepare_bot(rx);
-      // kilo_uid = rx->ID;
-      // mydata = rx->data;
-
-     /* Set up a distance measurement structure.
-      * We know the true distance, so we just store it in the structure.
-      * The estimate_distance() will just return high_gain.
-      */
-      distm.low_gain = 0;
-      distm.high_gain = bot_dist(tx, rx);
-
-      kilo_message_rx(msg, &distm);
-      finalize_bot(rx);
+  if (msg)
+    {
+      tx->tx_enabled = 1;
+      //printf ("n_in_range=%d\n",tx->n_in_range);
+      for (i = 0; i < tx->n_in_range; i++) {
+	kilobot *rx = allbots[tx->in_range[i]];
+	addCommLine(tx, rx);
+	
+	if (message_success()) // messages arrive with some probability
+	  {
+	    /* Set up a distance measurement structure.
+	     * We know the true distance, so we just store it in the structure.
+	     * The estimate_distance() will just return high_gain.
+	     */
+	    distm.low_gain = 0;
+	    distm.high_gain = noisy_distance(bot_dist(tx, rx));
+	    
+	    prepare_bot(rx);
+	    kilo_message_rx(msg, &distm);
+	    finalize_bot(rx);
+	  }
+      }
+      
+      // Switch to the transmitting bot, to call kilo_message_tx_success().
+      prepare_bot(tx);
+      kilo_message_tx_success();
+      finalize_bot(tx);
     }
-
-    // Switch to the transmitting bot, to call kilo_message_tx_success().
-    // kilo_uid = tx->ID;
-    // mydata = tx->data;
-    prepare_bot(tx);
-    kilo_message_tx_success();
-    finalize_bot(tx);
-  }
-  else {
-    tx->tx_enabled = 0;
-  }
+  else
+    {
+      tx->tx_enabled = 0;
+    }
 }
  
 void process_messaging(int n_bots)
