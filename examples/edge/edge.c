@@ -19,12 +19,10 @@ typedef struct
   uint8_t bot_type;
   uint8_t bot_state;
   uint8_t move_type;
-  uint8_t move_switch_flag;
-  uint8_t listen_counter;
 
   message_t transmit_msg;
   char message_lock;
-  uint32_t next_ticks;
+
   received_message_t RXBuffer[RB_SIZE];
   uint8_t RXHead, RXTail;
 
@@ -55,8 +53,6 @@ uint8_t colorNum[] = {
 };
 
 
-
-
 // message rx callback function. Pushes message to ring buffer.
 void rxbuffer_push(message_t *msg, distance_measurement_t *dist) {
     received_message_t *rmsg = &RB_back();
@@ -64,7 +60,6 @@ void rxbuffer_push(message_t *msg, distance_measurement_t *dist) {
     rmsg->dist = *dist;
     RB_pushback();
 }
-
 
 message_t *message_tx()
 {
@@ -108,7 +103,6 @@ void process_message()
   ID = data[0] | (data[1] << 8);
   uint8_t d = estimate_distance(&RB_front().dist);
 
-
   // search the neighbor list by ID
   for (i = 0; i < mydata->N_Neighbors; i++)
     if (mydata->neighbors[i].ID == ID)
@@ -130,8 +124,6 @@ void process_message()
   mydata->neighbors[i].n_bot_state = data[3];
 }
 
-
-
 /* Go through the list of neighbors, remove entries older than a threshold,
  * currently 2 seconds.
  */
@@ -142,46 +134,32 @@ void purgeNeighbors(void)
   for (i = mydata->N_Neighbors-1; i >= 0; i--)
     if (kilo_ticks - mydata->neighbors[i].timestamp  > 64) //32 ticks = 1 s
       { //this one is too old.
-	mydata->neighbors[i] = mydata->neighbors[mydata->N_Neighbors-1]; //replace it by the last entry
+	mydata->neighbors[i] = mydata->neighbors[mydata->N_Neighbors-1];
+	//replace it by the last entry
 	mydata->N_Neighbors--;
       }
 }
-
-
-//void printNeighbors(void)
-//{
-//  uint8_t i;
-//  printf ("UID:%d N:%d state:%d  move: %d, t:%lu\n", kilo_uid, mydata->N_Neighbors, get_bot_state(), get_move_type(), (unsigned long)kilo_ticks);
-//  printf ("\n");
-//  for (i = 0; i < mydata->N_Neighbors; i++)
-//    printf ("  ID: %2d, dist: %2d, delta_dist: %3d, state: %d, time:%lu\n", mydata->neighbors[i].ID,
-//	    mydata->neighbors[i].dist, mydata->neighbors[i].delta_dist, mydata->neighbors[i].n_bot_state,(unsigned long int)mydata->neighbors[i].timestamp);
-//
-//  printf ("\n");
-//}
 
 void setup_message(void)
 {
   mydata->message_lock = 1;  //don't transmit while we are forming the message
   mydata->transmit_msg.type = NORMAL;
-  mydata->transmit_msg.data[0] = kilo_uid & 0xff; //0 low  ID
-  mydata->transmit_msg.data[1] = kilo_uid >> 8;   //1 high ID
-  mydata->transmit_msg.data[2] = mydata->N_Neighbors;     //2 number of neighbors
-  mydata->transmit_msg.data[3] = get_bot_state();
+  mydata->transmit_msg.data[0] = kilo_uid & 0xff;     // 0 low  ID
+  mydata->transmit_msg.data[1] = kilo_uid >> 8;       // 1 high ID
+  mydata->transmit_msg.data[2] = mydata->N_Neighbors; // 2 number of neighbors
+  mydata->transmit_msg.data[3] = get_bot_state();     // 3 bot state
 
   mydata->transmit_msg.crc = message_crc(&mydata->transmit_msg);
   mydata->message_lock = 0;
 }
 
-void setup() {
-
+void setup()
+{
   rand_seed(kilo_uid + 1); //seed the random number generator
   
   mydata->message_lock = 0;
-  mydata->next_ticks = 0;
 
   mydata->N_Neighbors = 0;
-  mydata->move_switch_flag = 0;
   set_move_type(STOP);
   set_bot_state(LISTEN);
 
@@ -197,8 +175,6 @@ void receive_inputs()
     }
   purgeNeighbors();
 }
-
-
 
 uint8_t get_dist_by_ID(uint16_t bot)
 {
@@ -236,14 +212,17 @@ void follow_edge()
   uint8_t desired_dist = 55;
   if(find_nearest_N_dist() > desired_dist)
     {
-      if(get_move_type() == LEFT) spinup_motors();
+      if(get_move_type() == LEFT)
+	spinup_motors();
       set_motors(0, kilo_turn_right);
       set_move_type(RIGHT);
     }
 
-  if(find_nearest_N_dist() < desired_dist)
+  //if(find_nearest_N_dist() < desired_dist)
+  else
     {
-      if(get_move_type() == RIGHT) spinup_motors();
+      if(get_move_type() == RIGHT)
+	spinup_motors();
       set_motors(kilo_turn_left, 0);
       set_move_type(LEFT);
     }
@@ -254,8 +233,11 @@ void loop()
   //receive messages
   receive_inputs();
   if(kilo_uid == 0)
-    follow_edge();
-
+    {
+      set_color(RGB(0,1,0));
+      follow_edge();
+    }
+  
   setup_message();
 }
 
@@ -267,15 +249,14 @@ int main(void)
   kilo_init();
 
 #ifdef DEBUG
+  // setup debugging, i.e. printf to serial port, in real Kilobot
   debug_init();
 #endif
 
 #ifdef SIMULATOR
   register_callback(CALLBACK_BOTINFO, (void(*)(void))botinfo);
   register_callback(CALLBACK_RESET, setup);
-
 #endif
-
 
   RB_init();                       // initialize ring buffer
   kilo_message_rx = rxbuffer_push;
@@ -286,9 +267,9 @@ int main(void)
   return 0;
 }
 
-#ifndef KILOBOT
-static char botinfo_buffer[10000];
+#ifdef SIMULATOR
 // provide a text string for the status bar, about this bot
+static char botinfo_buffer[10000];
 char *botinfo(void)
 {
   int n;
