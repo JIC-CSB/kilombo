@@ -317,6 +317,46 @@ void init_SDL(void)
   gfxPrimitivesSetFont (font, 8, 8);
 }
 
+// include bitmap data for the icon in PNM (P6) format 
+#include "icon2-48px.h"
+
+// make an SDL surface from PNM (P6) data. Used for the program icon.
+SDL_Surface* surf_from_pnm(char *data)
+{
+  int x, y, maxval, n;
+  char *img;
+  if (strncmp(data, "P6\n", 3))
+    { 
+      printf("Unknown format in surf_from_pnm\n");
+      return NULL;
+    }
+  char header[5];
+  
+  sscanf (data, "%s %d %d %d %n", header, &x, &y, &maxval, &n);
+  // n  contains the number of characters used
+  // white space after last %d is important
+  
+  printf ("image is %dx%d. header is %s. maxval is %d\n", x, y, header, maxval);
+
+  // find start of the raw data
+  img = data + n;
+  
+  // masks for R, G and B in the data
+  int rm = 0x0000ff  ;
+  int gm = 0x00ff00  ;
+  int bm = 0xff0000  ;
+
+  SDL_Surface *surface =
+    SDL_CreateRGBSurfaceFrom(img, x, y, 24, x*3, rm, gm, bm, 0);
+
+  // make the black color transparent - doesn't help
+  SDL_SetColorKey(surface, SDL_SRCCOLORKEY, 0);
+  //SDL_SetAlpha(surface, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
+  //SDL_SetAlpha(surface, 0, SDL_ALPHA_OPAQUE);
+  return surface;
+}
+
+
 SDL_Surface *makeWindow(void)
 {
   SDL_Surface *screen;
@@ -340,6 +380,13 @@ SDL_Surface *makeWindow(void)
 			    SDL_SWSURFACE|SDL_DOUBLEBUF);
 
   if (screen == NULL) dieSDL("SDL_SetVideoMode failed: %s\n"); // FIXME: Hmmm
+
+  SDL_Surface *icon; // = SDL_LoadBMP("icon2-24px.bmp");
+  icon = surf_from_pnm(MagickImage);
+  if (icon)
+    SDL_WM_SetIcon(icon, NULL);
+  else
+    printf("No icon found\n");
   
   return screen;
 }
