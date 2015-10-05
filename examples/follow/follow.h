@@ -1,5 +1,5 @@
-#ifndef COHESION_H
-#define COHESION_H
+#ifndef FOLLOW_H
+#define FOLLOW_H
 
 #include "kilolib.h"
 
@@ -26,7 +26,6 @@ typedef struct {
   uint8_t dist;
   uint8_t N_Neighbors;
   uint32_t timestamp;
-  //  int8_t x, y;
   uint8_t gradient;
   uint8_t follower;
   uint8_t WG;
