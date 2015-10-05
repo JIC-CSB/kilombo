@@ -28,6 +28,13 @@ void distribute_line(int n_bots)
   }
 }
 
+void distribute_rline(int n_bots)
+{
+  for (int i=0; i < n_bots; i++) {
+    allbots[i]->x += 50 * (n_bots - i) - 40 * (n_bots - 1);
+  }
+}
+
 void distribute_rand(int n_bots, int w, int h)
 {
   for (int i=0; i < n_bots; i++) {
@@ -193,6 +200,7 @@ void distribute_bots(int n_bots)
   float f = get_float_param("distributePercent", 0.2);
   
   if(strcmp(formation, "line")    == 0) distribute_line(n_bots);
+  if(strcmp(formation, "rline")    == 0) distribute_rline(n_bots);
   if(strcmp(formation, "random")  == 0) distribute_rand(n_bots, f * w, f * h);
   if(strcmp(formation, "pile")    == 0) distribute_pile(n_bots);
   if(strcmp(formation, "circle")  == 0) distribute_circle(n_bots);
