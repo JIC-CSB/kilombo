@@ -6,6 +6,7 @@ set_target_properties(headless PROPERTIES COMPILE_DEFINITIONS "SKILO_HEADLESS")
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-std=c99)
     add_definitions("-Wall -O2 -g")
+#    add_definitions("-Wall -O3 -march=native -g")	
 endif()
 
 INSTALL(TARGETS sim headless

@@ -512,7 +512,7 @@ void update_interactions(int n_bots)
     for (int i=0; i<n_bots; i++) {
       if (user_obstacles(allbots[i]->x, allbots[i]->y, &push_x, &push_y)){
         allbots[i]->x += push_x;
-		allbots[i]->y += push_y;
+	allbots[i]->y += push_y;
       }
     }
   }
@@ -625,7 +625,9 @@ void pass_message(kilobot* tx)
       //printf ("n_in_range=%d\n",tx->n_in_range);
       for (i = 0; i < tx->n_in_range; i++) {
 	kilobot *rx = allbots[tx->in_range[i]];
+#ifndef SKILO_HEADLESS
 	addCommLine(tx, rx);
+#endif
 	
 	if (message_success()) // messages arrive with some probability
 	  {
@@ -664,12 +666,14 @@ void process_messaging(int n_bots)
     }
   }
 
+#ifndef SKILO_HEADLESS
   // Run removeOldCommLines at most once every kilo_ticks.
   static int last_ticks = 0;
   if (kilo_ticks > last_ticks) {
     removeOldCommLines(kilo_ticks-last_ticks, tx_period_ticks);
     last_ticks = kilo_ticks;
   }
+  #endif
 }
 
 

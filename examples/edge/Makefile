@@ -21,9 +21,16 @@ SIMHEADERS=/usr/local/include
 KILOLIB    =$(KILOHEADERS)/build/kilolib.a
 
 #compilation flags for simulated version
+#SIM_CFLAGS = -c -g -O2 -Wall -std=c99  #-I$(KILOHEADERS)
+
 SIM_CFLAGS = -c -g -O2 -Wall -std=c99  #-I$(KILOHEADERS)
+
 #linking flags for simulated version
 SIM_LFLAGS = -lsim -lSDL -lm -ljansson
+
+# LFLAGS to compile headless
+# SIM_LFLAGS = -lheadless  -lm -ljansson
+
 
 #compiling and linking flags with address sanitizer:
 #SIM_CFLAGS = -c -g -O2 -Wall -std=c99  -I$(KILOHEADERS) -fsanitize=address -fno-omit-frame-pointer

@@ -25,6 +25,12 @@
 #include"params.h"
 #include"stateio.h"
 
+// timing macros.
+// http://stackoverflow.com/questions/173409/how-can-i-find-the-execution-time-of-a-section-of-my-program-in-c
+clock_t startm, stopm;
+#define START if ( (startm = clock()) == -1) {printf("Error calling clock");exit(1);}
+#define STOP if ( (stopm = clock()) == -1) {printf("Error calling clock");exit(1);}
+#define PRINTTIME printf( "%6.3f s.", ((double)stopm-startm)/CLOCKS_PER_SEC);
 
 int n_bots = 100;
 int state = RUNNING;
@@ -177,13 +183,18 @@ int main(int argc, char *argv[])
 #endif
   
   json_t *j_state = json_array();
-    
+
+  printf ("Size of kilobot structure : %zd\n", sizeof(kilobot));
+  extern int UserdataSize;
+  printf ("Size of USERDATA structure: %d\n", UserdataSize);
+  
   printf("Running %d bots with timestep %f for total time %f\n", 
 	 n_bots, simparams->timeStep, simparams->maxTime);
 
   int n_step = 0;
 
-
+  START
+  
   while(time < simparams->maxTime || simparams->maxTime <= 0) {
     //printf("-- step:%d  kilo_ticks:%d  time:%6.1f--\n", n_step, kilo_ticks, time);
 
@@ -219,7 +230,16 @@ int main(int argc, char *argv[])
 		  exit(1);
 		}
 	    }
-#endif	
+#endif
+	if (n_step % 1000 == 0)
+	  {
+	    STOP
+	      printf("%6.0f s - %6d steps - %6d kilo_ticks   ", time, n_step, kilo_ticks);
+	    PRINTTIME
+	      printf ("\n");
+
+	    START
+	  }
       } // if RUNNING
 
 #ifndef SKILO_HEADLESS	
@@ -249,6 +269,8 @@ int main(int argc, char *argv[])
 #endif
   } // while running
 
+  printf ("Simulation finished\n");
+  
   save_bot_state_to_file(allbots, n_bots, "endstate.json");
 
   if (simparams->stateFileName && simparams->stateFileSteps != 0)
