@@ -1,7 +1,7 @@
 {
     "botName" : "Follow",
     "randSeed" : 1,
-    "nBots" : 200,
+    "nBots" : 300,
     "formation" : "rline",
     "__timeStep" : 0.0416666,
     "timeStep" : 0.03225,
@@ -24,6 +24,6 @@
     "stateFileName" : "simstates.json",
     "stateFileSteps" : 0,
     "colorscheme" : "bright",
-    "GUI" : 0
+    "GUI" : 1
 }
  

@@ -29,7 +29,8 @@
 #define T_MOVE 40
 #define T_STRAIGHT 00
 
-
+#define NO_GRADIENT 65535
+#define NO_ID 65535
 
 /* A potential linear in the distance d. 
  * 0 at 100 mm and further, negative when closer.
@@ -147,7 +148,7 @@ void idle_search()
  */
 void movement(float V)
 {
-  if (mydata->gradient == 255)
+  if (mydata->gradient == NO_GRADIENT)
     { // I'm not in the chain - search
       // idle_search();
       // when starting from a chian, this search sometimes break the chain so now its off.
@@ -199,8 +200,8 @@ void setup() {
 
   mydata->next_movement_ticks = kilo_ticks;
 
-  mydata->gradient = 255;
-  mydata->follower = 255;
+  mydata->gradient = NO_GRADIENT;
+  mydata->follower = NO_GRADIENT;
   mydata->turn = 0;
   
   // new state machine 
@@ -222,7 +223,7 @@ void follow_the_leader()
   uint8_t d_leader = 255;
   uint8_t d_follower = 255;
   uint8_t WG_leader = WAIT, WG_follower = WAIT;
-  uint8_t i_follower = 255;
+  uint16_t i_follower = NO_ID;
 
   // get distance to leader and follower, if they exist among neighbors.
   for (i = 0; i < mydata->N_Neighbors; i++)
@@ -241,14 +242,14 @@ void follow_the_leader()
     }
 
   if (d_follower == 255)
-    mydata->follower = 255;  // follower not found among neighbors, forget it. I'm last now.
+    mydata->follower = NO_ID;  // follower not found among neighbors, forget it. I'm last now.
   if (d_leader == 255 && mydata->gradient != 0)
     {                        //lost the leader
-      mydata->gradient = 255;
-      mydata->follower = 255;
+      mydata->gradient = NO_GRADIENT;
+      mydata->follower = NO_ID;
     }
  
-  if (mydata->gradient == 255)
+  if (mydata->gradient == NO_GRADIENT)
     { // not part of the chain
       for (i = 0; i < mydata->N_Neighbors; i++)
 	{
@@ -260,12 +261,12 @@ void follow_the_leader()
     }
   else
     { // I'm part of the chain
-      if (mydata->follower == 255)
+      if (mydata->follower == NO_ID)
 	{ // I'm last in the chain
 	  uint8_t dmin = 80; // pick followers if they are closer than this
 	  for (i = 0; i < mydata->N_Neighbors; i++)
 	    {  //found a neighbor without a place in the chain
-	      if ((mydata->neighbors[i].gradient == 255 && mydata->neighbors[i].dist < dmin) ||
+	      if ((mydata->neighbors[i].gradient == NO_GRADIENT && mydata->neighbors[i].dist < dmin) ||
 		   (mydata->neighbors[i].gradient == mydata->gradient+1)) //my old follower, lost and found again
 		  { //pick the closest neighbor as follower
 		    dmin = mydata->neighbors[i].dist;
@@ -286,8 +287,8 @@ void follow_the_leader()
         }
  case GO:
       if ((d_leader < D_MIN && mydata->gradient != 0) ||    // I'm not leader, and too close to the one before me
-	  (d_follower > D_MAX && mydata->follower != 255) ||  // I'm not last, and my follower is too far away
-	  (mydata->follower != 255 && kilo_ticks - mydata->neighbors[i_follower].timestamp > 16 )|| // we missed a message from the follower
+	  (d_follower > D_MAX && mydata->follower != NO_ID) ||  // I'm not last, and my follower is too far away
+	  (mydata->follower != NO_ID && kilo_ticks - mydata->neighbors[i_follower].timestamp > 16 )|| // we missed a message from the follower
 	  ( WG_follower == GO) // follower is also walking. shouldn't happen but can happen due to communication errors
 	  ) // we missed a message from the follower
 	mydata->WG = WAIT;
@@ -309,7 +310,7 @@ void gradient_propagation_follow()
       if (mydata->neighbors[i].gradient < min)
 	min = mydata->neighbors[i].gradient;
       
-      if (mydata->neighbors[i].gradient != 255)
+      if (mydata->neighbors[i].gradient != NO_GRADIENT)
 	{
 	  found = 1;
 	  if (mydata->neighbors[i].gradient > max)
@@ -329,7 +330,7 @@ void gradient_propagation_follow()
     {
       if(mydata->neighbors[i].gradient == mydata->gradient)  // collision
 	if(mydata->neighbors[i].ID < kilo_uid) // the one with the smaller ID keeps the smaller number
-	  if (mydata->gradient != 255)
+	  if (mydata->gradient != NO_GRADIENT)
 	    mydata->gradient++;
     }
 }
@@ -377,7 +378,7 @@ void loop()
     }
   if (mydata->gradient == 0)
     set_color(RGB(1,1,1));
-  else if (mydata->gradient < 255)
+  else if (mydata->gradient < NO_GRADIENT)
     set_color(colorNum[(mydata->gradient-1)%10]);
   else
     set_color(RGB(0,0,0));

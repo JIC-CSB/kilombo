@@ -26,8 +26,8 @@ typedef struct {
   uint8_t dist;
   uint8_t N_Neighbors;
   uint32_t timestamp;
-  uint8_t gradient;
-  uint8_t follower;
+  uint16_t gradient;
+  uint16_t follower;
   uint8_t WG;
 } Neighbor_t;
 
@@ -39,7 +39,7 @@ typedef struct {
 typedef struct 
 {
   Neighbor_t neighbors[MAXN];
-  int N_Neighbors;
+  uint8_t N_Neighbors;
   message_t transmit_msg;
   char message_lock;
   uint32_t next_ticks;
@@ -50,11 +50,11 @@ typedef struct
 
   uint8_t turn;
   uint8_t badsteps;
-  uint8_t gradient;
+  uint16_t gradient;
   uint16_t cycle_time;
   uint16_t movement_time;
 
-  uint8_t follower;
+  uint16_t follower;
 
   uint8_t WG;
   uint8_t prevWG;

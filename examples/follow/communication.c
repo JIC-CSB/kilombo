@@ -53,9 +53,9 @@ void process_message ()
   mydata->neighbors[i].timestamp = kilo_ticks;
   mydata->neighbors[i].dist = d;
   mydata->neighbors[i].N_Neighbors = data[2];
-  mydata->neighbors[i].gradient = data[3];
-  mydata->neighbors[i].follower = data[4];
-  mydata->neighbors[i].WG = data[5];
+  mydata->neighbors[i].gradient = data[3] | (data[4] << 8);
+  mydata->neighbors[i].follower = data[5] | (data[6] << 8);
+  mydata->neighbors[i].WG = data[7];
 }
 
 /* Go through the list of neighbors, remove entries older than a threshold,
@@ -83,9 +83,12 @@ void setup_message(void)
   mydata->transmit_msg.data[1] = kilo_uid >> 8;   //1 high ID
   mydata->transmit_msg.data[2] = mydata->N_Neighbors;     //2 number of neighbors
   
-  mydata->transmit_msg.data[3] = mydata->gradient; 
-  mydata->transmit_msg.data[4] = mydata->follower;
-  mydata->transmit_msg.data[5] = mydata->WG;
+  mydata->transmit_msg.data[3] = mydata->gradient & 0xff;
+  mydata->transmit_msg.data[4] = mydata->gradient >> 8;
+  
+  mydata->transmit_msg.data[5] = mydata->follower & 0xff;
+  mydata->transmit_msg.data[6] = mydata->follower >> 8;
+  mydata->transmit_msg.data[7] = mydata->WG;
   
   mydata->transmit_msg.crc = message_crc(&mydata->transmit_msg);
   mydata->message_lock = 0;
