@@ -320,7 +320,13 @@ void init_SDL(void)
 // include bitmap data for the icon in PNM (P6) format 
 #include "icon2-48px.h"
 
-// make an SDL surface from PNM (P6) data. Used for the program icon.
+/* make an SDL surface from PNM (P6) data. Used for the program icon.
+ * Complication: the image stored does not have an alpha channel.
+ * The icon needs a transparent background to look nice.
+ * Setting a colorkey for transparency doesn't semm to work.
+ * Workaround: blit the icon to another surface which has an 
+ * an alpha channel, this works.
+ */
 SDL_Surface* surf_from_pnm(char *data)
 {
   int x, y, maxval, n;
@@ -342,19 +348,32 @@ SDL_Surface* surf_from_pnm(char *data)
   // find start of the raw data
   img = data + n;
   
-  // masks for R, G and B in the data
-  int rm = 0x0000ff  ;
-  int gm = 0x00ff00  ;
-  int bm = 0xff0000  ;
-
-  SDL_Surface *surface =
-    SDL_CreateRGBSurfaceFrom(img, x, y, 24, x*3, rm, gm, bm, 0);
-
-  // make the black color transparent - doesn't help
+  int rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+  rmask = 0xff000000;
+  gmask = 0x00ff0000;
+  bmask = 0x0000ff00;
+  amask = 0x000000ff;
+#else
+  rmask = 0x000000ff;
+  gmask = 0x0000ff00;
+  bmask = 0x00ff0000;
+  amask = 0xff000000;
+#endif
+    SDL_Surface *surface =
+    SDL_CreateRGBSurfaceFrom(img, x, y, 24, x*3, rmask, gmask, bmask, 0);
+  
+  // create second surface, with alpha channel
+  SDL_Surface *surface2 = SDL_CreateRGBSurface(SDL_SWSURFACE,x,y,32, rmask, gmask, bmask, amask);
+  SDL_FillRect(surface2, NULL, 0); // fill with transparent color
+  
+  // make the black color transparent - doesn't
+  // work directly as icon, but works if first blitted to another surface.
   SDL_SetColorKey(surface, SDL_SRCCOLORKEY, 0);
-  //SDL_SetAlpha(surface, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
-  //SDL_SetAlpha(surface, 0, SDL_ALPHA_OPAQUE);
-  return surface;
+  SDL_BlitSurface(surface, NULL, surface2, NULL);
+
+  SDL_FreeSurface(surface);
+  return surface2;
 }
 
 
