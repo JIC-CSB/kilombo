@@ -624,10 +624,11 @@ void displayString (SDL_Surface *surface, int x, int y, char *s)
 
 // draw status message for one bot, if the mouse is over it
 // also draw a simulator status
-void draw_status(SDL_Surface *surface, int w, int h, double FPS)
+void draw_status(SDL_Surface *surface, int w, int h, double time, double FPS)
 {
   char buf[100];
-  sprintf(buf, "%3dx  %8d  %5.1f FPS", simparams->stepsPerFrame, kilo_ticks, FPS);
+  sprintf(buf, "%3dx    time: %8.1f     kilo_ticks: %8d     FPS: %5.1f",
+	  simparams->stepsPerFrame, time, kilo_ticks, FPS);
   displayString(surface, 10, 2, buf);
   
   
