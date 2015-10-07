@@ -120,37 +120,41 @@ The following keybindings are active during simulation:
 
 The following keywords are recognized in the simulator JSON configuration file:
 
-* `botName` : the name of this bot type
-* `randSeed` : a random seed, for repeatable simulations
-* `nBots` : number of bots to simulate     
-* `formation` : starting bot formation. Current options are ("random", "line", "pile", "circle", "ellipse"). Defaults to "random".     
-* `timeStep` : time step. Also determines the displayed frame rate (currently, will be configurable)
-* `simulationTime` : how long to run the simulation
-* `commsRadius` : the communication range of the robots in mm
-* `showComms` :  whether or not to draw a line between each pair of bots in communication range, whenever a message is passed between them.
-* `showCommsRadius` :  whether or not to draw a circle for the communications range of each bot
-* `distributePercent` : initially distribute the bots over this fraction of the display area
-* `displayWidth`  : absolute width of the window, pixels
-* `displayHeight` : absolute height of the window, pixels
-*  displayScale : initial zoom setting. Default is 1.
-* `showHist` : whether to show the paths the robots have moved
-* `histLength` : the length of the path history to show in number of steps 
-* `saveVideo` : 0 or 1, whether or not to store video frames periodically. Can be toggled during simulation by pressing `v`.
-* "saveVideoN" : store every N:th simulation step while saving video.
-* `imageName` :  file name for storing images during the simulation. Format example: `movie/f%04d.bmp`,
-  where the `%...d` will be replaced by an increasing number.
-  
-* `stateFileName` : file name for saving the simulation state as JSON during the simulation.
-* `stateFileSteps` : number of simulator timesteps between storing the simulator state as JSON. Use 0 to disable storage. 
-
-* `stepsPerFrame`  : number of simulator time steps to perform between drawing. Can be changed interactively using numpad `/` and '*'. 
-* `finalImage`     : file name for saving an image of the final simulation state. `null` can be specified to disable this.
-* `GUI` : 0 or 1 (default). If 0, the simulator is run as fast as possible, without displaying the progress. Periodic screenshots can still be stored.
-* `colorscheme` : `dark` or `bright`, different color schemes. Bright tends to look better in print.
-
-#Command line options
-* `-p parameterfile.json` : Simulator parameters. Optional, default is to use the name of the robot, with the suffix `.json`. 
-* `-b bots.json` : starting positions for the bots. Optional.
+|parameter name  |type  |default value |use  | 
+|----------------|------|--------------|-----|
+|**Simulation**||||
+|`botName`              |string| "default" | the name of this bot type|
+|`randSeed`             |int   | 0 | a random seed, for repeatable simulations|
+|`simulationTime`       |float | 0 | how long to run the simulation|
+|**Scenario**||||
+|`nBots`                |int   |*required*| number of bots to simulate     |
+|`formation`            |option|`random`| starting bot formation. Current options are (`random`, `line`, `pile`, `circle`, `ellipse`).|
+|`displayWidthPercent`  |float |0.9| initially distribute the bots over this fraction of the display width|
+|`displayHeightPercent` |float |0.9| initially distribute the bots over this fraction of the display height|
+|`timeStep`             |float |0.02| time step. Also determines the displayed frame rate (currently, will be configurable)|
+|`commsRadius`          |int   |70| the communication range of the robots in mm|
+|**User interface**||||
+|`displayWidth`         |int   |1| absolute width of the window in pixels|
+| `displayHeight`       |int   |1| absolute height of the window in pixels|
+| `displayScale`        |float |1.0| initial zoom setting.|
+| `showHist`            |int   |0| whether to show the paths the robots have moved|
+| `histLength`          |int   |2000| the length of the path history to show in number of steps |
+| `showComms`           |int   |1|  whether or not to draw a line between each pair of bots in communication range, whenever a message is passed between them.|
+| `showCommsRadius`     |int   |1|  whether or not to draw a circle for the communications range of each bot|
+| `stepsPerFrame`       |int   |1| number of simulator time steps to perform between drawing. Can be changed interactively using numpad `/` and `*`. |
+| `GUI`                 |int   |1| 0 or 1. If 0, the simulator is run as fast as possible, without displaying the progress. Periodic screenshots can still be stored.|
+| `colorscheme`         |option|`dark`| `dark` or `bright`, different color schemes. Bright tends to look better in print.|
+|**Data output**||||
+| `saveVideo`           |int   |0| 0 or 1, whether or not to store video frames periodically. Can be toggled during simulation by pressing `v`.|
+| `saveVideoN`          |int   |1| store every N:th simulation step while saving video.|
+| `imageName`           |string|""|  file name for storing images during the simulation. Format example: `movie/f%04d.bmp`, where the `%...d` will be replaced by an increasing number.|
+| `finalImage`          |string|""| file name for saving an image of the final simulation state. `null` can be specified to disable this. |
+| `storeHistory`        |int   |1| TBD.|
+| `stateFileName`       |string|""| file name for saving the simulation state as JSON during the simulation.|
+| `stateFileSteps`      |int   |100| number of simulator timesteps between storing the simulator state as JSON. Use 0 to disable storage. |
+|**Command line options**|||
+|`-p parameterfile.json`|string|<sim name\>.json| Simulator parameters. Optional. |
+|`-b bots.json`         |string|""| starting positions for the bots. Optional.|
 
 At the end of the simulation, the simulator stores the final state of the robots in a file named `endstate.json`. This file can be given as a starting state for the next simulation, simply copy it to a new name, and pass that name to the simulator with the -b option. Thus the simulator can be used as an editor of bot starting configurations as well.
 
