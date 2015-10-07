@@ -129,11 +129,12 @@ The following keywords are recognized in the simulator JSON configuration file:
 |**Scenario**||||
 |`nBots`                |int   |*required*| number of bots to simulate     |
 |`formation`            |option|`random`| starting bot formation. Current options are (`random`, `line`, `pile`, `circle`, `ellipse`).|
-|`displayWidthPercent`  |float |0.9| initially distribute the bots over this fraction of the display width|
-|`displayHeightPercent` |float |0.9| initially distribute the bots over this fraction of the display height|
+|`distributePercent`    |float |0.2| initially distribute the bots over this fraction of the display width|
 |`timeStep`             |float |0.02| time step. Also determines the displayed frame rate (currently, will be configurable)|
 |`commsRadius`          |int   |70| the communication range of the robots in mm|
 |**User interface**||||
+|`displayWidthPercent`  |float |0.9| if no absolute window size is given use this proportion of the screen width |
+|`displayHeightPercent` |float |0.9| if no absolute window size is given use this proportion of the screen height |
 |`displayWidth`         |int   |1| absolute width of the window in pixels|
 | `displayHeight`       |int   |1| absolute height of the window in pixels|
 | `displayScale`        |float |1.0| initial zoom setting.|
