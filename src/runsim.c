@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 	    break;
 	  draw(); // The same frame may already be drawn for video, drawing again for simplicity
 	  // Draw status message on screen but not in video
-	  draw_status(screen, simparams->display_w, simparams->display_h, 1000.0/frameTimeAvg);
+	  draw_status(screen, simparams->display_w, simparams->display_h, time, 1000.0/frameTimeAvg);
 	  
 	  SDL_Flip(screen);
 	  if (!fullSpeed)
