@@ -16,10 +16,13 @@ This repository holds the code for ckbsim, a C based kilobot simulator. The simu
 You'll need to have:
 - git
 - cmake
-- avr-gcc (c compiler for the AVR microcontroller, to compile for the kilobot)
 - SDL 1.X (including headers for building, i.e. devel packages under linux)
 - the [Jansson library](http://www.digip.org/jansson/) (though it's in many package managers. Again, get the development package)
 - the [Check unit testing library](http://check.sourceforge.net/)
+
+Additionally, to compile the code for real kilobots as well, the following are needed:
+- avr-gcc (c compiler for the AVR microcontroller, to compile for the kilobot)
+- [Kilolib](https://github.com/acornejo/kilolib) (the official Kilobot library)
 
 
 ### Debian-based Linux systems
@@ -58,6 +61,13 @@ cd examples
 cd orbit
 make     # or make -f Makefile.osx on OSX
 ./orbit -b start_positions.json
+
+The example makefiles are set up to build the code for the simulator by default. By running
+    make hex
+the same source code is compiled for the real Kilobot. This requires the avr-gcc toolchain
+and the official Kilolib to be installed (see prerequisites above). The path to Kilolib
+needs to be specified in the Makefile.
+
 
 
 Note: the simulator uses the [SDL_GFX library](http://cms.ferzkopp.net/index.php/software/13-sdl-gfx)

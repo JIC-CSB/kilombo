@@ -1,4 +1,3 @@
-
 # Make file for compiling a kilobot program, both for the
 # kilobot simulator and for the real kilobot.
 # The program can consist of multiple files. Files and paths to various libraries are
@@ -13,22 +12,39 @@ EXECUTABLE=gradient
 #path to the official kilolib, used for real bots only
 KILOHEADERS=../../../swarmbots/kilolib
 
-# path of userdata.h distributed with the simulator but needed
-# when compiling the user program
+# path of userdata.h distributed with the simulator but also needed
+# when compiling the user program for the real kilobot (avr-gcc has different default paths)
 SIMHEADERS=/usr/local/include
 
 #path to kilolib.a in the official kilolib, needed for real bots only
 KILOLIB    =$(KILOHEADERS)/build/kilolib.a
 
-
 #compilation flags for simulated version
 SIM_CFLAGS = -c -g -O2 -Wall -std=c99  #-I$(KILOHEADERS)
+
 #linking flags for simulated version
 SIM_LFLAGS = -lsim -lSDL -lm -ljansson
 
-# # # # # # # # # # The following should be generic and not need changes # # # # # # # # # # # # # 
+# linking flags to compile headless
+# SIM_LFLAGS = -lheadless  -lm -ljansson
 
-all: $(EXECUTABLE).hex $(EXECUTABLE)
+
+# Makefile targets.
+# sim (default target) is the simulator program
+# hex is the .hex file (program) for the real kilobot.
+# all builds both.
+
+# Note: the hex targer requires the AVR toolchain and
+# the kilolib library to be installed. See simulator README.
+
+sim: $(EXECUTABLE)
+hex: $(EXECUTABLE).hex
+all: sim hex
+
+clean :
+	rm *.o $(EXECUTABLE) *.elf *.hex
+
+# # # # # # # # # # The following should be generic and not need changes # # # # # # # # # # # # # 
 
 # compiling for the real bot
 #
@@ -47,9 +63,6 @@ CFLAGS += -DF_CPU=8000000 -I$(KILOHEADERS) -I$(SIMHEADERS) -DKILOBOT
 CFLAGS += -Wl,-u,vfprintf -lprintf_flt -lm
 
 ASFLAGS = $(CFLAGS)
-#BOOTLDR_FLAGS = -Wl,-section-start=.text=0x7000 -DBOOTLOADER
-#OHC_FLAGS = -Wl,-section-start=.text=0x7000 -DOHC
-#OHC_ARDUINO_FLAGS = -DOHC -DARDUINO
 
 FLASH = -R .eeprom -R .fuse -R .lock -R .signature
 EEPROM = -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0  
@@ -75,6 +88,7 @@ $(EXECUTABLE).elf: $(SOURCES) $(KILOLIB)
 # $< first item of right-hand side of :
 
 
+
 # From here on, we compile for the simulator
 # 
 
@@ -93,5 +107,3 @@ $(EXECUTABLE): $(OBJECTS) $(SIMLIB)
 	$(SIM_CC)  $(SIM_LFLAGS) -o $@  $(OBJECTS) 
 
 
-clean :
-	rm *.o $(EXECUTABLE) *.elf *.hex
