@@ -23,6 +23,8 @@ typedef struct {
   int l_hist; // number of history points stored
   
   int right_motor_power, left_motor_power;
+  double speed;                     // speed in mm / s
+  double turn_rate_l, turn_rate_r;  // turning rate right and left, radians / s
   int ID;
   double direction; // Angle relative to constant x, +ve y in radians
   int r_led, g_led, b_led;

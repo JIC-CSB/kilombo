@@ -61,6 +61,9 @@ void initialise_simulator(const char *param_filename)
   } else {
     srand(simparams->randSeed);
   }
+#ifndef SKILO_HEADLESS
+  set_display_center(simparams->displayX, simparams->displayY);
+#endif
 }
 
 #ifndef SKILO_HEADLESS

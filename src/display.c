@@ -64,8 +64,14 @@ ColorScheme *colorscheme = &darkColors;
 
 int quit = 0;
 
-int c_x = 0;
-int c_y = 0;
+double c_x = 0;
+double c_y = 0;
+
+void set_display_center(double X, double Y)
+{
+  c_x = X;
+  c_y = Y;
+}
 
 void dieSDL(char *reason)
 {

@@ -155,6 +155,13 @@ kilobot *new_kilobot(int ID, int n_bots)
   
   bot->right_motor_power = 0;
   bot->left_motor_power = 0;
+
+  bot->speed = simparams->speed;
+  bot->turn_rate_l = simparams->turn_rate * M_PI/180; // convert to radians here
+  bot->turn_rate_r = simparams->turn_rate * M_PI/180;
+  // individual noise could be added here
+
+  
   bot->direction = (2 * M_PI / 4);
   bot->r_led = 0;
   bot->g_led = 0;
@@ -166,7 +173,6 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->n_in_range = 0;
 
   bot->tx_ticks = rand() % tx_period_ticks;
-
 
   bot->user_setup = NULL;
   bot->user_loop  = NULL;
@@ -321,9 +327,10 @@ void move_bot_forward(kilobot *bot, float timestep)
 {
   /* Move the bot forwards by a timestep dependent increment. */
 
-  int velocity = 0.5 * (bot->left_motor_power + bot->right_motor_power);
-  bot->y += timestep * velocity * cos(bot->direction);
-  bot->x += timestep * velocity * sin(bot->direction);
+  //int velocity = 0.5 * (bot->left_motor_power + bot->right_motor_power);
+
+  bot->y += timestep * bot->speed * cos(bot->direction);
+  bot->x += timestep * bot->speed * sin(bot->direction);
 }
 
 
@@ -336,7 +343,11 @@ void turn_bot_right(kilobot *bot, float timestep)
   // double y_r = bot->y - r * sin(bot->direction);
   double x_r = bot->x + r * sin(bot->direction + bot->leg_angle);
   double y_r = bot->y + r * cos(bot->direction + bot->leg_angle);
-  bot->direction += timestep * (double) (bot->left_motor_power) / 30;
+  // bot->direction += timestep * (double) (bot->left_motor_power) / 30;
+  bot->direction += timestep * bot->turn_rate_r; 
+  // note: turn_rate_r is in radians per sec
+  // note: motor power is ignored
+  
   bot->x = x_r - r * sin(bot->direction + bot->leg_angle);
   bot->y = y_r - r * cos(bot->direction + bot->leg_angle);
 }
@@ -350,7 +361,10 @@ void turn_bot_left(kilobot *bot, float timestep)
   // double y_l = bot->y + r * sin(bot->direction);
   double x_l = bot->x + r * sin(bot->direction - bot->leg_angle);
   double y_l = bot->y + r * cos(bot->direction - bot->leg_angle);
-  bot->direction -= timestep * (double) (bot->right_motor_power) / 30;
+  //  bot->direction -= timestep * (double) (bot->right_motor_power) / 30;
+  bot->direction -= timestep * bot->turn_rate_l; 
+  // note: turn_rate_r is in radians per sec
+  // note: motor power is ignored
   bot->x = x_l - r * sin(bot->direction - bot->leg_angle);
   bot->y = y_l - r * cos(bot->direction - bot->leg_angle);
 }

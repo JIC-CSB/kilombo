@@ -59,6 +59,10 @@ void parse_param_file(const char *filename)
   simparams->GUI             = get_int_param("GUI", 1);
   simparams->distance_noise  = get_float_param("distanceNoise", 0);
   simparams->msg_success_rate= get_float_param("msgSuccessRate", 1);
+  simparams->speed           = get_float_param("speed", 7);
+  simparams->turn_rate       = get_float_param("turn_rate", 13);
+  simparams->displayX        = get_float_param("displayX", 0);
+  simparams->displayY        = get_float_param("displayY", 0);
 }
 
 int get_int_param(const char *param_name, int default_val)

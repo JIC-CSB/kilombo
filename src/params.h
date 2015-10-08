@@ -32,9 +32,12 @@ typedef struct {
   int showHist;
   int randSeed;
   int commsRadius;
+  double turn_rate;  // degrees / s
+  double speed;      // mm / s
   int GUI;
   float msg_success_rate;
   float distance_noise;
+  double displayX, displayY;
 } simulation_params;
 
 void parse_param_file(const char *filename);

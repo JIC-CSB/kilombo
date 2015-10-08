@@ -26,6 +26,8 @@ uint16_t kilo_uid = 0;
 /* motor calibration values 
  * In the kilobots, these are different for each robot, and are stored in the EEPROM
  * In the simulator we don't need them to be different.
+ * currently the actual movement speed is set using speed and turn_rate in the params,
+ * these only need to be non-zero for the motors to be considered on.
  */
 uint8_t kilo_turn_left  = 7;
 uint8_t kilo_turn_right = 7;
