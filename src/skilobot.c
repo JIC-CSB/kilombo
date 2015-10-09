@@ -11,6 +11,7 @@
 #include "skilobot.h"
 #include "kilolib.h"
 
+#include "neighbors.h"
 
 /* Global variables.
  */
@@ -713,7 +714,8 @@ void update_all_bots(int n_bots, float timestep)
     update_bot(allbots[i], timestep);
   }
 
-  update_interactions(n_bots);
+  //update_interactions(n_bots);
+  update_interactions_grid(n_bots);
 
   process_messaging(n_bots);
 }
