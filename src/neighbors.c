@@ -1,6 +1,11 @@
+/* Functions for finding the neighbors of all robots efficiently.
+ *
+ */
+
 #include<stdio.h>
 #include<math.h>
 
+//#define NDEBUG // define to turn assertions off
 #include<assert.h>
 #include"skilobot.h"
 #include"cd_matrix.h"
@@ -41,12 +46,20 @@ void prepare_grid_cache(double cr)
   assert(max_coord.x > min_coord.x);
   assert(max_coord.y > min_coord.y);
 
+    
   double eps = .1; // small margin to avoid rounding trouble
                    // risk: rightmost point's x+cr gets rounded to one past the last index in matrix.
                    // TODO: ceil is dangerous in some (very rare) cases -- DONE?
-  
+
+  // increase grid cell size to cr
+  if (cr+eps > gc_cell_sz.x)
+    gc_cell_sz.x = cr+eps;  // eps is not crucial here, just to ensure we need to loop over only 3 cells
+  if (cr+eps > gc_cell_sz.y)
+    gc_cell_sz.y = cr+eps;
+
   size_t x_range = ceil((max_coord.x - min_coord.x + 2*cr + 2*eps)/gc_cell_sz.x);
   size_t y_range = ceil((max_coord.y - min_coord.y + 2*cr + 2*eps)/gc_cell_sz.y);
+  // here eps is important, to ensure the grid extends a bit beyond the outermost robots
   
   // this looks like a lot of effort compared to just creating a new matrix
   // but it saves us expensive reallocation of the per-cell arrays
@@ -90,10 +103,11 @@ void update_interactions_grid (int n_bots)
 
   int i;
   kilobot *bot;
+  // bounding box
   for (i = 0; i < n_bots; i++)
     {
       bot = allbots[i];
-      
+
       bot->x > max_coord.x ? (max_coord.x = bot->x) :
 	(bot->x < min_coord.x ? (min_coord.x = bot->x) : 0);
       
@@ -103,12 +117,14 @@ void update_interactions_grid (int n_bots)
 
    prepare_grid_cache(cr);
 
+   // insert bots into the grid
    for (i=0; i<n_bots; i++)
      {
        store_cache(allbots[i]);
        allbots[i]->n_in_range = 0;
      }
 
+   // loop over the bots, find neighbors using the grid
    for (int i=0; i<n_bots; i++) {
      kilobot * cur = allbots[i];
 

@@ -1,7 +1,7 @@
 #ifndef CD_MATRIX_H
 #define CD_MATRIX_H
 
-
+//#define NDEBUG // define to turn assertions off
 #include "assert.h"
 
 // let's keep at least this one generic
