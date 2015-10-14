@@ -285,10 +285,16 @@ void input(void)
     d = 1;
   
   if (keystates[SDLK_KP_PLUS] || keystates[SDLK_PLUS])
-   simparams->display_scale *= s;
- if (keystates[SDLK_KP_MINUS] || keystates[SDLK_MINUS])
-   simparams->display_scale *= 1/s;
- if (keystates[SDLK_RIGHT])
+    {
+      simparams->display_scale *= s;
+      printf ("Scale: %f\n", simparams->display_scale);
+    }
+  if (keystates[SDLK_KP_MINUS] || keystates[SDLK_MINUS])
+    {
+      simparams->display_scale *= 1/s;
+      printf ("Scale: %f\n", simparams->display_scale);
+    }
+  if (keystates[SDLK_RIGHT])
    c_x += d;
  if (keystates[SDLK_LEFT])
    c_x -= d; 
@@ -573,16 +579,18 @@ void draw_bot(SDL_Surface *surface, int w, int h, kilobot *bot)
   //int y_l = draw_y + scale * r * sin(bot->direction);
   int x_l = draw_x + scale * r * sin(bot->direction + bot->leg_angle);
   int y_l = draw_y + scale * r * cos(bot->direction + bot->leg_angle);
-  if (colorscheme->anti_alias)
-    aacircleColor(surface, x_l, y_l, scale * 2, colorscheme->bot_left_leg);
-  filledCircleColor(surface, x_l, y_l, scale * 2, colorscheme->bot_left_leg);
-
+    
   //int x_r = draw_x + scale * r * cos(bot->direction);
   //int y_r = draw_y - scale * r * sin(bot->direction);
   int x_r = draw_x + scale * r * sin(bot->direction - bot->leg_angle);
   int y_r = draw_y + scale * r * cos(bot->direction - bot->leg_angle);
-  if (colorscheme->anti_alias)
-    aacircleColor(surface, x_r, y_r, scale * 2, colorscheme->bot_right_leg);
+  if (colorscheme->anti_alias && scale > 1) // for smaller scales it draws weird legs 
+    {
+      aacircleColor(surface, x_r, y_r, scale * 2, colorscheme->bot_right_leg);
+      aacircleColor(surface, x_l, y_l, scale * 2, colorscheme->bot_left_leg);
+    }
+  
+  filledCircleColor(surface, x_l, y_l, scale * 2, colorscheme->bot_left_leg);
   filledCircleColor(surface, x_r, y_r, scale * 2, colorscheme->bot_right_leg);
 
   /* Draw LED */
