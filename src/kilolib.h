@@ -73,6 +73,7 @@ void set_callback_global_setup(void(*fp)(void));
 void set_callback_obstacles(int16_t (*fp)(double, double, double *, double *));
 void set_callback_lighting(int16_t (*fp)(double, double));
 
+#define SET_CALLBACK(ID, CALLBACK) set_callback_ ## ID (CALLBACK)
 
 // measure a fictive potential in the environment, for testing
 enum {POT_LINEAR, POT_PARABOLIC, POT_GRAVITY};

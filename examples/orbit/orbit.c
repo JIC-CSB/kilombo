@@ -3,7 +3,7 @@
  *
  * Lightly modified to work in the simulator, in particular:
  * - mydata->variable for global variables
- * - callback function botinfo() to report bot state back to the simulator for display
+ * - callback function cb_botinfo() to report bot state back to the simulator for display
  * - spin-up motors only when required, using the helper function  smooth_set_motors()
  *
  * Modifications by Fredrik Jansson 2015
@@ -14,7 +14,7 @@
 #include "kilolib.h"
 #include "orbit.h"
 
-#include<userdata.h>
+#include <userdata.h>
 
 #ifdef SIMULATOR
 #include <stdio.h> // for printf
@@ -149,7 +149,7 @@ void setup()
 #ifdef SIMULATOR
 /* provide a text string for the simulator status bar about this bot */
 static char botinfo_buffer[10000];
-char *botinfo(void)
+char *cb_botinfo(void)
 {
   char *p = botinfo_buffer;
   p += sprintf (p, "ID: %d \n", kilo_uid);
@@ -167,9 +167,7 @@ int main() {
     kilo_init();
     kilo_message_rx = message_rx;
 
-#ifdef SIMULATOR
-    set_callback_botinfo(botinfo);
-#endif
+    SET_CALLBACK(botinfo, cb_botinfo);
     
     // bot 0 is stationary and transmits messages. Other bots orbit around it.
     if (kilo_uid == 0)

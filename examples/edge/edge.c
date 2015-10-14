@@ -252,10 +252,8 @@ int main(void)
   debug_init();
 #endif
 
-#ifdef SIMULATOR
-  set_callback_botinfo(botinfo);
-  set_callback_reset(setup);
-#endif
+  SET_CALLBACK(botinfo, botinfo);
+  SET_CALLBACK(reset, setup);
 
   RB_init();                       // initialize ring buffer
   kilo_message_rx = rxbuffer_push;

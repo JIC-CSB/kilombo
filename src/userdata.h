@@ -18,4 +18,6 @@ USERDATA *mydata;
 USERDATA myuserdata;             
 USERDATA *mydata = &myuserdata;
 
+#define SET_CALLBACK(ID, CALLBACK)
+
 #endif

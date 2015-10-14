@@ -397,11 +397,8 @@ int main(void)
   debug_init();
 #endif
   
-#ifdef SIMULATOR
-  set_callback_botinfo(botinfo);
-  set_callback_reset(setup);
-    
-#endif
+  SET_CALLBACK(botinfo, botinfo);
+  SET_CALLBACK(reset, setup);
   
   //initialize ring buffer
   RB_init();

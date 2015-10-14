@@ -124,11 +124,9 @@ int main() {
     // register your program
     kilo_start(setup, loop);
 
-#ifdef SIMULATOR
-    set_callback_botinfo(botinfo);
-    set_callback_reset(setup);
-    set_callback_json_state(json_state);
-#endif
+    SET_CALLBACK(botinfo, botinfo);
+    SET_CALLBACK(reset, setup);
+    SET_CALLBACK(json_state, json_state);
     
     
     return 0;
