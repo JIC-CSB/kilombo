@@ -9,8 +9,11 @@ SOURCES=follow.c util.c communication.c
 #name of the executable file
 EXECUTABLE=follow
 
-#path to the official kilolib, used for real bots only
-KILOHEADERS=../../../swarmbots/kilolib
+# Path to the official kilolib, used for real bots only
+# Set it here, or as an environment variable in the shell:
+#      export KILOLIB=/your/path/  
+#
+#KILOHEADERS=
 
 # path of userdata.h distributed with the simulator but also needed
 # when compiling the user program for the real kilobot (avr-gcc has different default paths)
