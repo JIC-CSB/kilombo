@@ -2,7 +2,8 @@
 #include <avr/io.h>  // for microcontroller register defs
 #endif
 
-#include "kilolib.h"
+#include <kilombo.h>
+
 #include "util.h"
 
 

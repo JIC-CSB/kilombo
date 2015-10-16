@@ -4,8 +4,8 @@
  */
 
 #include <math.h>
-#include <stdint.h>   // for uint8_t and friends
-#include "kilolib.h"
+
+#include <kilombo.h>
 
 #include "edge.h"
 
@@ -26,9 +26,9 @@ typedef struct
   received_message_t RXBuffer[RB_SIZE];
   uint8_t RXHead, RXTail;
 
-} USERDATA;
+} MyUserdata;
 
-#include <userdata.h>
+REGISTER_USERDATA(MyUserdata)
 
 #ifdef SIMULATOR
 #include <stdio.h>    // for printf

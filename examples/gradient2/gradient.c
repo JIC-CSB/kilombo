@@ -25,15 +25,14 @@
  * Modifications by Fredrik Jansson 2015
  */
 
-#include <kilolib.h>
-#include <stdint.h>   // for uint8_t and friends
+#include <kilombo.h>
 
 #include "gradient.h"  // defines the USERDATA structure
-#include <userdata.h> // for definition of the mydata pointer
 
 
 #define CUTOFF 100 //neighbors further away are ignored. (mm)
 
+REGISTER_USERDATA(USERDATA)
 
 
 // rainbow colors

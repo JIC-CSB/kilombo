@@ -1,6 +1,10 @@
-#include "kilolib.h"
+#include <kilombo.h>
+
 #include "follow.h"
 #include "communication.h"
+
+extern USERDATA * mydata;
+
 
 // message rx callback function. Pushes message to ring buffer.
 void rxbuffer_push(message_t *msg, distance_measurement_t *dist)

@@ -13,8 +13,9 @@ INSTALL(TARGETS sim headless
   ARCHIVE DESTINATION lib
 )
 
-INSTALL(FILES kilolib.h message.h message_crc.h params.h userdata.h
-	DESTINATION include
-)
+INSTALL(FILES kilombo.h DESTINATION include)
+
+INSTALL(FILES kilolib.h message.h message_crc.h params.h
+	DESTINATION include/kilombo)
 
 add_subdirectory(tests)

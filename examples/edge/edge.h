@@ -1,17 +1,8 @@
 #ifndef GRN_H
 #define GRN_H
 
-#include "kilolib.h"
-
-#ifdef KILOBOT  // physical kilobot
-
-#else           //  simulator
-  #include <stdio.h>     // for printf
- #endif
-
 
 #include <math.h>
-#include <stdint.h>   // for uint8_t and friends
 
 #ifndef M_PI
 #define M_PI 3.141592653589793238462643383279502884197169399375105820974944

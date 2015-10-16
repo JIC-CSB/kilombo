@@ -20,7 +20,8 @@ The simulator aims to be compatible with the [kilolib API.](https://www.kiloboti
 Initialization, messaging, motion, and random number generation work with the same function calls in the simulator and in the real kilobot. Two topics that require special care when using the simulator are global variables and timing.
 
 ## Variables
-Kilobot C code usually makes use of static variables (to allow these to persist across repeated calls to the user supplied function) or global variables.  These variables demand special treatment when run in the simulator.  The simulator handles all robots in a single program, so a global or static variable ends up being common to all robots. A workaround implemented in the simulator is to keep all global variables inside a `struct`, defined in the robot's header file. 
+Kilobot C code usually makes use of static variables (to allow these to persist across repeated calls to the user supplied function) or global variables.  These variables demand special treatment when run in the simulator.  The simulator handles all robots in a single program, so a global or static variable ends up being common to all robots. A workaround implemented in the simulator is to keep all global variables inside a single `struct`. The type of this user data has to be announced to the simulator by using the macro `REGISTER_USERDATA`.
+
 
     typedef struct 
     {
@@ -28,20 +29,17 @@ Kilobot C code usually makes use of static variables (to allow these to persist 
         ...
     } USERDATA;
 
-When used in the simulator, the robot program declares a  USERDATA *mydata;. The simulator ensures that this pointer points to the data of the correct robot before calling any of the user program's functions. Additionally, the simulator needs to know the size of the USERDATA structure (however, it does not need to know the contents of it, and it will never change it). The size of the structure is communicated to the simulator by declaring a variable UserdataSize, and setting it to the size of the structure:
+    REGISTER_USERDATA(USERDATA)
+
+In the program, the variables can then be accessed using e.g. `mydata->N_Neighbors`. The simulator ensures that `mydata` points to the data of the currently running bot. Note that local variables (i.e. regular variables defined inside a function) can be used in the usual way. 
+
+### A note on the implementation:
+
+The `REGISTER_USERDATA` macro resolves to (a.o.) a declaration USERDATA *mydata. The simulator ensures that this pointer points to the data of the correct robot before calling any of the user program's functions. Additionally, the simulator needs to know the size of the USERDATA structure (however, it does not need to know the contents of it, and it will never change it). The size of the structure is communicated to the simulator by declaring a variable UserdataSize, and setting it to the size of the structure. When compiling for the simulator the macro call above is therefore roughly equivalent to the following code:
 
     #ifdef SIMULATOR
     int UserdataSize = sizeof(USERDATA);
     USERDATA *mydata;
-    #endif
-
-In the program, the variables can then be accessed using `mydata->N_Neighbors`. The simulator ensures that `mydata` points to the data of the currently running bot. Note that local variables (i.e. regular variables defined inside a function) can be used in the usual way. 
-
-When the program is compiled for a real kilobot, the same way of accessing the variables can be used, provided that the program declares one instance of the `USERDATA` structure. 
-
-    #ifndef SIMULATOR
-      USERDATA myuserdata;
-      USERDATA *mydata = &myuserdata;
     #endif
 
 

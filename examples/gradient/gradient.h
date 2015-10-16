@@ -25,6 +25,3 @@ typedef struct
 
 extern USERDATA *mydata;
 
-
-
-

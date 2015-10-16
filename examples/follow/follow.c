@@ -5,15 +5,13 @@
 
 
 #include <math.h>
-#include <stdint.h>   // for uint8_t and friends
-#include "kilolib.h"
+
+#include <kilombo.h>
 
 #include "follow.h"
 #include "util.h"
 #include "communication.h"
 
-
-#include <userdata.h>
 
 #ifndef SIMULATOR
 #include <avr/io.h>      // for microcontroller register defs 
@@ -31,6 +29,8 @@
 
 #define NO_GRADIENT 65535
 #define NO_ID 65535
+
+REGISTER_USERDATA(USERDATA)
 
 /* A potential linear in the distance d. 
  * 0 at 100 mm and further, negative when closer.

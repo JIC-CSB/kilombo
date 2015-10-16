@@ -1,12 +1,9 @@
 #ifndef FOLLOW_H
 #define FOLLOW_H
 
-#include "kilolib.h"
-
-
 #include <stdio.h>     // for printf
 #include <math.h>
-#include <stdint.h>   // for uint8_t and friends
+
 
 #ifndef M_PI
 #define M_PI 3.141592653589793238462643383279502884197169399375105820974944
@@ -65,8 +62,6 @@ typedef struct
   uint8_t state;
   
 } USERDATA;
-
-USERDATA *mydata;
 
 
 // Ring buffer operations. Taken from kilolib's ringbuffer.h

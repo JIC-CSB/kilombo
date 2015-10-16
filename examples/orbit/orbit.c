@@ -10,11 +10,10 @@
  */
 
 #include <math.h>
-#include <stdint.h>   // for uint8_t and friends
-#include "kilolib.h"
-#include "orbit.h"
 
-#include <userdata.h>
+#include <kilombo.h>
+
+#include "orbit.h"
 
 #ifdef SIMULATOR
 #include <stdio.h> // for printf
@@ -24,6 +23,7 @@
 //  #include "debug.h"
 #endif
 
+REGISTER_USERDATA(USERDATA)
 
 // declare constants
 static const uint8_t TOOCLOSE_DISTANCE = 40; // 40 mm
