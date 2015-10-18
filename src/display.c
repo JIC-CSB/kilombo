@@ -323,8 +323,13 @@ void init_SDL(void)
   gfxPrimitivesSetFont (font, 8, 8);
 }
 
+/* ***   Icon Loading Stuff   *** */
+
+
+// the following is not in use due to difficulties with transparency 
+
 // include bitmap data for the icon in PNM (P6) format 
-#include "icon2-48px.h"
+//#include "icon2-48px.h"
 
 /* make an SDL surface from PNM (P6) data. Used for the program icon.
  * Complication: the image stored does not have an alpha channel.
@@ -382,6 +387,25 @@ SDL_Surface* surf_from_pnm(char *data)
   return surface2;
 }
 
+#include "icon.h"
+SDL_Surface *makeIcon(void)
+{
+  int rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+  rmask = 0xff000000;
+  gmask = 0x00ff0000;
+  bmask = 0x0000ff00;
+  amask = 0x000000ff;
+#else
+  rmask = 0x000000ff;
+  gmask = 0x0000ff00;
+  bmask = 0x00ff0000;
+  amask = 0xff000000;
+#endif
+  SDL_Surface *surface =
+    SDL_CreateRGBSurfaceFrom(icon_data, icon_w, icon_h, 32, icon_w*4, rmask, gmask, bmask, amask);
+  return surface;
+}
 
 SDL_Surface *makeWindow(void)
 {
@@ -408,7 +432,8 @@ SDL_Surface *makeWindow(void)
   if (screen == NULL) dieSDL("SDL_SetVideoMode failed: %s\n"); // FIXME: Hmmm
 
   SDL_Surface *icon; // = SDL_LoadBMP("icon2-24px.bmp");
-  icon = surf_from_pnm((char*)MagickImage);
+  //icon = surf_from_pnm((char*)MagickImage);
+  icon = makeIcon();
   if (icon)
     SDL_WM_SetIcon(icon, NULL);
   else
