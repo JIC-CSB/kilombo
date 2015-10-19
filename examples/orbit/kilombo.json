@@ -29,7 +29,7 @@
     "speed": 7,
     "turn_rate" : 22,
     "GUI"  : 1 ,
-	"msgSuccessRate" : .8,
-	"distanceNoise" : 2
+    "msgSuccessRate" : 0.8,
+    "distanceNoise" : 2
 }
 
