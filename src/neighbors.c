@@ -43,8 +43,8 @@ void prepare_grid_cache(double cr)
   // it might be good to only do that if it had to be extended
   matrix_clear_all(&grid_cache);
   
-  assert(max_coord.x > min_coord.x);
-  assert(max_coord.y > min_coord.y);
+  assert(max_coord.x >= min_coord.x);
+  assert(max_coord.y >= min_coord.y);
 
     
   double eps = .1; // small margin to avoid rounding trouble
@@ -85,6 +85,21 @@ void store_cache(kilobot * bot)
   p_vec_push(cell, bot);
 }
 
+
+void check_bots_in_bounds(int n_bots)
+{
+  int i;
+  kilobot *bot;
+  for (i = 0; i < n_bots; i++)
+    {
+      bot = allbots[i];
+      assert(bot->x >= min_coord.x);
+      assert(bot->x <= max_coord.x);
+      assert(bot->y >= min_coord.y);
+      assert(bot->y <= max_coord.y);
+    }
+}
+
 /* Update the bots' interactions with each other.
  *
  * - Move clashing bots apart.
@@ -114,21 +129,24 @@ void update_interactions_grid (int n_bots)
       bot->y > max_coord.y ? (max_coord.y = bot->y) :
 	(bot->y < min_coord.y ? (min_coord.y = bot->y) : 0);
     }
-
-   prepare_grid_cache(cr);
-
+  check_bots_in_bounds(n_bots);
+  prepare_grid_cache(cr);
+  check_bots_in_bounds(n_bots);
+   
    // insert bots into the grid
    for (i=0; i<n_bots; i++)
      {
        store_cache(allbots[i]);
        allbots[i]->n_in_range = 0;
      }
-
+   check_bots_in_bounds(n_bots);
+   
    // loop over the bots, find neighbors using the grid
    for (int i=0; i<n_bots; i++) {
      kilobot * cur = allbots[i];
 
      // range of cells we have to check
+     //     printf ("bot:%d x:%f y:%f cr:%f\n", i, cur->x, cur->y, cr);
      size_t low_x = bot2gc_x(cur->x - cr);
      size_t high_x = bot2gc_x(cur->x + cr);
      size_t low_y = bot2gc_y(cur->y - cr);
@@ -152,20 +170,6 @@ void update_interactions_grid (int n_bots)
 		 continue;
 	       
 	       double sq_bd = bot_sq_dist(cur, other);
-	       if (sq_bd < (4 * sq_r)) {
-		 //	  printf("Whack %d %d\n", i, j);
-		 coord2D us = separation_unit_vector(cur, other);
-		 cur->x -= us.x;
-		 cur->y -= us.y;
-		 other->x += us.x;
-		 other->y += us.y;
-		 // we move the bots, this changes the distance.
-		 // so bd should be recalculated.
-		 // but we only need it below to tell if the bots are
-		 // in communications range, and after resolving the collision, 
-		 // they will still be
-		 // ... unless they are densely packed and a bot is moved very far, unlikely.
-	       }
 	       if (sq_bd < sq_cr) {
 		 //if (i == 0) printf("%d and %d in range\n", i, j);
 		 cur->in_range[cur->n_in_range++] = other->ID;  // ugly conversion back to index
@@ -173,5 +177,35 @@ void update_interactions_grid (int n_bots)
 	       }
 	     }
 	 }
-   }
+      }
+
+   
+   // Move colliding robots appart, using the list of neighbors in range.
+   // Note: Once the bots are moved, the grid cache is no longer valid
+   
+   int j;
+   for (i = 0; i < n_bots; i++)
+     {
+      kilobot * cur = allbots[i];
+      for (j = 0; j < cur->n_in_range; j++)
+	{
+	  kilobot * other = allbots[cur->in_range[j]];
+	  double sq_bd = bot_sq_dist(cur, other);
+	  if (sq_bd < (4 * sq_r))
+	    {
+	    //	  printf("Whack %d %d\n", i, j);
+	    coord2D us = separation_unit_vector(cur, other);
+	    cur->x -= us.x;
+	    cur->y -= us.y;
+	    other->x += us.x;
+	    other->y += us.y;
+	    // we move the bots, this changes the distance.
+	    // so bd should be recalculated.
+	    // but we only need it below to tell if the bots are
+	    // in communications range, and after resolving the collision, 
+	    // they will still be. 
+	  }
+	}
+     }
+	   
 }
