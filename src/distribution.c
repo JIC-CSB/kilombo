@@ -112,6 +112,46 @@ void distribute_pile(int n_bots)
     }
 }
 
+/* A circular pile of bots, like distribute_pile, but with random directions
+ */
+void distribute_random_pile(int n_bots)
+{
+	float bot_radius = 1.3 * allbots[0]->radius;
+	float radius = 0;
+	int max_n_bots = 1;
+	int bot = 0;
+	float x_value = 0;
+	float y_value = 0;
+	float theta = 0;
+	float delta_theta = 0;
+	//	float alpha = theta - M_PI/4;
+
+    while(bot < n_bots){
+
+    	allbots[bot]->x = x_value;
+    	allbots[bot]->y = y_value;
+    	allbots[bot]->direction =  ((float)rand()/(float)(RAND_MAX)) * (2*M_PI);
+
+    	max_n_bots--;
+    	if(max_n_bots > 0){
+	  	theta += delta_theta;
+    	}
+    	else{
+    		radius += 2 * bot_radius + bot_radius/3;
+
+    		max_n_bots = (int) (M_PI * radius/bot_radius);
+
+    		delta_theta = 2 * M_PI/max_n_bots;
+    		theta = 0;
+    	}
+
+    	x_value = radius * sin(theta);
+	y_value = radius * cos(theta);
+
+    	bot++;
+    }
+}
+
 void distribute_elipse(int n_bots)
 {
 	float bot_radius = 1.5 * allbots[0]->radius;
@@ -152,7 +192,7 @@ void distribute_elipse(int n_bots)
     	}
 
     	x_value = radius * sin(theta);
-		y_value = 0.75 * radius * cos(theta);
+	y_value = 0.75 * radius * cos(theta);
 
 
     	bot++;
@@ -199,12 +239,13 @@ void distribute_bots(int n_bots)
   const char *formation = get_string_param("formation","random");
   float f = get_float_param("distributePercent", 0.2);
   
-  if(strcmp(formation, "line")    == 0) distribute_line(n_bots);
-  if(strcmp(formation, "rline")    == 0) distribute_rline(n_bots);
-  if(strcmp(formation, "random")  == 0) distribute_rand(n_bots, f * w, f * h);
-  if(strcmp(formation, "pile")    == 0) distribute_pile(n_bots);
-  if(strcmp(formation, "circle")  == 0) distribute_circle(n_bots);
-  if(strcmp(formation, "ellipse") == 0) distribute_elipse(n_bots);
+  if(strcmp(formation, "line")         == 0) distribute_line(n_bots);
+  if(strcmp(formation, "rline")        == 0) distribute_rline(n_bots);
+  if(strcmp(formation, "random")       == 0) distribute_rand(n_bots, f * w, f * h);
+  if(strcmp(formation, "pile")         == 0) distribute_pile(n_bots);
+  if(strcmp(formation, "random_pile")  == 0) distribute_random_pile(n_bots);
+  if(strcmp(formation, "circle")       == 0) distribute_circle(n_bots);
+  if(strcmp(formation, "ellipse")      == 0) distribute_elipse(n_bots);
 }
 
 
