@@ -30,12 +30,28 @@ Additionally, to compile the code for real kilobots as well, the following are n
 
 ### OSX systems (incomplete)
 
+Standard development tools, includeing git and a c compiler, can be obtained by installing xcode.
+In addition, several libraries are needed, which can be obtained using the package manager brew.
+A tutorial: http://hackercodex.com/guide/mac-osx-mavericks-10.9-configuration/
+
+With brew installed, install the libraries.
+
+cmake:
+`brew install cmake`
+
 check library:
 `brew install check`
 
-Sometimes, need to compile with
-`C_INCLUDE_PATH=/usr/local/include/ make`
-for the libraries to be found.
+SDL library:
+`brew install sdl`
+
+
+For the brew-installed libraries to be found, the following lines can be
+added to `.bash_profile`:
+`export C_INCLUDE_PATH=/usr/local/include/:$C_INCLUDE_PATH`
+`export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH`
+
+
 
 ## Build instructions
 

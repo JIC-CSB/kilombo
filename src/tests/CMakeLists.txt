@@ -1,5 +1,7 @@
 include_directories(${PROJECT_SOURCE_DIR}/src)
-LINK_DIRECTORIES(/usr/local/lib)
+link_directories(/usr/local/lib)
+include_directories(/usr/local/include)
+
 
 add_executable(check_skilobot check_skilobot.c ../skilobot.c ../kbapi.c ../neighbors.c)
 
