@@ -19,6 +19,11 @@ The simulator aims to be compatible with the [kilolib API.](https://www.kiloboti
 
 Initialization, messaging, motion, and random number generation work with the same function calls in the simulator and in the real kilobot. Two topics that require special care when using the simulator are global variables and timing.
 
+A program for the Kilombo simulator should begin by including the file kilombo.h, which is distributed with the simulator. The program does not need to include kilolib.h, since kilombo.h handles this.
+
+    #include <kilombo.h>
+
+
 ## Variables
 Kilobot C code usually makes use of static variables (to allow these to persist across repeated calls to the user supplied function) or global variables.  These variables demand special treatment when run in the simulator.  The simulator handles all robots in a single program, so a global or static variable ends up being common to all robots. A workaround implemented in the simulator is to keep all global variables inside a single `struct`. The type of this user data has to be announced to the simulator by using the macro `REGISTER_USERDATA`.
 
@@ -35,7 +40,7 @@ In the program, the variables can then be accessed using e.g. `mydata->N_Neighbo
 
 ### A note on the implementation:
 
-The `REGISTER_USERDATA` macro resolves to (a.o.) a declaration USERDATA *mydata. The simulator ensures that this pointer points to the data of the correct robot before calling any of the user program's functions. Additionally, the simulator needs to know the size of the USERDATA structure (however, it does not need to know the contents of it, and it will never change it). The size of the structure is communicated to the simulator by declaring a variable UserdataSize, and setting it to the size of the structure. When compiling for the simulator the macro call above is therefore roughly equivalent to the following code:
+The `REGISTER_USERDATA` macro resolves to (a.o.) a declaration `USERDATA *mydata`. The simulator ensures that this pointer points to the data of the correct robot before calling any of the user program's functions. Additionally, the simulator needs to know the size of the `USERDATA` structure (however, it does not need to know the contents of it, and it will never change it). The size of the structure is communicated to the simulator by declaring a variable `UserdataSize`, and setting it to the size of the structure. When compiling for the simulator the macro call above is therefore roughly equivalent to the following code:
 
     #ifdef SIMULATOR
     int UserdataSize = sizeof(USERDATA);
@@ -44,9 +49,9 @@ The `REGISTER_USERDATA` macro resolves to (a.o.) a declaration USERDATA *mydata.
 
 
 ## Timing and delays 
-The simulator does not implement the `delay()` function at all, since it would be difficult.  The delay() function exists, but returns immediately. The simulator simply calls the bot's main loop  function  once every simulator time step, for every bot. The main loop function is the one specified when calling `kilo_init()`.
+The simulator does not implement the `delay()` function at all, since it would be difficult.  The delay() function exists, but returns immediately. The simulator simply calls the bot's main loop function once every simulator time step, for every bot. The main loop function is the one specified when calling `kilo_init()`.
 
-Note that in programs for real kilobots, the kilolib API documentation states that it is best to use `delay()` only for short times, like when spinning up motors, and that  for timing the bot's behaviour, one should instead use the global variable `kilo_ticks`. `kilo_ticks` is incremented 31 times per second, and is  implemented in the simulator as well.
+Note that in programs for real kilobots, the kilolib API documentation states that it is best to use `delay()` only for short times, like when spinning up motors, and that  for timing the bot's behaviour, one should instead use the global variable `kilo_ticks`. `kilo_ticks` is incremented 31 times per second, and is implemented in the simulator as well.
 
 
 ## Data types
@@ -58,14 +63,14 @@ A solution is to explicitly specify the size of the types, e.g. declaring variab
 For convenience, the simulator implements a system of callback functions for communication with the user-specified robot program. The callbacks are registered using the macro `SET_CALLBACK(ID, function)`, typically at the beginning of `main()` before calling `kilo_init()`. All callback functions are optional. If the bot does not register them, they are not used. Note also that the macro resolves to an empty statement if the code is compiled for the kilobot platform.
 
 |ID  | example function definition  |  use | 
-| ----------------------|-----------------------------------|--------|
+| -------------|-----------------------------------|--------|
 |`params`      | `void  callback_F5(void)`         | Reload configuration parameters from file. Called once, not for every bot, when F5 is pressed.|
 |`reset`       | `void  callback_F6(void)`         | Reset bot. Called for every bot, when F6 is pressed. |
 |`botinfo`     | `char *botinfo()`                 | Return a string describing the internal state of the current bot, used for the simulator status bar.|
 |`json_state`  | `json_t* json_state(void)`        | Return a json object describing the bot's internal state. Used to store snapshots of the simulation. |
 |`global_setup`| `void callback_global_setup(void)`| Perform global setup, such as reading additional simulation-specific parameters. Called once, after the parameter file has been read but before the bot-specific setup.|
-| `lighting` | `int16_t callback_lighting(double, double)` | Set user-defined light levels.| 
-| `obstacles` | `int callback_obstacles(double, double, double *, double *)` | Set user-defined physical obstacles. |
+| `lighting`   | `int16_t callback_lighting(double, double)`                  | Set user-defined light levels.       | 
+| `obstacles`  | `int callback_obstacles(double, double, double *, double *)` | Set user-defined physical obstacles. |
 
 
 The functions need to be defined with return types as specified in the table above. For an example of the botinfo callback, see `examples/orbit/orbit.c`.
@@ -157,13 +162,13 @@ At the end of the simulation, and optionally also during the simulation the simu
 The json object contains an array named `bot_states`.
 Each element in this array contains the data for one bot, with the following keys:
 
-| key | value| 
-|------|--------|
-|ID|  the bot's unique ID number|
-|direction| angle in which the bot is poiting, radians|
-|x_position | x coordinate, in mm|
-|y_position | y coordinate, in mm|
-| state| a json object describing the internal state of the bot, optionally provided by the callback function CALLBACK_JSON_STATE|
+|   key     | value  | 
+|-----------|--------|
+|ID         | the bot's unique ID number                 |
+|direction  | angle in which the bot is poiting, radians |
+|x_position | x coordinate, in mm                        |
+|y_position | y coordinate, in mm                        |
+| state     | a json object describing the internal state of the bot, optionally provided by the callback function `json_state` |
 
 
 
@@ -176,7 +181,7 @@ One stationary bot, with ID 0, emits messages. Another bot moves and tries to ke
 
 ## gradient
 The robot with ID 0 is initialized ith the gradient_value 0.  Every other bot gets the smallest-value-ever-received + 1 as its own value.  Note that the gradient_value never increases, even if the bots are moved around.  In the simulator one can force a reset by pressing F6, which calls setup()  using the callback mechanism.
-Callbacks in use: `CALLBACK_RESET`, `CALLBACK_BOTINFO`, `CALLBACK_JSON_STATE`
+Callbacks in use: `reset`, `botinfo`, `json_state`.
 
 ## gradient2
 This version of the gradient example maintains a table of neighbors, and uses that to  calculate the current gradient_value.  This means that the value is dynamically updated if the  robots are moved around. The robot with ID 0 is initialized with the gradient_value 0.   Every other bot gets the smallest-value-of-current-neighbors + 1 as its own value  In the simulator one can force a reset by pressing F6, which calls `setup()` using the callback mechanism.
@@ -201,7 +206,7 @@ We wanted the simulator to run the same program as the actual kilobots, to make 
 * A way to run the programs of all robots in parallel, and synchronizedly
 
 The kilobot API specifies that the user program should be written as a function, which is called repeatedly by the kilobot library as long as the robot is in the RUNNING state. 
-A simple way to simulate many robots in parallel is to sequentially execute the loop function for each robot. This means that the robot program should be written in a way that is independent of how long it takes to execute the loop function. Also, it means a delay in the middle of the loop function is difficult to implement. We found that these limitations are possible to deal with in practice. First, timed events should be implemented using timers, not using delays. The kilobot API defines a varible kilo_ticks, which is incremented 31 times a second. The simulator implements kilo_ticks as well. This variable can be used for measuring times and for waiting for specific lengths of time. In the simulator, it is possible to control how many iterations of the loop function are run, before the kilo_ticks variable is incremented. This implementation means that the time it takes to run the loop function is not accurately simulated. Effectively, the simulation assumes that the loop function runs instantly. 
+A simple way to simulate many robots in parallel is to sequentially execute the loop function for each robot. This means that the robot program should be written in a way that is independent of how long it takes to execute the loop function. Also, it means a delay in the middle of the loop function is difficult to implement. We found that these limitations are possible to deal with in practice. First, timed events should be implemented using timers, not using delays. The kilobot API defines a varible `kilo_ticks`, which is incremented 31 times a second. The simulator implements `kilo_ticks` as well. This variable can be used for measuring times and for waiting for specific lengths of time. In the simulator, it is possible to control how many iterations of the loop function are run, before the `kilo_ticks` variable is incremented. This implementation means that the time it takes to run the loop function is not accurately simulated. Effectively, the simulation assumes that the loop function runs instantly. 
 
 In order to simulate delays in the middle of the loop function, it would be possible to run the programs for all robots in parallel as separate threads. The threads would then need to be synchronized with each other and with the physical simulation, e.g. using barriers. We decided that for our application, this level of simulation is not needed, and therefore we did not pursue this option further. If the robots are running as separate threads the program could take advantage of multiple processor cores, but on the other hand the synchronization of the threads would introduce some overhead as well.
 
