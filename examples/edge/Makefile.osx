@@ -9,10 +9,13 @@ SOURCES=edge.c
 #name of the executable file
 EXECUTABLE=edge
 
-#path to the official kilolib, used for real bots
-KILOHEADERS=../../../swarmbots/kilolib
+# Path to the official kilolib, used for real bots only
+# Set it here, or as an environment variable in the shell:
+#      export KILOHEADERS=/your/path/  
+#
+#KILOHEADERS=
 
-# path of userdata.h distributed with the simulator but needed
+# path of kilombo.h distributed with the simulator but needed
 # when compiling the user program
 SIMHEADERS=/usr/local/include
 

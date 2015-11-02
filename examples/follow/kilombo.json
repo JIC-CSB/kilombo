@@ -1,7 +1,7 @@
 {
     "botName" : "Follow",
     "randSeed" : 1,
-    "nBots" : 300,
+    "nBots" : 10,
     "formation" : "rline",
     "__timeStep" : 0.0416666,
     "timeStep" : 0.03225,
@@ -14,7 +14,7 @@
     "displayHeight_" : 424,
     "displayWidth"  : 800,
     "displayHeight" : 600,
-    "displayScale"  : 0.04,
+    "displayScale"  : 1,
     "showHist" : 1,
     "storeHistory": 1,
     "finalImage" : "final.bmp",

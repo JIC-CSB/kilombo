@@ -1,7 +1,7 @@
 {
     "botName" : "Gradient bot 2",
     "randSeed" : 1,
-    "nBots" : 39,
+    "nBots" : 100,
     "timeStep" : 0.0416666,
     "simulationTime" : 10000.0,
     "commsRadius" : 110,

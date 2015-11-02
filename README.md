@@ -28,7 +28,7 @@ Additionally, to compile the code for real kilobots as well, the following are n
 ### Debian-based Linux systems
 `sudo apt-get install build-essential git gcc-avr gdb-avr binutils-avr avr-libc avrdude libsdl1.2-dev libjansson-dev cmake check`
 
-### OSX systems (incomplete)
+### OSX systems
 
 Standard development tools, includeing git and a c compiler, can be obtained by installing xcode.
 In addition, several libraries are needed, which can be obtained using the package manager brew.
@@ -45,12 +45,14 @@ check library:
 SDL library:
 `brew install sdl`
 
+AVR toolchain, (Optional, needed for real kilobots):
+`brew tap osx-cross/avr`
+`brew install avr-libc`
 
 For the brew-installed libraries to be found, the following lines can be
 added to `.bash_profile`:
 `export C_INCLUDE_PATH=/usr/local/include/:$C_INCLUDE_PATH`
 `export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH`
-
 
 
 ## Build instructions
@@ -81,12 +83,27 @@ make     # or make -f Makefile.osx on OSX
 The example makefiles are set up to build the code for the simulator by default. By running
     make hex
 the same source code is compiled for the real Kilobot. This requires the avr-gcc toolchain
-and the official Kilolib to be installed (see prerequisites above). The path to Kilolib
-needs to be specified in the Makefile.
+and the official Kilolib to be installed (see prerequisites above). 
+
+## Setup for compiling programs for the real Kilobots
+
+### Kilolib
+
+    git clone https://github.com/acornejo/kilolib
+    cd kilolib
+    make
+
+add `export KILOHEADERS=/path/to/kilolib/` to `.bash_profile` or another suitable
+configureation file, or provide the path in the Makefile for the bot program.
+For the setting to take effect, open a new terminal or `source .bash_profile`. 
+
+To compile the example programs for real robots:
+`cd examples/orbit`  # or another example 
+`make hex`
 
 
-
-Note: the simulator uses the [SDL_GFX library](http://cms.ferzkopp.net/index.php/software/13-sdl-gfx)
+## Third-party code
+The simulator uses the [SDL_GFX library](http://cms.ferzkopp.net/index.php/software/13-sdl-gfx)
 by Andreas Schiffler (distributed under the zlib license). The source
 code for the sdl_gfx library is bundled with the simulator due to its
 unreliable availability in various Linux distributions. It is located in the

@@ -24,6 +24,6 @@
     "finalImage" : null,
     "stateFileName" : "simstates.json",
     "stateFileSteps" : 0,
-    "colorscheme" : "dark",
+    "colorscheme" : "bright",
     "GUI"  : 1 
 }
