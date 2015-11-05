@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Kilombo by JIC-CSB</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Kilombo</h1>
+          <h2>Kilobot simulator in C</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/JIC-CSB/kilombo/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/JIC-CSB/kilombo/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/JIC-CSB/kilombo" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="kilombo---c-kilobot-simulator" class="anchor" href="#kilombo---c-kilobot-simulator" aria-hidden="true"><span class="octicon octicon-link"></span></a>kilombo - C kilobot simulator</h1>
+
+<p>Authors: Fredrik Jansson, Matthew Hartley, Martin Hinsch, 
+         Tjelvar Olsson, Ivica Slavkov, Noemí Carranza</p>
+
+<p>Contact: 
+Fredrik Jansson: <a href="mailto:fjansson@abo.fi">fjansson@abo.fi</a>
+Matthew Hartley: <a href="mailto:Matthew.Hartley@jic.ac.uk">Matthew.Hartley@jic.ac.uk</a></p>
+
+<p>This repository holds the code for kilombo, a C based kilobot simulator. The simulator was developed in the <a href="www.swarm-organ.eu">Swarm Organ project</a>, and is distributed under the MIT license (see the file LICENSE for details). Installation instructions follow below. For detailed usage instruction and programming documentation, see <code>docs/manual.md</code> and the example bots in <code>examples/</code>.</p>
+
+<h2>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h2>
+
+<p>You'll need to have:</p>
+
+<ul>
+<li>git</li>
+<li>cmake</li>
+<li>SDL 1.X (including headers for building, i.e. devel packages under linux)</li>
+<li>the <a href="http://www.digip.org/jansson/">Jansson library</a> (though it's in many package managers. Again, get the development package)</li>
+<li>the <a href="http://check.sourceforge.net/">Check unit testing library</a>
+</li>
+</ul>
+
+<p>Additionally, to compile the code for real kilobots as well, the following are needed:</p>
+
+<ul>
+<li>avr-gcc (c compiler for the AVR microcontroller, to compile for the kilobot)</li>
+<li>
+<a href="https://github.com/acornejo/kilolib">Kilolib</a> (the official Kilobot library)</li>
+</ul>
+
+<h3>
+<a id="debian-based-linux-systems" class="anchor" href="#debian-based-linux-systems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Debian-based Linux systems</h3>
+
+<p><code>sudo apt-get install build-essential git gcc-avr gdb-avr binutils-avr avr-libc avrdude libsdl1.2-dev libjansson-dev cmake check</code></p>
+
+<h3>
+<a id="osx-systems" class="anchor" href="#osx-systems" aria-hidden="true"><span class="octicon octicon-link"></span></a>OSX systems</h3>
+
+<p>Standard development tools, includeing git and a c compiler, can be obtained by installing xcode.
+In addition, several libraries are needed, which can be obtained using the package manager brew.
+A tutorial: <a href="http://hackercodex.com/guide/mac-osx-mavericks-10.9-configuration/">http://hackercodex.com/guide/mac-osx-mavericks-10.9-configuration/</a></p>
+
+<p>With brew installed, install the libraries.</p>
+
+<p>cmake:
+<code>brew install cmake</code></p>
+
+<p>check library:
+<code>brew install check</code></p>
+
+<p>SDL library:
+<code>brew install sdl</code></p>
+
+<p>AVR toolchain, (Optional, needed for real kilobots):
+<code>brew tap osx-cross/avr</code>
+<code>brew install avr-libc</code></p>
+
+<p>For the brew-installed libraries to be found, the following lines can be
+added to <code>.bash_profile</code>:
+<code>export C_INCLUDE_PATH=/usr/local/include/:$C_INCLUDE_PATH</code>
+<code>export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH</code></p>
+
+<h2>
+<a id="build-instructions" class="anchor" href="#build-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build instructions</h2>
+
+<p>Make a build directory:</p>
+
+<pre><code>mkdir build
+cd build
+</code></pre>
+
+<p>Run cmake:</p>
+
+<pre><code>cmake ..
+</code></pre>
+
+<p>Install:</p>
+
+<pre><code>sudo make install
+</code></pre>
+
+<p>This installs the kilobot simulator in a system-wide location, by default
+under <code>/usr/local/lib</code> and <code>/usr/local/include</code>.</p>
+
+<h2>
+<a id="compile-and-run-examples" class="anchor" href="#compile-and-run-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compile and run examples</h2>
+
+<p>cd examples
+cd orbit
+make     # or make -f Makefile.osx on OSX
+./orbit -b start_positions.json</p>
+
+<p>The example makefiles are set up to build the code for the simulator by default. By running
+    make hex
+the same source code is compiled for the real Kilobot. This requires the avr-gcc toolchain
+and the official Kilolib to be installed (see prerequisites above). </p>
+
+<h2>
+<a id="setup-for-compiling-programs-for-the-real-kilobots" class="anchor" href="#setup-for-compiling-programs-for-the-real-kilobots" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup for compiling programs for the real Kilobots</h2>
+
+<h3>
+<a id="kilolib" class="anchor" href="#kilolib" aria-hidden="true"><span class="octicon octicon-link"></span></a>Kilolib</h3>
+
+<pre><code>git clone https://github.com/acornejo/kilolib
+cd kilolib
+make
+</code></pre>
+
+<p>add <code>export KILOHEADERS=/path/to/kilolib/</code> to <code>.bash_profile</code> or another suitable
+configureation file, or provide the path in the Makefile for the bot program.
+For the setting to take effect, open a new terminal or <code>source .bash_profile</code>. </p>
+
+<p>To compile the example programs for real robots:
+<code>cd examples/orbit</code>  # or another example 
+<code>make hex</code></p>
+
+<h2>
+<a id="third-party-code" class="anchor" href="#third-party-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Third-party code</h2>
+
+<p>The simulator uses the <a href="http://cms.ferzkopp.net/index.php/software/13-sdl-gfx">SDL_GFX library</a>
+by Andreas Schiffler (distributed under the zlib license). The source
+code for the sdl_gfx library is bundled with the simulator due to its
+unreliable availability in various Linux distributions. It is located in the
+directory src/gfx, and is automatically compiled with the rest of the
+source code.</p>
+
+<p>The simulator also includes the API definitions of kilolib, the C
+library for the physical kilobot robot. These are located in the file
+src/kilolib.h, with minor, simulator-specific changes.
+The full kilolib source code is here: <a href="https://github.com/acornejo/kilolib">https://github.com/acornejo/kilolib</a> .</p>
+        </section>
+
+        <footer>
+          Kilombo is maintained by <a href="https://github.com/JIC-CSB">JIC-CSB</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
