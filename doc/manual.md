@@ -1,14 +1,20 @@
 # Introduction
-This tool is a simulator for kilobot robots. The kilobot c program is compiled natively on the host computer where the simulator is to be run. The robot program is linked with a simulator library, which provides the functions from the kiloblib API. Since the robot program is compiled to native code, the simulator is very fast. 
+This tool is a simulator for kilobot robots. The kilobot c program is compiled natively on the host computer where the simulator is to be run. The robot program is linked with a simulator library, which provides the functions from the kiloblib API. Since the robot program is compiled to native code, the simulator is very fast. The simulator uses SDL for grapical output. All configuration and result files are written in JSON.
 
-The simulator uses SDL for grapical output. All configuration and result files are written in JSON.
-
-The program is distributed under the MIT license, with no warranty, please see the file LICENSE for details. 
-The simulator was developed in the [SWARM Organ](www.swarm-organ.eu) European Union FP7 project.
+The program is distributed under the MIT license, with no warranty, please see the file LICENSE for details. The simulator was developed in the [SWARM Organ](www.swarm-organ.eu) European Union FP7 project.
 
 Contact: 
 - Fredrik Jansson: fjansson@abo.fi
 - Matthew Hartley: Matthew.Hartley@jic.ac.uk
+
+A preprint of an article about the simultator is available on
+arXiv. If the Kilombo simulator is used for academic purposes, we
+would highly appreciate citations of this article and the GitHub
+repository.  [ArXiv 1511.04285](http://arxiv.org/abs/1511.04285)
+
+Any feedback on the simulator is welcome, contact the authors listed
+above. If the simulator turns out to be useful for you, we would like
+to hear it - please write us a short mail to let us know.
 
 
 # Installation
