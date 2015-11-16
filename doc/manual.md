@@ -119,14 +119,16 @@ The following options can be set in the simulator JSON configuration file or on 
 |`botName`              |string| "default" | the name of this bot type|
 |`randSeed`             |int   | 0 | a random seed, for repeatable simulations|
 |`simulationTime`       |float | 0 | how long to run the simulation|
+|`timeStep`             |float |0.02| Simulator time step. |
 |**Scenario**||||
 |`nBots`                |int   |*required*| number of bots to simulate     |
 |`formation`            |option|`random`| starting bot formation. Current options are (`random`, `line`, `pile`, `circle`, `ellipse`).|
 |`distributePercent`    |float |0.2| initially distribute the bots over this fraction of the display width|
-|`timeStep`             |float |0.02| time step. Also determines the displayed frame rate (currently, will be configurable)|
 |`commsRadius`          |int   |70| the communication range of the robots in mm|
-| `msg_success_rate`    |float |1.0| probability of messages between robots to be transmitted successfully|
-| `distance_noise` 		|float |0| stochasticity of distance measurements (standard deviation)
+| `msgSuccessRate`    |float |1.0| probability of messages between robots to be transmitted successfully|
+| `distanceNoise` 		|float |0| stochasticity of distance measurements (standard deviation)
+| `speed` 		|float |7| robot movement speed in mm/s. |
+| `turnRate` 		|float |13| robot turning speed in degrees/s. |
 |**User interface**||||
 |`displayWidthPercent`  |float |0.9| if no absolute window size is given use this proportion of the screen width |
 |`displayHeightPercent` |float |0.9| if no absolute window size is given use this proportion of the screen height |
