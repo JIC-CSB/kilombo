@@ -1,14 +1,20 @@
 # Introduction
-This tool is a simulator for kilobot robots. The kilobot c program is compiled natively on the host computer where the simulator is to be run. The robot program is linked with a simulator library, which provides the functions from the kiloblib API. Since the robot program is compiled to native code, the simulator is very fast. 
+This tool is a simulator for kilobot robots. The kilobot c program is compiled natively on the host computer where the simulator is to be run. The robot program is linked with a simulator library, which provides the functions from the kiloblib API. Since the robot program is compiled to native code, the simulator is very fast. The simulator uses SDL for grapical output. All configuration and result files are written in JSON.
 
-The simulator uses SDL for grapical output. All configuration and result files are written in JSON.
-
-The program is distributed under the MIT license, with no warranty, please see the file LICENSE for details. 
-The simulator was developed in the [SWARM Organ](www.swarm-organ.eu) European Union FP7 project.
+The program is distributed under the MIT license, with no warranty, please see the file LICENSE for details. The simulator was developed in the [SWARM Organ](www.swarm-organ.eu) European Union FP7 project.
 
 Contact: 
 - Fredrik Jansson: fjansson@abo.fi
 - Matthew Hartley: Matthew.Hartley@jic.ac.uk
+
+A preprint of an article about the simultator is available on
+arXiv. If the Kilombo simulator is used for academic purposes, we
+would highly appreciate citations of this article and the GitHub
+repository.  [ArXiv 1511.04285](http://arxiv.org/abs/1511.04285)
+
+Any feedback on the simulator is welcome, contact the authors listed
+above. If the simulator turns out to be useful for you, we would like
+to hear it - please write us a short mail to let us know.
 
 
 # Installation
@@ -119,14 +125,16 @@ The following options can be set in the simulator JSON configuration file or on 
 |`botName`              |string| "default" | the name of this bot type|
 |`randSeed`             |int   | 0 | a random seed, for repeatable simulations|
 |`simulationTime`       |float | 0 | how long to run the simulation|
+|`timeStep`             |float |0.02| Simulator time step. |
 |**Scenario**||||
 |`nBots`                |int   |*required*| number of bots to simulate     |
 |`formation`            |option|`random`| starting bot formation. Current options are (`random`, `line`, `pile`, `circle`, `ellipse`).|
 |`distributePercent`    |float |0.2| initially distribute the bots over this fraction of the display width|
-|`timeStep`             |float |0.02| time step. Also determines the displayed frame rate (currently, will be configurable)|
 |`commsRadius`          |int   |70| the communication range of the robots in mm|
-| `msg_success_rate`    |float |1.0| probability of messages between robots to be transmitted successfully|
-| `distance_noise` 		|float |0| stochasticity of distance measurements (standard deviation)
+| `msgSuccessRate`    |float |1.0| probability of messages between robots to be transmitted successfully|
+| `distanceNoise` 		|float |0| stochasticity of distance measurements (standard deviation)
+| `speed` 		|float |7| robot movement speed in mm/s. |
+| `turnRate` 		|float |13| robot turning speed in degrees/s. |
 |**User interface**||||
 |`displayWidthPercent`  |float |0.9| if no absolute window size is given use this proportion of the screen width |
 |`displayHeightPercent` |float |0.9| if no absolute window size is given use this proportion of the screen height |
