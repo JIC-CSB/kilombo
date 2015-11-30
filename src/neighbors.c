@@ -110,6 +110,17 @@ int check_bots_in_bounds(int n_bots)
  */
 void update_interactions_grid (int n_bots)
 {
+  if (user_obstacles != NULL) {
+    double push_x, push_y;
+
+    for (int i=0; i<n_bots; i++) {
+      if (user_obstacles(allbots[i]->x, allbots[i]->y, &push_x, &push_y)){
+        allbots[i]->x += push_x;
+	allbots[i]->y += push_y;
+      }
+    }
+  }
+
   // initialize bounding box
   max_coord.x = min_coord.x = allbots[0]->x;
   max_coord.y = min_coord.y = allbots[0]->y;
