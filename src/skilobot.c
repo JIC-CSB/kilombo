@@ -84,6 +84,7 @@ void set_callback_global_setup(void(*fp)(void))
 
 void set_callback_obstacles(int16_t (*fp)(double, double, double *, double *))
 {
+	printf("setting user obstacles callback!\n");
   user_obstacles = fp;
 }
 
@@ -519,6 +520,8 @@ void update_interactions(int n_bots)
   double communication_radius = allbots[0]->cr;
   double communication_radius_sq = communication_radius * communication_radius;
   
+	printf("update_interactions!\n");
+
   reset_n_in_range_indices(n_bots);
 
   if (user_obstacles != NULL) {

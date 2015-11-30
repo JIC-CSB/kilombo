@@ -86,7 +86,7 @@ void store_cache(kilobot * bot)
 }
 
 
-void check_bots_in_bounds(int n_bots)
+int check_bots_in_bounds(int n_bots)
 {
   int i;
   kilobot *bot;
@@ -98,6 +98,8 @@ void check_bots_in_bounds(int n_bots)
       assert(bot->y >= min_coord.y);
       assert(bot->y <= max_coord.y);
     }
+
+  return 1;
 }
 
 /* Update the bots' interactions with each other.
@@ -129,9 +131,10 @@ void update_interactions_grid (int n_bots)
       bot->y > max_coord.y ? (max_coord.y = bot->y) :
 	(bot->y < min_coord.y ? (min_coord.y = bot->y) : 0);
     }
-  check_bots_in_bounds(n_bots);
+  // use assert here so that the call gets compiled out in release
+  assert(check_bots_in_bounds(n_bots));
   prepare_grid_cache(cr);
-  check_bots_in_bounds(n_bots);
+  assert(check_bots_in_bounds(n_bots));
    
    // insert bots into the grid
    for (i=0; i<n_bots; i++)
@@ -139,7 +142,7 @@ void update_interactions_grid (int n_bots)
        store_cache(allbots[i]);
        allbots[i]->n_in_range = 0;
      }
-   check_bots_in_bounds(n_bots);
+   assert(check_bots_in_bounds(n_bots));
    
    // loop over the bots, find neighbors using the grid
    for (int i=0; i<n_bots; i++) {
