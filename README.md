@@ -3,6 +3,8 @@
 Authors: Fredrik Jansson, Matthew Hartley, Martin Hinsch, 
          Tjelvar Olsson, Ivica Slavkov, Noemí Carranza
 
+For an extended list of those contributing to the simulator and related paper, see [here](contributors.md).
+
 Contact: 
 Fredrik Jansson: fjansson@abo.fi
 Matthew Hartley: Matthew.Hartley@jic.ac.uk
