@@ -1,5 +1,6 @@
 ---
 title: Project contributors
+layout: default
 ---
 
 The following people contributed to the development of the simulator and accompanying paper:
