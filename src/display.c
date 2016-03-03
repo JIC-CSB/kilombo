@@ -284,7 +284,7 @@ void input(void)
   if (d < 1)
     d = 1;
   
-  if (keystates[SDLK_KP_PLUS] || keystates[SDLK_PLUS])
+  if (keystates[SDLK_KP_PLUS] || keystates[SDLK_PLUS] || keystates[SDLK_p])
     {
       simparams->display_scale *= s;
       printf ("Scale: %f\n", simparams->display_scale);
