@@ -37,6 +37,7 @@ typedef struct {
   int GUI;
   float msg_success_rate;
   float distance_noise;
+  double distanceCoefficient; // slope of measured distance
   double displayX, displayY;
 } simulation_params;
 

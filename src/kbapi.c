@@ -80,7 +80,6 @@ void set_color(uint8_t color)
   int r = color & 3;
   int g = (color >> 2) & 3;
   int b = (color >> 4) & 3;
-  
   kilobot* self = Me();
 
   self->r_led = r;

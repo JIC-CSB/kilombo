@@ -274,7 +274,7 @@ void dump_bot_info(kilobot *self)
 
 void dump_all_bots(int n_bots)
 {
-  /* Dump info for all bots. Should only be called in a critical region. */
+  /* Dump info for all bots. */
 
   for (int i=0; i<n_bots; i++) {
     dump_bot_info(allbots[i]);
@@ -513,7 +513,6 @@ void update_interactions(int n_bots)
    * - Update which bots can communicate with each other.
    */
 
-  //double r = (double) allbots[0].radius;
   double r = allbots[0]->radius;
   double d_sq = 4*r*r;
   double communication_radius = allbots[0]->cr;
@@ -607,14 +606,27 @@ double rnd_gauss (double mean, double sig)
 	return mean + sig * y * sqrt (-2.0 * log (r2) / r2);
 	}
 
+/* Simulate a distance measurement
+ * with optional gaussian noise and a linear correction.
+ * 
+ * observations, with bots on whiteboard, not yet simulated 
+ * - more noise on long distances, maybe noise proportional to distance-d0
+ * - measured distance vs distance starts as linear but flattens out at ~100 mm . 
+ */
 double noisy_distance(double dist)
 {
-  if (simparams->distance_noise == 0.0)
-	  return dist;
+  double alpha = simparams->distanceCoefficient;
+  double d0 = 2 * allbots[0]->radius; 
 
-  const double n_dist = rnd_gauss(dist, simparams->distance_noise);
+  // apply linear transformation on the distance.
+  // assume that touching bots report the correct distance, and that longer distances scale with alpha.
+  dist = alpha*(dist-d0) + d0;
+
+  // add noise
+  if (simparams->distance_noise > 0.0)
+    dist += rnd_gauss(0, simparams->distance_noise);
   
-  return n_dist > 0 ? n_dist : 0;
+  return dist > 0 ? dist : 0;
 }
 
 int message_success()
@@ -648,7 +660,7 @@ void pass_message(kilobot* tx)
 	  {
 	    /* Set up a distance measurement structure.
 	     * We know the true distance, so we just store it in the structure.
-	     * The estimate_distance() will just return high_gain.
+	     * estimate_distance() will just return high_gain.
 	     */
 	    distm.low_gain = 0;
 	    distm.high_gain = noisy_distance(bot_dist(tx, rx));

@@ -132,7 +132,8 @@ The following options can be set in the simulator JSON configuration file or on 
 |`distributePercent`    |float |0.2| initially distribute the bots over this fraction of the display width|
 |`commsRadius`          |int   |70| the communication range of the robots in mm|
 | `msgSuccessRate`    |float |1.0| probability of messages between robots to be transmitted successfully|
-| `distanceNoise` 		|float |0| stochasticity of distance measurements (standard deviation)
+| `distanceNoise` 		|float |0| stochasticity of distance measurements (standard deviation)|
+| `distanceCoefficient` 	|float |1| slope of bot-bot distance function| 
 | `speed` 		|float |7| robot movement speed in mm/s. |
 | `turnRate` 		|float |13| robot turning speed in degrees/s. |
 |**User interface**||||
