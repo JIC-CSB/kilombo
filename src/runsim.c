@@ -205,7 +205,6 @@ int main(int argc, char *argv[])
       {
 	// Do one time step
 	process_bots(n_bots, simparams->timeStep);
-	n_step++;
 	time += simparams->timeStep;
 	kilo_ticks = time * TICKS_PER_SEC;
        
@@ -217,6 +216,7 @@ int main(int argc, char *argv[])
 	      json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
 	      json_array_append(j_state, t);
 	    }
+
 #ifndef SKILO_HEADLESS	
 	// save screenshots for video
 	if (simparams->imageName && simparams->saveVideo)
@@ -271,6 +271,9 @@ int main(int argc, char *argv[])
 	}
 #endif
   } // while running
+
+  // increment step here so that state is printed at t=0
+  n_step++;
 
   printf ("Simulation finished\n");
   
