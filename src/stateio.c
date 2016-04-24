@@ -16,13 +16,13 @@ json_t* (*callback_json_state) (void);
 void json_store_double(json_t* root, const char *key, double value)
 {
   json_t* jvalue = json_real(value);
-  json_object_set(root, key, jvalue);
+  json_object_set_new(root, key, jvalue);
 }
 
 void json_store_int(json_t* root, const char *key, int value)
 {
   json_t* jvalue = json_integer(value);
-  json_object_set(root, key, jvalue);
+json_object_set_new(root, key, jvalue);
 }
 
 json_t* json_bot_rep(kilobot *bot)
@@ -64,7 +64,7 @@ json_t* json_bot_rep(kilobot *bot)
   else // if the bot did not define a callback function
     j_state = json_object();   // ... output an empty object
 
-  json_object_set(root, "state", j_state);
+  json_object_set_new(root, "state", j_state);
   
   return root;
 }
@@ -75,13 +75,13 @@ json_t* json_rep_all_bots(kilobot **bot_array, int array_size, int ticks)
   json_t* j_bot_array = json_array();
   
   
-  json_object_set(root, "bot_states", j_bot_array);
+  json_object_set_new(root, "bot_states", j_bot_array);
   json_store_int(root, "ticks", ticks);
    
   json_t *jbot;
   for (int i=0; i<array_size; i++) {
     jbot = json_bot_rep(bot_array[i]);
-    json_array_append(j_bot_array, jbot);
+    json_array_append_new(j_bot_array, jbot);
   }
 
   return root;
@@ -97,6 +97,8 @@ void save_bot_state_to_file(kilobot **bot_array, int array_size, const char *fil
   json_t* root = json_rep_all_bots(bot_array, array_size, kilo_ticks);
 
   json_dump_file(root, filename, JSON_INDENT(2) | JSON_SORT_KEYS);
+
+  json_decref(root);
 }
 
 

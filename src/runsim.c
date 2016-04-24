@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 	    {
 	      // printf("Saving state to JSON at %6d steps\n", n_step);
 	      json_t *t = json_rep_all_bots(allbots, n_bots, kilo_ticks);
-	      json_array_append(j_state, t);
+	      json_array_append_new(j_state, t);
 	    }
 
 #ifndef SKILO_HEADLESS	
@@ -270,10 +270,10 @@ int main(int argc, char *argv[])
 	  lastTicks = t;    
 	}
 #endif
-  } // while running
 
   // increment step here so that state is printed at t=0
   n_step++;
+  } // while running
 
   printf ("Simulation finished\n");
   
@@ -282,6 +282,7 @@ int main(int argc, char *argv[])
   if (simparams->stateFileName && simparams->stateFileSteps != 0)
     {
       json_dump_file(j_state, simparams->stateFileName, JSON_INDENT(2) | JSON_SORT_KEYS);
+	  json_decref(j_state);
     }
 
 #ifndef SKILO_HEADLESS	
