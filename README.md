@@ -3,6 +3,8 @@
 Authors: Fredrik Jansson, Matthew Hartley, Martin Hinsch, 
          Tjelvar Olsson, Ivica Slavkov, Noemí Carranza
 
+For an extended list of those contributing to the simulator and related paper, see [here](contributors.md).
+
 Contact: 
 Fredrik Jansson: fjansson@abo.fi
 Matthew Hartley: Matthew.Hartley@jic.ac.uk
@@ -10,7 +12,7 @@ Matthew Hartley: Matthew.Hartley@jic.ac.uk
 
 This repository holds the code for Kilombo, a C based Kilobot
 simulator. The simulator was developed in the [Swarm Organ
-project](www.swarm-organ.eu), and is distributed under the MIT license
+project](http://www.swarm-organ.eu), and is distributed under the MIT license
 (see the file LICENSE for details). Installation instructions follow
 below. For detailed usage instruction and programming documentation,
 see `docs/manual.md` and the example bots in `examples/`.
