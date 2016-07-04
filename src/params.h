@@ -39,6 +39,7 @@ typedef struct {
   float distance_noise;
   double distanceCoefficient; // slope of measured distance
   double displayX, displayY;
+  int useGrid; // if true, use the grid cache
 } simulation_params;
 
 void parse_param_file(const char *filename);

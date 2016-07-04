@@ -269,10 +269,10 @@ void input(void)
       default: break;
       }
 
-    if (grabbed)
-      move_bot_to_mouse(grabbed);
-    if (grabbedRot)
-      rotateBot(grabbedRot);
+  if (grabbed)
+    move_bot_to_mouse(grabbed);
+  if (grabbedRot)
+    rotateBot(grabbedRot);
 
   // Check which keys are held down
   // these are for keys that should have an effect as long as the key is held down

@@ -26,7 +26,6 @@ kilobot* current_bot;
 
 // Settings of the simulation.
 int tx_period_ticks = 15;  // Message twice a second.
-int storeHistory = 1;
 
 // Callback function pointer for saving the bot's internal state as JSON.
 json_t* (*callback_json_state) (void) = NULL;
@@ -146,8 +145,11 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->y = 0;
 
   bot->n_hist = simparams->histLength;
-  bot->x_history = (double *) calloc(bot->n_hist, sizeof(double));
-  bot->y_history = (double *) calloc(bot->n_hist, sizeof(double));
+  if (simparams->storeHistory)
+    {
+      bot->x_history = (double *) calloc(bot->n_hist, sizeof(double));
+      bot->y_history = (double *) calloc(bot->n_hist, sizeof(double));
+    }
   bot->p_hist = 0;
   bot->l_hist = 0;
   
@@ -396,7 +398,7 @@ void update_bot(kilobot *bot, float timestep)
    *
    * Save the history (if required) before updating the location.
    */
-  if (storeHistory) {
+  if (simparams->storeHistory) {
     update_bot_history_ring(bot);
   }
   update_bot_location(bot, timestep);
@@ -519,7 +521,7 @@ void update_interactions(int n_bots)
   double communication_radius = allbots[0]->cr;
   double communication_radius_sq = communication_radius * communication_radius;
   
-	printf("update_interactions!\n");
+  //printf("update_interactions!\n");
 
   reset_n_in_range_indices(n_bots);
 
@@ -729,13 +731,15 @@ void update_all_bots(int n_bots, float timestep)
     update_bot(allbots[i], timestep);
   }
 
-  //update_interactions(n_bots);
-  update_interactions_grid(n_bots);
+  if (simparams->useGrid)
+    update_interactions_grid(n_bots);
+  else
+    update_interactions(n_bots);
 
   process_messaging(n_bots);
 }
 
-char botinfo_buffer[100];
+char botinfo_buffer[500];
 
 //default callback_botinfo function
 char *botinfo_simple()

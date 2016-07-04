@@ -136,12 +136,15 @@ The following options can be set in the simulator JSON configuration file or on 
 | `distanceCoefficient` 	|float |1| slope of bot-bot distance function| 
 | `speed` 		|float |7| robot movement speed in mm/s. |
 | `turnRate` 		|float |13| robot turning speed in degrees/s. |
+| `useGrid` 		|int |1| Whether to use the grid cache to find neighbors. Faster for large swarms (n > 50 robots) |
 |**User interface**||||
 |`displayWidthPercent`  |float |0.9| if no absolute window size is given use this proportion of the screen width |
 |`displayHeightPercent` |float |0.9| if no absolute window size is given use this proportion of the screen height |
 |`displayWidth`         |int   |1| absolute width of the window in pixels|
 | `displayHeight`       |int   |1| absolute height of the window in pixels|
 | `displayScale`        |float |1.0| initial zoom setting.|
+| `displayX`            |float |0.0| initial center coordinates of view.|
+| `displayY`            |float |0.0| initial center coordinates of view.|
 | `showHist`            |int   |0| whether to show the paths the robots have moved|
 | `histLength`          |int   |2000| the length of the path history to show in number of steps |
 | `showComms`           |int   |1|  whether or not to draw a line between each pair of bots in communication range, whenever a message is passed between them.|
@@ -157,9 +160,12 @@ The following options can be set in the simulator JSON configuration file or on 
 | `storeHistory`        |int   |1| TBD.|
 | `stateFileName`       |string|""| file name for saving the simulation state as JSON during the simulation.|
 | `stateFileSteps`      |int   |100| number of simulator timesteps between storing the simulator state as JSON. Use 0 to disable storage. |
+
+
 |**Command line options**|||
 |`-p parameterfile.json`|string|<sim name\>.json| Simulator parameters. Optional. |
 |`-b bots.json`         |string|""| starting positions for the bots. Optional.|
+
 
 
 At the end of the simulation, the simulator stores the final state of the robots in a file named `endstate.json`. This file can be given as a starting state for the next simulation, simply copy it to a new name, and pass that name to the simulator with the -b option. Thus the simulator can be used as an editor of bot starting configurations as well.
