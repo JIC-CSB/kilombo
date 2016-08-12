@@ -87,7 +87,6 @@ void run_all_bots(int n_bots);
 void dump_all_bots(int n_bots);
 void update_all_bots(int n_bots, float timestep);
 double bot_dist(kilobot *bot1, kilobot *bot2);
-double bot_sq_dist(kilobot *bot1, kilobot *bot2);
 void process_bots(int n_bots, float timestep);
 void update_interactions(int n_bots);
 coord2D separation_unit_vector(kilobot* bot1, kilobot* bot2);

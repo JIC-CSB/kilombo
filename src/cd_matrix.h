@@ -1,8 +1,9 @@
 #ifndef CD_MATRIX_H
 #define CD_MATRIX_H
 
-//#define NDEBUG // define to turn assertions off
+#define NDEBUG // define to turn assertions off
 #include "assert.h"
+#include <time.h>
 
 // let's keep at least this one generic
 typedef struct {
@@ -37,12 +38,14 @@ void p_vec_reserve(p_vec * v, size_t new_size)
 	v->allocated = new_size;
 	}
 
+#define INITIAL_SIZE 8
 void p_vec_push(p_vec * v, void * el) 
 	{
 	assert(v->size <= v->allocated);
 
 	if (v->size == v->allocated)
-		p_vec_reserve(v, (v->allocated == 0 ? 1 : 2*v->allocated));
+	  //p_vec_reserve(v, (v->allocated == 0 ? 1 : 2*v->allocated));
+	  p_vec_reserve(v, (v->allocated < INITIAL_SIZE ? INITIAL_SIZE : 2*v->allocated));
 
 	v->data[(v->size)++] = el;
 	}
@@ -89,8 +92,9 @@ void matrix_init(pv_matrix * m, size_t x, size_t y)
 
 	assert(m->data != NULL);
 
-	for (size_t i=0; i<n; i++)
-		p_vec_init(&(m->data[i]), 0);
+	//for (size_t i=0; i<n; i++)
+	//	p_vec_init(&(m->data[i]), 0);
+	// calloc already zeroes the data - equivalent to p_vec_init with size 0
 	}
 
 p_vec * matrix_get(pv_matrix * m, size_t x, size_t y)
@@ -103,7 +107,9 @@ p_vec * matrix_get(pv_matrix * m, size_t x, size_t y)
 
 void matrix_extend(pv_matrix * m, size_t xmi_p, size_t xma_p, size_t ymi_p, size_t yma_p)
 	{
-	// we don't do shrinking
+	  //clock_t t = clock();
+	  
+	  // we don't do shrinking
 	assert(xmi_p >= 0);
 	assert(xma_p >= 0);
 	assert(ymi_p >= 0);
@@ -127,6 +133,11 @@ void matrix_extend(pv_matrix * m, size_t xmi_p, size_t xma_p, size_t ymi_p, size
 
 	// all of the important stuff is pointers, so just copy everything
 	*m = new_m;
+
+	/* t = clock() - t;
+	double time_taken = ((double)t)/CLOCKS_PER_SEC; // in seconds
+	printf("matrix_extend %d %d - %f s\n", new_xsize, new_ysize, time_taken);
+	*/
 	}
 
 void matrix_clear_all(pv_matrix * m)

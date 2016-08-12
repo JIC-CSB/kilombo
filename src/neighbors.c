@@ -5,7 +5,7 @@
 #include<stdio.h>
 #include<math.h>
 
-//#define NDEBUG // define to turn assertions off
+#define NDEBUG // define to turn assertions off
 #include<assert.h>
 #include"skilobot.h"
 #include"cd_matrix.h"
@@ -13,7 +13,7 @@
 
 pv_matrix grid_cache;
 coord2D gc_offset = {0, 0};
-coord2D gc_cell_sz = {50, 50};
+coord2D gc_cell_sz = {100, 100};
 
 // initialized in update_all_bots before movement
 coord2D max_coord, min_coord;

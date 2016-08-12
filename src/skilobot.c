@@ -419,16 +419,6 @@ double bot_dist(kilobot *bot1, kilobot *bot2)
   return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
-double bot_sq_dist(kilobot *bot1, kilobot *bot2)
-{
-  double x1 = bot1->x;
-  double x2 = bot2->x;
-  double y1 = bot1->y;
-  double y2 = bot2->y;
-
-  return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-}
-
 
 coord2D normalise(coord2D c)
 {
@@ -658,7 +648,8 @@ void pass_message(kilobot* tx)
       for (i = 0; i < tx->n_in_range; i++) {
 	kilobot *rx = allbots[tx->in_range[i]];
 #ifndef SKILO_HEADLESS
-	addCommLine(tx, rx);
+	if (simparams->GUI)
+	  addCommLine(tx, rx);
 #endif
 	
 	if (message_success()) // messages arrive with some probability
@@ -701,7 +692,7 @@ void process_messaging(int n_bots)
 #ifndef SKILO_HEADLESS
   // Run removeOldCommLines at most once every kilo_ticks.
   static int last_ticks = 0;
-  if (kilo_ticks > last_ticks) {
+  if (simparams->GUI && kilo_ticks > last_ticks) {
     removeOldCommLines(kilo_ticks-last_ticks, tx_period_ticks);
     last_ticks = kilo_ticks;
   }
