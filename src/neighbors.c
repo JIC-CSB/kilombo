@@ -208,11 +208,7 @@ void update_interactions_grid (int n_bots)
 	  if (sq_bd < (4 * sq_r))
 	    {
 	    //	  printf("Whack %d %d\n", i, j);
-	    coord2D us = separation_unit_vector(cur, other);
-	    cur->x -= us.x;
-	    cur->y -= us.y;
-	    other->x += us.x;
-	    other->y += us.y;
+        separate_clashing_bots(cur, other);
 	    // we move the bots, this changes the distance.
 	    // so bd should be recalculated.
 	    // but we only need it below to tell if the bots are

@@ -34,6 +34,7 @@ typedef struct {
   int commsRadius;
   double turn_rate;  // degrees / s
   double speed;      // mm / s
+  double pushDisplacement; // [0,1]
   int GUI;
   float msg_success_rate;
   float distance_noise;

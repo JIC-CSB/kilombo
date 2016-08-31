@@ -61,6 +61,7 @@ void parse_param_file(const char *filename)
   simparams->msg_success_rate     = get_float_param("msgSuccessRate", 1);
   simparams->speed                = get_float_param("speed", 7);
   simparams->turn_rate            = get_float_param("turnRate", 13);
+  simparams->pushDisplacement     = get_float_param("pushDisplacement", 1.0); 
   simparams->distanceCoefficient  = get_float_param("distanceCoefficient", 1.0);
   simparams->displayX             = get_float_param("displayX", 0);
   simparams->displayY             = get_float_param("displayY", 0);

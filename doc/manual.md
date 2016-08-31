@@ -136,7 +136,7 @@ The following options can be set in the simulator JSON configuration file or on 
 | `distanceCoefficient` 	|float |1| slope of bot-bot distance function| 
 | `speed` 		|float |7| robot movement speed in mm/s. |
 | `turnRate` 		|float |13| robot turning speed in degrees/s. |
-| `useGrid` 		|int |1| Whether to use the grid cache to find neighbors. Faster for large swarms (n > 50 robots) |
+| `pushDisplacement` 	|float |1.0| displacement of stationary bots due to pushing |
 |**User interface**||||
 |`displayWidthPercent`  |float |0.9| if no absolute window size is given use this proportion of the screen width |
 |`displayHeightPercent` |float |0.9| if no absolute window size is given use this proportion of the screen height |
@@ -160,6 +160,8 @@ The following options can be set in the simulator JSON configuration file or on 
 | `storeHistory`        |int   |1| TBD.|
 | `stateFileName`       |string|""| file name for saving the simulation state as JSON during the simulation.|
 | `stateFileSteps`      |int   |100| number of simulator timesteps between storing the simulator state as JSON. Use 0 to disable storage. |
+|**Optimization**||||
+| `useGrid` 		|int |1| Whether to use the grid cache to find neighbors. Faster for large swarms (n > 50 robots) |
 
 
 |**Command line options**|||

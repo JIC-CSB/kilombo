@@ -463,11 +463,21 @@ void separate_clashing_bots(kilobot* bot1, kilobot* bot2)
    * Each bot moves one unit away from the other.
    */
 
+  double p1 = 1, p2 = 1;
+  
+  int m1 = bot1->left_motor_power || bot1->right_motor_power;
+  int m2 = bot2->left_motor_power || bot2->right_motor_power;
+  
+  if (m1 && !m2)
+  	p2 = simparams->pushDisplacement;
+  else if (!m1 && m2)
+    p1 = simparams->pushDisplacement;
+
   coord2D suv = separation_unit_vector(bot1, bot2);
-  bot1->x -= suv.x;
-  bot1->y -= suv.y;
-  bot2->x += suv.x;
-  bot2->y += suv.y;
+  bot1->x -= p1 * suv.x;
+  bot1->y -= p1 * suv.y;
+  bot2->x += p2 * suv.x;
+  bot2->y += p2 * suv.y;
 }
 
 
