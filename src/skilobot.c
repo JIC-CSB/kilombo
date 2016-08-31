@@ -55,6 +55,7 @@ void message_rx_dummy(message_t *m, distance_measurement_t *d) { }
 message_t *message_tx_dummy() { return NULL; }
 void message_tx_success_dummy() {}
 
+double rnd_gauss (double mean, double sig);
 
 void set_callback_params(void (*fp)(void))
 {
@@ -160,10 +161,12 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->right_motor_power = 0;
   bot->left_motor_power = 0;
 
-  bot->speed = simparams->speed;
-  bot->turn_rate_l = simparams->turn_rate * M_PI/180; // convert to radians here
-  bot->turn_rate_r = simparams->turn_rate * M_PI/180;
-  // individual noise could be added here
+  
+  bot->speed = simparams->speed + rnd_gauss(0, simparams->speedVariation);
+  bot->turn_rate_l = (simparams->turn_rate + rnd_gauss(0, simparams->turnVariation)) * 
+	  M_PI/180; // convert to radians here
+  bot->turn_rate_r = (simparams->turn_rate + rnd_gauss(0, simparams->turnVariation)) * 
+	  M_PI/180; // individual noise could be added here
 
   
   bot->direction = (2 * M_PI / 4);
