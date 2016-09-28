@@ -33,7 +33,8 @@ typedef struct {
   int randSeed;
   int commsRadius;
   double turn_rate;  // degrees / s
-  double turnVariation;
+  double offsetVariation;
+  double slopeVariation;
   double speed;      // mm / s
   double speedVariation;
   double pushDisplacement; // [0,1]

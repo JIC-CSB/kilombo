@@ -136,8 +136,9 @@ The following options can be set in the simulator JSON configuration file or on 
 | `distanceCoefficient` 	|float |1| slope of bot-bot distance function| 
 | `speed` 		|float |7| robot movement speed in mm/s. |
 | `speedVariation`  |float |0.0| variation between robots in movement speed (standard deviation) |
-| `turnRate` 		|float |13| robot turning speed in degrees/s. |
-| `turnVariation` 		|float |0.0| variation between robots (and motors) in turning speed (standard deviation) |
+| `turnRate` 		|float |13| (average) robot turning speed in degrees/s. |
+| `turnOffsetVariation` 		|float |0.0| variation between robots (and motors) in minimum activation required to start turning (standard deviation) |
+| `turnSlopeVariation` 		|float |0.0| variation between robots (and motors) in how activation translates into turning speed (standard deviation) |
 | `pushDisplacement` 	|float |1.0| displacement of stationary bots due to pushing |
 |**User interface**||||
 |`displayWidthPercent`  |float |0.9| if no absolute window size is given use this proportion of the screen width |
