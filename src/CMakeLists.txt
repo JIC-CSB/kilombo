@@ -15,7 +15,7 @@ INSTALL(TARGETS sim headless
 
 INSTALL(FILES kilombo.h DESTINATION include)
 
-INSTALL(FILES kilolib.h message.h message_crc.h params.h
+INSTALL(FILES kilolib.h message.h message_crc.h params.h skilobot.h
 	DESTINATION include/kilombo)
 
 add_subdirectory(tests)
