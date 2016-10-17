@@ -2,7 +2,7 @@
 #define __NEIGHBORS_H
 void update_interactions_grid (int n_bots);
 
-inline double bot_sq_dist(kilobot *bot1, kilobot *bot2)
+static inline double bot_sq_dist(kilobot *bot1, kilobot *bot2)
 {
   double x1 = bot1->x;
   double x2 = bot2->x;
