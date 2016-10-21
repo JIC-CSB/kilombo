@@ -94,7 +94,11 @@ void separate_clashing_bots(kilobot* bot1, kilobot* bot2);
 void spread_out(int n_bots, double k);
 
 extern kilobot* current_bot;
+
+// we need to supress this declaration in user code
+#ifndef KILOMBO_H
 extern void* mydata;
+#endif
 
 kilobot *Me();
 void prepare_bot(kilobot *bot);
