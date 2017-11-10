@@ -55,6 +55,7 @@ void message_rx_dummy(message_t *m, distance_measurement_t *d) { }
 message_t *message_tx_dummy() { return NULL; }
 void message_tx_success_dummy() {}
 
+double rnd_gauss (double mean, double sig);
 
 void set_callback_params(void (*fp)(void))
 {
@@ -160,10 +161,14 @@ kilobot *new_kilobot(int ID, int n_bots)
   bot->right_motor_power = 0;
   bot->left_motor_power = 0;
 
-  bot->speed = simparams->speed;
-  bot->turn_rate_l = simparams->turn_rate * M_PI/180; // convert to radians here
-  bot->turn_rate_r = simparams->turn_rate * M_PI/180;
-  // individual noise could be added here
+  bot->left_motor_offset = 60 + rnd_gauss(0, simparams->offsetVariation);
+  bot->right_motor_offset = 60 + rnd_gauss(0, simparams->offsetVariation);
+  bot->left_motor_slope = 1.0 + rnd_gauss(0, simparams->slopeVariation);
+  bot->right_motor_slope = 1.0 + rnd_gauss(0, simparams->slopeVariation);
+  
+  bot->speed = simparams->speed + rnd_gauss(0, simparams->speedVariation);
+  bot->turn_rate_l = 0;
+  bot->turn_rate_r = 0;
 
   
   bot->direction = (2 * M_PI / 4);
@@ -325,6 +330,18 @@ void update_bot_history_ring(kilobot *bot)
 }
 
 
+void set_speeds(kilobot * bot, uint8_t left, uint8_t right)
+  {
+  bot->left_motor_power = left;
+  bot->right_motor_power  = right;
+
+  double tr = (left - bot->left_motor_offset)/15 * bot->left_motor_slope;
+  bot->turn_rate_r = (tr < 0.5 || tr > 2.0 ? 0 : tr) * simparams->turn_rate * M_PI/180;
+  tr = (right - bot->right_motor_offset)/15 * bot->right_motor_slope;
+  bot->turn_rate_l = (tr < 0.5 || tr > 2.0 ? 0 : tr) * simparams->turn_rate * M_PI/180;
+  //printf("turn rates: %g, %g\n", bot->turn_rate_l, bot->turn_rate_r);
+  }
+
 /* Functions for moving the bots. */
 
 void move_bot_forward(kilobot *bot, float timestep)
@@ -376,14 +393,14 @@ void turn_bot_left(kilobot *bot, float timestep)
 void update_bot_location(kilobot *bot, float timestep)
 {
   /* Update the bot's location by a timestep dependent increment. */
-  if (bot->right_motor_power && bot->left_motor_power) { // forward movement
+  if (bot->turn_rate_l > 0 && bot->turn_rate_r > 0) { // forward movement
     move_bot_forward(bot, timestep);
   }
   else {
-    if (bot->left_motor_power) {
+    if (bot->turn_rate_r > 0) {
       turn_bot_right(bot, timestep);
     }
-    if (bot->right_motor_power) {
+	else if (bot->turn_rate_l > 0) {
       turn_bot_left(bot, timestep);
     }
   }

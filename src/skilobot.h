@@ -22,9 +22,18 @@ typedef struct {
   int n_hist; // size of the history ring buffer 
   int l_hist; // number of history points stored
   
-  int right_motor_power, left_motor_power;
+  // motor power; translates non-linearly into speed
+  int right_motor_power, left_motor_power;   
+
+  // parameters for the function that translates power to speed
+  // these are modified in setup if stochasticity is set
+  double left_motor_offset, right_motor_offset;
+  double left_motor_slope, right_motor_slope;
+
+  // actual physical speed
   double speed;                     // speed in mm / s
   double turn_rate_l, turn_rate_r;  // turning rate right and left, radians / s
+  
   int ID;
   double direction; // Angle relative to constant x, +ve y in radians
   int r_led, g_led, b_led;
@@ -103,6 +112,8 @@ extern void* mydata;
 kilobot *Me();
 void prepare_bot(kilobot *bot);
 void finalize_bot(kilobot *bot);
+
+void set_speeds(kilobot * bot, uint8_t left, uint8_t right);
 
 int bot_main (void);
 

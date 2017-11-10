@@ -24,13 +24,14 @@ volatile uint32_t kilo_ticks = 0;
 uint16_t kilo_uid = 0;
 
 /* motor calibration values 
- * In the kilobots, these are different for each robot, and are stored in the EEPROM
- * In the simulator we don't need them to be different.
- * currently the actual movement speed is set using speed and turn_rate in the params,
- * these only need to be non-zero for the motors to be considered on.
+ * In the kilobots, these are different for each robot, and are stored in the EEPROM.
+ * We model this in a very simple way in the simulator. The model is tuned so that 
+ * even if noise is set, on average the configured turn speed will be reached at an
+ * activation value of 75.
+ * Note that at this point straight movement is still independent of motor activation value.
  */
-uint8_t kilo_turn_left  = 7;
-uint8_t kilo_turn_right = 7;
+uint8_t kilo_turn_left  = 75;
+uint8_t kilo_turn_right = 75;
 uint8_t kilo_straight_left = 7;
 uint8_t kilo_straight_right = 7;
 
@@ -61,8 +62,8 @@ void set_motors(uint8_t left, uint8_t right)
 {
   kilobot* self = Me();
 
-  self->left_motor_power = left;
-  self->right_motor_power  = right;
+  set_speeds(self, left, right);
+
   return;
 }
 

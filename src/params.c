@@ -60,7 +60,10 @@ void parse_param_file(const char *filename)
   simparams->distance_noise       = get_float_param("distanceNoise", 0);
   simparams->msg_success_rate     = get_float_param("msgSuccessRate", 1);
   simparams->speed                = get_float_param("speed", 7);
+  simparams->speedVariation       = get_float_param("speedVariation", 0);
   simparams->turn_rate            = get_float_param("turnRate", 13);
+  simparams->offsetVariation        = get_float_param("turnOffsetVariation", 0);
+  simparams->slopeVariation        = get_float_param("turnSlopeVariation", 0);
   simparams->pushDisplacement     = get_float_param("pushDisplacement", 1.0); 
   simparams->distanceCoefficient  = get_float_param("distanceCoefficient", 1.0);
   simparams->displayX             = get_float_param("displayX", 0);
