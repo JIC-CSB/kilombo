@@ -43,7 +43,7 @@ Additionally, to compile the code for real kilobots as well, the following are n
 
 ### Debian-based Linux systems
 `sudo apt-get install build-essential git gcc-avr gdb-avr binutils-avr
-avr-libc avrdude libsdl1.2-dev libjansson-dev cmake check`
+avr-libc avrdude libsdl1.2-dev libjansson-dev libsubunit-dev cmake check`
 
 ### OSX systems
 
