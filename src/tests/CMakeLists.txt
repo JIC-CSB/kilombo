@@ -12,4 +12,9 @@ else(APPLE)
     target_link_libraries(check_skilobot check pthread rt m)
 endif()
 
+if(SUBUNIT_FOUND)
+    target_link_libraries(check_skilobot subunit)
+endif()
+
+
 add_test(check_skilobot check_skilobot)
