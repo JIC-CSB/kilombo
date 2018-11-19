@@ -32,8 +32,8 @@ uint16_t kilo_uid = 0;
  */
 uint8_t kilo_turn_left  = 75;
 uint8_t kilo_turn_right = 75;
-uint8_t kilo_straight_left = 7;
-uint8_t kilo_straight_right = 7;
+uint8_t kilo_straight_left = 75;
+uint8_t kilo_straight_right = 75;
 
 
 /* Each bot is required to call kilo_init.
