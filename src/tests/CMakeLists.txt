@@ -9,7 +9,7 @@ add_executable(check_skilobot check_skilobot.c ../skilobot.c ../kbapi.c ../neigh
 if(APPLE)
     target_link_libraries(check_skilobot check m)
 else(APPLE)
-    target_link_libraries(check_skilobot check pthread rt m)
+    target_link_libraries(check_skilobot check pthread subunit rt m)
 endif()
 
 if(SUBUNIT_FOUND)
